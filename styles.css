@@ -1,0 +1,293 @@
+/* Grundlegende Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-image: url('https://images.unsplash.com/photo-1542831371-d531d36971e6');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+header {
+    background: rgba(0, 0, 0, 0);
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+}
+
+header .logo .logo-img {
+    height: 40px;
+    width: auto;
+}
+
+/* Hamburger-Button */
+.menu-toggle {
+    display: none; /* Default hidden */
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+    background: transparent;
+    border: none;
+    z-index: 1001;
+    position: relative;
+}
+
+/* Navigation */
+header nav {
+    display: flex; /* Visible on larger screens */
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+header nav ul li {
+    margin-left: 20px;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+header nav ul li a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+}
+
+/* Dropdown-Menü */
+#nav-menu {
+    display: flex; /* Visible on larger screens */
+    z-index: 1000; /* Ensure the navigation stays below the hamburger icon */
+}
+
+#nav-menu ul {
+    display: flex;
+    list-style: none;
+}
+
+#nav-menu ul li {
+    margin-left: 20px;
+}
+
+#nav-menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+#nav-menu ul li a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+}
+
+/* Zentrierter Inhalt im Hauptteil */
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Inhalt zentrieren */
+.content-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.content-center h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.content-center p {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    display: inline-block;
+}
+
+/* Animationseffekt von oben nach unten */
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-center h1, .content-center p {
+    animation: slideInFromTop 1s ease-out;
+}
+
+/* Social Media Box auf der linken Seite mit Icons */
+.social-media {
+    position: fixed;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0);
+    padding: 10px;
+    border: none;
+    box-shadow: none;
+    text-align: center;
+}
+
+.social-media a {
+    display: block;
+    margin-bottom: 10px;
+    color: #fff;
+    font-size: 24px;
+}
+
+.social-media a:hover {
+    color: #007BFF;
+}
+
+/* Footer */
+footer {
+    background: rgba(51, 51, 51, 0.8);
+    color: #fff;
+    text-align: center;
+    padding: 15px 20px;
+    font-size: 14px;
+    border-top: 2px solid #007BFF;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    header {
+        flex-direction: row; /* Logo on the right, hamburger on the left */
+        justify-content: space-between;
+        padding: 10px 5px;
+    }
+
+    header .logo img {
+        height: 30px;
+    }
+
+    header nav {
+        display: none; /* Standardmäßig versteckt */
+    }
+
+    header .menu-toggle {
+        display: block; /* Hamburger-Button sichtbar */
+        z-index: 1001; /* Ensure the hamburger icon is above the nav menu */
+        position: relative;
+    }
+
+    /* Dropdown-Menü-Styling */
+    #nav-menu {
+        display: none; /* Sichtbar, wenn aktiv */
+        flex-direction: column;
+        width: 100%; /* Menü in voller Breite anzeigen */
+        position: absolute; /* Menü über dem Inhalt positionieren */
+        top: 60px; /* Unterhalb des Headers */
+        left: 0;
+        background: rgba(0, 0, 0, 0.8); /* Hintergrundfarbe für das Dropdown */
+        z-index: 999; /* Sicherstellen, dass das Menü über anderen Inhalten liegt */
+    }
+
+    #nav-menu ul {
+        display: flex;
+        flex-direction: column; /* Vertikale Ausrichtung der Links */
+        padding: 0;
+        margin: 0;
+    }
+
+    #nav-menu ul li {
+        margin: 0;
+        text-align: center; /* Zentrierter Text */
+    }
+
+    #nav-menu ul li a {
+        padding: 10px;
+        display: block; /* Links als Block anzeigen */
+        font-size: 18px; /* Größere Schrift für bessere Lesbarkeit */
+    }
+
+    .social-media {
+        position: static;
+        transform: none;
+        margin: 20px auto;
+        background: rgba(0, 0, 0, 0);
+        padding: 0;
+    }
+
+    .social-media a {
+        display: inline-block;
+        margin: 0 10px;
+        font-size: 20px;
+    }
+
+    footer {
+        padding: 10px;
+        font-size: 12px;
+        border-top: none;
+        box-shadow: none;
+    }
+}
+
+/* Hamburger Menü JavaScript-Styling */
+#nav-menu.active {
+    display: flex; /* Show the menu when active */
+    flex-direction: column; /* Ensure vertical alignment of items in the menu */
+    width: 100%; /* Full-width for mobile screens */
+    position: absolute; /* Position above other content */
+    top: 60px; /* Adjust as needed */
+    left: 0;
+    background: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    z-index: 999; /* Ensure it's on top */
+}
