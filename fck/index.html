@@ -211,7 +211,8 @@
                     listItem.innerHTML = `
                         <span>
                             <img src="${getTeamLogo(match.teams.home.name)}" alt="${match.teams.home.name}" class="team-logo">
-                            ${match.teams.home.name} ${match.score.fulltime.home} - ${match.score.fulltime.away}
+                            ${match.teams.home.name} 
+                            <span style="color: #e30613; font-weight: bold;">${match.score.fulltime.home} - ${match.score.fulltime.away}</span>
                             <img src="${getTeamLogo(match.teams.away.name)}" alt="${match.teams.away.name}" class="team-logo">
                             ${match.teams.away.name}
                         </span>
