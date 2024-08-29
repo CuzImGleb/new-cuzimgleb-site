@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #121212; /* Dunkler Hintergrund */
-            color: #e0e0e0; /* Helle Schriftfarbe */
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text color */
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,76 +16,90 @@
             align-items: center;
             justify-content: center;
         }
-
+    
         .container {
             width: 80%;
             max-width: 1200px;
             margin-top: 20px;
         }
-
+    
         .header {
             text-align: center;
-            background-color: #1f1f1f; /* Dunkleres Grau */
+            background-color: #1f1f1f; /* Darker grey */
             color: #e0e0e0;
             padding: 20px;
             border-radius: 10px;
         }
-
+    
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
-
+    
         .box {
-            background-color: #1f1f1f; /* Dunkles Grau */
+            background-color: #1f1f1f; /* Dark grey */
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            align-items: stretch;
             text-align: center;
         }
-
+    
         .box h2 {
             margin-top: 0;
-            color: #e30613; /* Rote Akzentfarbe */
+            margin-bottom: 10px;
+            color: #e30613; /* Red accent color */
+            background-color: #2c2c2c; /* Slightly lighter dark grey */
+            padding: 10px;
+            border-radius: 5px;
+            flex-shrink: 0; /* Prevent shrinking */
         }
-
+    
         .matches, .upcoming {
             list-style: none;
             padding: 0;
             margin: 0;
+            flex-grow: 1; /* Ensure it fills the remaining space */
         }
-
+    
         .matches li, .upcoming li {
-            background-color: #2c2c2c; /* Etwas helleres Dunkelgrau */
+            background-color: #2c2c2c; /* Slightly lighter dark grey */
             margin: 10px 0;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             display: flex;
             justify-content: space-between;
+            align-items: center; /* Aligns items vertically */
         }
 
+        .team-logo {
+            width: 20px; /* Adjust the size as needed */
+            height: auto;
+            vertical-align: middle;
+        }
+    
         .matches span, .upcoming span {
-            color: #e0e0e0; /* Helle Schriftfarbe für die Liste */
+            color: #e0e0e0; /* Light text color for the list */
+            font-size: 14px;
         }
-
+    
         .footer {
             margin-top: 20px;
             text-align: center;
             font-size: 0.8em;
             color: #e0e0e0;
         }
-
+    
         .stats {
-            font-size: 3em; /* Größere Schriftgröße für die Zahl */
+            font-size: 3em; /* Larger font size for the number */
             font-weight: bold;
-            color: #ffffff; /* Weiße Farbe */
-            margin: 20px 0; /* Abstand oben und unten */
+            color: #ffffff; /* White color */
+            margin: 20px 0; /* Margin top and bottom */
+            flex-grow: 1; /* Ensure it fills the remaining space */
         }
     </style>
 </head>
@@ -127,65 +141,113 @@
     </div>
 
     <script>
-        // JavaScript zum Abrufen der Daten von der API und Einfügen in die Seite
         async function fetchData() {
-            const apiKey = 'f4bbf5e4c38c4ba2801ce2ebbbf8e428';  // Hier den API-Schlüssel einfügen
-            const teamId = '4'; // Team-ID für 1. FC Kaiserslautern
-            const matchesUrl = `https://api.football-data.org/v2/teams/${teamId}/matches?status=FINISHED`;
-            const upcomingUrl = `https://api.football-data.org/v2/teams/${teamId}/matches?status=SCHEDULED`;
-
-            try {
-                // Abrufen der vergangenen Spiele
-                const matchesResponse = await fetch(matchesUrl, {
-                    headers: { 'X-Auth-Token': apiKey }
+            const apiKey = '0fefdd9487b80a05774c2410377eaa50';
+            const teamId = 745;
+            const season = 2024;
+            
+            const leagues = [79, 81];
+    
+            const matchesData = [];
+            const upcomingData = [];
+    
+            // Funktion zum Abrufen der Daten für eine bestimmte Liga
+            async function fetchLeagueData(leagueId, status) {
+                const url = `https://v3.football.api-sports.io/fixtures?team=${teamId}&season=${season}&status=${status}&league=${leagueId}`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 
+                        'x-apisports-key': apiKey,
+                    }
                 });
-                if (!matchesResponse.ok) throw new Error(`HTTP error! Status: ${matchesResponse.status}`);
-                const matchesData = await matchesResponse.json();
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return await response.json();
+            }
+
+            // Function to format the team name for the logo filename
+            function getTeamLogo(teamName) {
+                const specialCharsMap = {
+                    'ä': 'ae',
+                    'ö': 'oe',
+                    'ü': 'ue',
+                    'ß': 'ss',
+                    'Ä': 'Ae',
+                    'Ö': 'Oe',
+                    'Ü': 'Ue'
+                };
                 
-                // Abrufen der nächsten Spiele
-                const upcomingResponse = await fetch(upcomingUrl, {
-                    headers: { 'X-Auth-Token': apiKey }
-                });
-                if (!upcomingResponse.ok) throw new Error(`HTTP error! Status: ${upcomingResponse.status}`);
-                const upcomingData = await upcomingResponse.json();
+                const formattedName = teamName.replace(/\s+/g, '_') // Replace spaces with underscores
+                    .replace(/[äöüßÄÖÜ]/g, char => specialCharsMap[char]); // Replace special characters
 
+                return `logos/${formattedName}.png`; // Path to the logo directory
+            }
+    
+            try {
+                // Daten für jede Liga abrufen
+                for (const leagueId of leagues) {
+                    const matchesResponse = await fetchLeagueData(leagueId, 'FT');
+                    matchesData.push(...matchesResponse.response);
+    
+                    const upcomingResponse = await fetchLeagueData(leagueId, 'NS');
+                    upcomingData.push(...upcomingResponse.response);
+                }
+    
+                // Spiele nach Datum sortieren (Vergangene Spiele)
+                matchesData.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
+                // Nächste Spiele sortieren
+                upcomingData.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
+    
                 // Update der ungeschlagenen Spiele
-                const unstoppableCount = matchesData.matches.filter(match =>
-                    (match.homeTeam.name === '1. FC Kaiserslautern' && match.score.fullTime.homeTeam > match.score.fullTime.awayTeam) ||
-                    (match.awayTeam.name === '1. FC Kaiserslautern' && match.score.fullTime.awayTeam > match.score.fullTime.homeTeam)
+                const unstoppableCount = matchesData.filter(match =>
+                    (match.teams.home.name === '1. FC Kaiserslautern' && match.score.fulltime.home >= match.score.fulltime.away) ||
+                    (match.teams.away.name === '1. FC Kaiserslautern' && match.score.fulltime.away >= match.score.fulltime.home)
                 ).length;
                 document.getElementById('unstoppable-count').innerText = unstoppableCount;
-
+        
                 // Update der vergangenen Spiele
                 const matchesList = document.getElementById('matches-list');
-                matchesData.matches.forEach(match => {
+                matchesData.forEach(match => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        <span>${match.homeTeam.name} ${match.score.fullTime.homeTeam} - ${match.score.fullTime.awayTeam} ${match.awayTeam.name}</span>
-                        <span>${new Date(match.utcDate).toLocaleDateString()}</span>
+                        <span>
+                            <img src="${getTeamLogo(match.teams.home.name)}" alt="${match.teams.home.name}" class="team-logo">
+                            ${match.teams.home.name} ${match.score.fulltime.home} - ${match.score.fulltime.away}
+                            <img src="${getTeamLogo(match.teams.away.name)}" alt="${match.teams.away.name}" class="team-logo">
+                            ${match.teams.away.name}
+                        </span>
+                        <span>${new Date(match.fixture.date).toLocaleDateString()}</span>
                     `;
                     matchesList.appendChild(listItem);
                 });
-
+        
                 // Update der nächsten Spiele
                 const upcomingList = document.getElementById('upcoming-list');
-                upcomingData.matches.forEach(match => {
+                upcomingData.forEach(match => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        <span>${match.homeTeam.name} vs ${match.awayTeam.name}</span>
-                        <span>${new Date(match.utcDate).toLocaleDateString()}</span>
+                        <span>
+                            <img src="${getTeamLogo(match.teams.home.name)}" alt="${match.teams.home.name}" class="team-logo">
+                            ${match.teams.home.name} vs 
+                            <img src="${getTeamLogo(match.teams.away.name)}" alt="${match.teams.away.name}" class="team-logo">
+                            ${match.teams.away.name}
+                        </span>
+                        <span>${new Date(match.fixture.date).toLocaleDateString()}</span>
                     `;
                     upcomingList.appendChild(listItem);
                 });
+        
+                // Console log after all data has been successfully fetched and updated
+                console.log('Alle Daten wurden erfolgreich abgerufen und die Seite wurde aktualisiert.');
+        
             } catch (error) {
                 console.error('Fehler beim Abrufen der Daten:', error);
                 // Hier können Sie eine Benutzerfreundliche Fehlermeldung anzeigen
             }
         }
-
+        
         // Abrufen der Daten beim Laden der Seite
         fetchData();
     </script>
-
+    
 </body>
 </html>
