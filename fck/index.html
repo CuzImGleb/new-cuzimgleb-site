@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/svg+xml">
     <title>1. FC Kaiserslautern - Dashboard</title>
     <style>
         body {
@@ -69,7 +70,34 @@
             grid-column: 1 / 2; /* Span the first column */
             grid-row: 1 / 2; /* Span the first row */
             justify-content: flex-start;
-            align-items: center;
+        }
+
+        #league-table-box ul {
+            list-style: none; /* Remove default list styling */
+            padding: 0;
+            margin: 0;
+        }
+
+        #league-table-box li {
+            display: flex; /* Use flexbox for proper alignment */
+            align-items: center; /* Center align items vertically */
+            padding: 5px 0; /* Add some padding for spacing */
+        }
+
+        #league-table-box li img {
+            margin-right: 8px; /* Add space between the logo and the text */
+            width: 20px; /* Adjust the size of the logos */
+            height: auto;
+        }
+
+        #league-table-box li span {
+            flex-grow: 1; /* Allow the span to take up the remaining space */
+        }
+
+        #league-table-box li:nth-child(odd) {
+            background-color: #2c2c2c; /* Alternate background color for readability */
+            border-radius: 5px;
+            padding-left: 8px; /* Adjust padding for alternating rows */
         }
     
         /* Top Middle: Next match */
@@ -197,13 +225,6 @@
             <!-- Top Left: League table -->
             <div class="box" id="league-table-box">
                 <h2>Ligatabelle</h2>
-                <!-- Placeholder content for league table -->
-                <ul>
-                    <li>1. Team A - 35 Punkte</li>
-                    <li>2. Team B - 34 Punkte</li>
-                    <li>3. Team C - 33 Punkte</li>
-                    <!-- More teams... -->
-                </ul>
             </div>
 
             <!-- Top Middle: Next match -->
@@ -252,15 +273,14 @@
 
     <script>
         async function fetchData() {
-            const apiKey = '956396358d6241c25ad2b095cc2b58d3';
+            const apiKey = '38ecb33bc1483aaf9b07f00b150ccbd5';
             const teamId = 745;
             const season = 2024;
-            
             const leagues = [79, 81];
-    
+
             const matchesData = [];
             const upcomingData = [];
-    
+
             // Function to fetch data for a specific league
             async function fetchLeagueData(leagueId, status) {
                 const url = `https://v3.football.api-sports.io/fixtures?team=${teamId}&season=${season}&status=${status}&league=${leagueId}`;
@@ -273,7 +293,20 @@
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 return await response.json();
             }
-    
+
+            // Function to fetch standings data for a specific league
+            async function fetchStandings(leagueId) {
+                const url = `https://v3.football.api-sports.io/standings?league=${leagueId}&season=${season}`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 
+                        'x-apisports-key': apiKey,
+                    }
+                });
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return await response.json();
+            }
+
             // Function to format the team name for the logo filename
             function getTeamLogo(teamName) {
                 const specialCharsMap = {
@@ -288,32 +321,45 @@
                 
                 const formattedName = teamName.replace(/\s+/g, '_') // Replace spaces with underscores
                     .replace(/[äöüßÄÖÜ]/g, char => specialCharsMap[char]); // Replace special characters
-    
+
                 return `logos/${formattedName}.png`; // Path to the logo directory
             }
-    
+
             try {
-                // Fetch data for each league
+                // Fetch standings data for each league
+                const standingsData = await fetchStandings(leagues[0]); // Assuming you want to show the first league standings
+
+                // Update the league table
+                const leagueTableBox = document.getElementById('league-table-box');
+                const standings = standingsData.response[0].league.standings[0]; // Assuming first group of standings
+                leagueTableBox.innerHTML += '<ul>' + standings.map(team => 
+                    `<li>
+                        <img src="${getTeamLogo(team.team.name)}" alt="${team.team.name}" class="team-logo">
+                        ${team.rank}. ${team.team.name} - ${team.points} Punkte
+                    </li>`
+                ).join('') + '</ul>';
+
+                // Fetch data for each league (matches and upcoming games)
                 for (const leagueId of leagues) {
                     const matchesResponse = await fetchLeagueData(leagueId, 'FT');
                     matchesData.push(...matchesResponse.response);
-    
+
                     const upcomingResponse = await fetchLeagueData(leagueId, 'NS');
                     upcomingData.push(...upcomingResponse.response);
                 }
-    
+
                 // Sort matches by date (Past matches)
                 matchesData.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
                 // Sort upcoming matches
                 upcomingData.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
-    
+
                 // Update unbeaten matches
                 const unstoppableCount = matchesData.filter(match =>
                     (match.teams.home.name === '1. FC Kaiserslautern' && match.score.fulltime.home >= match.score.fulltime.away) ||
                     (match.teams.away.name === '1. FC Kaiserslautern' && match.score.fulltime.away >= match.score.fulltime.home)
                 ).length;
                 document.getElementById('unstoppable-count').innerText = unstoppableCount;
-    
+
                 // Update last matches
                 const matchesList = document.getElementById('matches-list');
                 const lastMatches = matchesData.slice(-5); // Get the last 5 matches
@@ -330,7 +376,7 @@
                         <span>${new Date(match.fixture.date).toLocaleDateString()}</span>`;
                     matchesList.appendChild(listItem);
                 });
-    
+
                 // Update upcoming matches
                 const upcomingList = document.getElementById('upcoming-list');
                 upcomingData.forEach(match => {
@@ -344,7 +390,7 @@
                         <span>${new Date(match.fixture.date).toLocaleDateString()}</span>`;
                     upcomingList.appendChild(listItem);
                 });
-    
+
                 // Update the next match (Top Middle)
                 const nextMatch = upcomingData[0];
                 document.querySelector('#next-match-box .team-logo-large:nth-child(1)').src = getTeamLogo(nextMatch.teams.home.name);
@@ -352,12 +398,12 @@
                 document.querySelector('#next-match-box .team-logo-large:nth-child(3)').src = getTeamLogo(nextMatch.teams.away.name);
                 document.querySelector('#next-match-box .team-logo-large:nth-child(3)').alt = nextMatch.teams.away.name;
                 document.querySelector('#next-match-box .match-date').innerText = new Date(nextMatch.fixture.date).toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         }
-    
+
         fetchData();
     </script>
 </body>
