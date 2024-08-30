@@ -72,44 +72,65 @@
             display: block;
             height: auto;
             margin-left: auto;
-            margin-right: auto; /* Centers the table horizontally */
-            width: 90%; /* Adjust this value to control the table's width */
-            max-width: 500px; /* Limits the table's maximum width */
+            margin-right: auto;
+            width: 90%;
+            max-width: 500px;
         }
 
         #league-table-box tr:nth-child(odd) {
-            background-color: #444; /* Dunkelgrau */
+            background-color: #444;
         }
 
         #league-table-list {
             width: 100%;
-            border-collapse: collapse; /* Verhindert doppelte Ränder */
+            border-collapse: collapse;
         }
 
         #league-table-list th, #league-table-list td {
             padding: 8px;
-            border: 1px solid #666; /* Optional: Dünner Rand um die Zellen */
+            border: 1px solid #666;
             text-align: left;
         }
 
         #league-table-list th {
-            background-color: #333; /* Dunkler Hintergrund für die Kopfzeile */
-            color: #ffffff; /* Rote Schriftfarbe für die Kopfzeile */
+            background-color: #333;
+            color: #ffffff;
         }
 
         #league-table-box tr:nth-child(even) {
-            background-color: #555; /* Grau */
+            background-color: #555;
         }
 
         #league-table-box table {
-            width: 100%; /* Die Tabelle nimmt die volle Breite des Containers ein */
-            border-spacing: 0; /* Kein zusätzlicher Platz zwischen den Zellen */
+            width: 100%;
+            border-spacing: 0;
         }
 
         #league-table-box td {
             padding: 2px;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
+        }
+
+        /* Highlighting for positions 1 and 2 (Promotion - Green) */
+        .promotion {
+            background-color: #138f30c0 !important;
+            color: #ffffff !important;
+            font-weight: bold !important;
+        }
+
+        /* Highlighting for positions 3 and 16 (Relegation Play-offs - Yellow) */
+        .relegation-playoff {
+            background-color: #ffc107b4 !important;
+            color: #000000 !important;
+            font-weight: bold !important;
+        }
+
+        /* Highlighting for positions 17 and 18 (Relegation - Red) */
+        .relegation {
+            background-color: #dc3545 !important;
+            color: #ffffff !important;
+            font-weight: bold !important;
         }
 
         #league-table-box td img.team-logo-small {
@@ -119,9 +140,9 @@
         }
         
         .fck-highlight {
-            background-color: #e30613 !important; /* Rote Hintergrundfarbe */
-            color: #ffffff !important; /* Weiße Schriftfarbe */
-            font-weight: bold !important; /* Fett gedruckter Text */
+            background-color: #e30613 !important;
+            color: #ffffff !important;
+            font-weight: bold !important;
         }
         #next-match-box {
             background-color: #2c2c2c;
@@ -167,22 +188,22 @@
             border: 1px solid #e30613;
         }
         .upcoming li span:last-child {
-            margin-left: 5px; /* Adjust this value as needed */
-            margin-right: 5px; /* Adjust this value as needed */
+            margin-left: 5px;
+            margin-right: 5px;
             font-size: 0.7em;
         }
 
         .upcoming li span {
-            margin-left: 5px; /* Adjust this value as needed */
-            margin-right: 5px; /* Adjust this value as needed */
+            margin-left: 5px;
+            margin-right: 5px;
             font-size: 0.8em;
         }
         .matches li span {
             flex: 1;
             text-align: center;
-            margin-left: 5px; /* Increase space between logo and text */
-            margin-right: 5px; /* Increase space between text and logo */
-            font-size: 0.8em; /* Reduce the font size of the team names */
+            margin-left: 5px;
+            margin-right: 5px;
+            font-size: 0.8em;
         }
         .match-result {
             color: red;
@@ -319,7 +340,6 @@
 
         function updateLeagueTable() {
             console.log("Fetching Bundesliga table...");
-
             fetch('https://corsproxy.io/?https://api.openligadb.de/getbltable/bl2/2024')
                 .then(response => response.json())
                 .then(tableData => {
@@ -334,13 +354,23 @@
                     tableData.forEach((team, index) => {
                         const row = document.createElement("tr");
 
+                        // Add highlight class based on the team's position
+                        const position = index + 1;
+                        if (position === 1 || position === 2) {
+                            row.classList.add("promotion");
+                        } else if (position === 3 || position === 16) {
+                            row.classList.add("relegation-playoff");
+                        } else if (position === 17 || position === 18) {
+                            row.classList.add("relegation");
+                        }
+
                         // Add highlight class if the team is FCK
                         if (team.teamName.toLowerCase() === "1. fc kaiserslautern") {
                             row.classList.add("fck-highlight");
                         }
 
                         row.innerHTML = `
-                            <td>${index + 1}.</td> <!-- Platzierung -->
+                            <td>${position}.</td> <!-- Platzierung -->
                             <td><img class="team-logo-small" src="${team.teamIconUrl}" alt="${team.teamName}"> ${team.teamName}</td>
                             <td>${team.points} Punkte</td>
                         `;
