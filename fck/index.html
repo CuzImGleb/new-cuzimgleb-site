@@ -8,8 +8,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #121212; /* Dark background */
-            color: #e0e0e0; /* Light text color */
+            background-color: #121212;
+            color: #e0e0e0;
             margin: 0;
             padding: 0;
             display: flex;
@@ -17,38 +17,36 @@
             align-items: center;
             justify-content: center;
         }
-    
         .container {
             width: 90%;
             max-width: 1200px;
             margin-top: 20px;
         }
-    
         .header {
             text-align: center;
-            background-color: #1f1f1f; /* Darker grey */
+            background-color: #1f1f1f;
             color: #e0e0e0;
             padding: 20px;
             border-radius: 10px;
         }
-    
+
+        .header h1 {
+            color: #e30613;
+        }
+
         .dashboard {
             display: grid;
-            grid-template-columns: 1fr; /* Single column for mobile */
-            grid-template-rows: auto; /* Adapt rows based on content */
+            grid-template-columns: 1fr;
+            grid-template-rows: auto;
             gap: 20px;
             margin-top: 20px;
         }
-
-        /* Adjust grid for larger screens */
         @media (min-width: 768px) {
             .dashboard {
-                grid-template-columns: 1fr 2fr 1fr; /* Two smaller boxes on the sides and one large box in the middle */
-                grid-template-rows: 1fr 1fr; /* Two rows */
+                grid-template-columns: 1fr 2fr 1fr;
+                grid-template-rows: 1fr 1fr;
             }
         }
-
-        /* Box styling */
         .box {
             background-color: #1f1f1f;
             padding: 20px;
@@ -58,61 +56,78 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            min-height: 200px; /* Minimum height for each box */
+            min-height: 200px;
         }
-
         .box h2 {
             margin-top: 0;
             margin-bottom: 10px;
-            color: #e30613; /* Red accent color */
-            background-color: #2c2c2c; /* Slightly lighter dark grey */
+            color: #e30613;
+            background-color: #2c2c2c;
             text-align: center;
             font-size: 1.5em;
             padding: 10px;
             border-radius: 5px;
         }
-
-        /* Top Left: League table */
         #league-table-box {
-            justify-content: flex-start;
-        }
-
-        #league-table-box ul {
-            list-style: none; /* Remove default list styling */
-            padding: 0;
-            margin: 0;
-        }
-
-        #league-table-box li {
-            display: flex; /* Use flexbox for proper alignment */
-            align-items: center; /* Center align items vertically */
-            padding: 5px 0; /* Add some padding for spacing */
-        }
-
-        #league-table-box li img {
-            margin-right: 8px; /* Add space between the logo and the text */
-            width: 20px; /* Adjust the size of the logos */
+            display: block;
             height: auto;
+            margin-left: auto;
+            margin-right: auto; /* Centers the table horizontally */
+            width: 90%; /* Adjust this value to control the table's width */
+            max-width: 500px; /* Limits the table's maximum width */
         }
 
-        #league-table-box li span {
-            flex-grow: 1; /* Allow the span to take up the remaining space */
+        #league-table-box tr:nth-child(odd) {
+            background-color: #444; /* Dunkelgrau */
         }
 
-        #league-table-box li:nth-child(odd) {
-            background-color: #2c2c2c; /* Alternate background color for readability */
-            border-radius: 5px;
-            padding-left: 8px; /* Adjust padding for alternating rows */
+        #league-table-list {
+            width: 100%;
+            border-collapse: collapse; /* Verhindert doppelte Ränder */
         }
-    
-        /* Top Middle: Next match */
+
+        #league-table-list th, #league-table-list td {
+            padding: 8px;
+            border: 1px solid #666; /* Optional: Dünner Rand um die Zellen */
+            text-align: left;
+        }
+
+        #league-table-list th {
+            background-color: #333; /* Dunkler Hintergrund für die Kopfzeile */
+            color: #ffffff; /* Rote Schriftfarbe für die Kopfzeile */
+        }
+
+        #league-table-box tr:nth-child(even) {
+            background-color: #555; /* Grau */
+        }
+
+        #league-table-box table {
+            width: 100%; /* Die Tabelle nimmt die volle Breite des Containers ein */
+            border-spacing: 0; /* Kein zusätzlicher Platz zwischen den Zellen */
+        }
+
+        #league-table-box td {
+            padding: 2px;
+            color: white;
+            font-size: 14px;
+        }
+
+        #league-table-box td img.team-logo-small {
+            width: 15px;
+            height: auto;
+            vertical-align: middle;
+        }
+        
+        .fck-highlight {
+            background-color: #e30613 !important; /* Rote Hintergrundfarbe */
+            color: #ffffff !important; /* Weiße Schriftfarbe */
+            font-weight: bold !important; /* Fett gedruckter Text */
+        }
         #next-match-box {
-            background-color: #2c2c2c; /* Slightly lighter dark grey */
+            background-color: #2c2c2c;
             color: #ffffff;
             justify-content: center;
         }
-
-        /* Styling for the next match display */
         .match-teams {
             display: flex;
             justify-content: space-between;
@@ -120,86 +135,49 @@
             font-size: 2em;
             margin-bottom: 10px;
         }
-
         .team-logo-large {
-            width: 50px; /* Large team logo */
+            width: 50px;
             height: auto;
             vertical-align: middle;
         }
-
-        .team-logo {
-            width: 20px; /* Adjust the size as needed */
+        .team-logo-small {
+            width: 15px;
             height: auto;
             vertical-align: middle;
         }
-
         .match-date {
             font-size: 1.2em;
             margin-top: 10px;
             color: #e0e0e0;
         }
-
-        /* Top Right: Upcoming matches */
-        #upcoming-box {
-            justify-content: flex-start;
-        }
-
         .upcoming, .matches {
             list-style: none;
             padding: 0;
             margin: 0;
             width: 100%;
         }
-
         .upcoming li, .matches li {
-            background-color: #2c2c2c; /* Slightly lighter dark grey */
+            background-color: #2c2c2c;
             margin: 10px 0;
             padding: 8px;
             border-radius: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid #e30613; /* Red border */
+            border: 1px solid #e30613;
         }
-
         .matches li span {
-            flex: 1; /* Make spans take up equal space */
-            text-align: center; /* Center align text in spans */
+            flex: 1;
+            text-align: center;
         }
-
-        .matches li span:first-child {
-            text-align: left; /* Align the first span to the left */
-            margin-right: 10px; /* Add margin to the right */
-        }
-
-        .matches li span:last-child {
-            text-align: right; /* Align the last span to the right */
-            margin-left: 10px; /* Add margin to the left */
-        }
-
-        /* Bottom Left: Undefeated series */
-        #unstoppable-box {
-            color: #ffffff;
-            justify-content: flex-start;
-            align-items: center;
-        }
-
-        .stats {
-            font-size: 4em; /* Large font size for the number */
+        .match-result {
+            color: red;
             font-weight: bold;
         }
-
-        /* Bottom Middle: Free space */
-        #free-space-box {
-            background-color: #1f1f1f; /* Dark grey */
-            justify-content: center;
+        .stats {
+            font-size: 4em;
+            font-weight: bold;
         }
-
-        /* Bottom Right: Last games */
-        #last-match-box {
-            justify-content: flex-start;
-        }
-    
         .footer {
             margin-top: 20px;
             text-align: center;
@@ -217,23 +195,35 @@
         </div>
 
         <div class="dashboard">
-            <!-- Top Left: League table -->
+            <!-- League Table -->
             <div class="box" id="league-table-box">
-                <h2>Ligatabelle</h2>
+                <h2>2. Bundesliga Tabelle</h2>
+                <table id="league-table-list">
+                    <thead>
+                        <tr>
+                            <th>Platzierung</th>
+                            <th>Team</th>
+                            <th>Punkte</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Tabellenzeilen werden hier durch JavaScript eingefügt -->
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Top Middle: Next match -->
+            <!-- Next Match -->
             <div class="box" id="next-match-box">
                 <h2>Nächstes Spiel</h2>
                 <div class="match-teams">
-                    <img src="logos/team1.png" alt="Team 1" class="team-logo-large">
+                    <img src="logos/default.png" alt="Team 1" class="team-logo-large">
                     <span>vs</span>
-                    <img src="logos/team2.png" alt="Team 2" class="team-logo-large">
+                    <img src="logos/default.png" alt="Team 2" class="team-logo-large">
                 </div>
                 <p class="match-date">-/-</p>
             </div>
 
-            <!-- Top Right: Upcoming matches -->
+            <!-- Upcoming Matches -->
             <div class="box" id="upcoming-box">
                 <h2>Nächste Spiele</h2>
                 <ul class="upcoming" id="upcoming-list">
@@ -241,165 +231,226 @@
                 </ul>
             </div>
 
-            <!-- Bottom Left: Undefeated series -->
+            <!-- Undefeated Series -->
             <div class="box" id="unstoppable-box">
                 <h2>Ungeschlagene Spiele</h2>
-                <p class="stats" id="unstoppable-count">0</p>
+                <p class="stats" id="unstoppable-stats">0</p>
             </div>
 
-            <!-- Bottom Middle: Free space -->
+            <!-- Free Space -->
             <div class="box" id="free-space-box">
-                <!-- Free space -->
             </div>
 
-            <!-- Bottom Right: Last games -->
+            <!-- Last Matches -->
             <div class="box" id="last-match-box">
-                <h2>Letzte Spiele</h2>
-                <ul class="matches" id="matches-list">
-                    <!-- Last games will be dynamically inserted here -->
+                <h2>Vergangene Spiele</h2>
+                <ul class="matches" id="last-match-list">
+                    <!-- Last matches will be dynamically inserted here -->
                 </ul>
             </div>
         </div>
 
         <div class="footer">
-            <p>Diese Seite verwendet eine API, um die neuesten Spiele und Ergebnisse des 1. FC Kaiserslautern anzuzeigen.</p>
+            <p>&copy; 2024 1. FC Kaiserslautern Dashboard. All rights reserved.</p>
         </div>
     </div>
 
     <script>
-        async function fetchData() {
-            const apiKey = '38ecb33bc1483aaf9b07f00b150ccbd5';
-            const teamId = 745;
-            const season = 2024;
-            const leagues = [79, 81];
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("Document loaded, fetching match data...");
 
-            const matchesData = [];
-            const upcomingData = [];
+            // Fetch match data from the OpenLigaDB API
+            fetch('https://cors-anywhere.herokuapp.com/https://www.openligadb.de/api/getmatchdata/bl2/2024')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Parsed JSON data:", data);
+                    updateDashboard(data);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
 
-            // Function to fetch data for a specific league
-            async function fetchLeagueData(leagueId, status) {
-                const url = `https://v3.football.api-sports.io/fixtures?team=${teamId}&season=${season}&status=${status}&league=${leagueId}`;
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: { 
-                        'x-apisports-key': apiKey,
+        function updateDashboard(bl2Data) {
+            console.log("Filtering matches involving 1. FC Kaiserslautern in the 2. Bundesliga...");
+            const fckBL2Matches = bl2Data.filter(match => 
+                match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" || 
+                match.team2.teamName.toLowerCase() === "1. fc kaiserslautern"
+            );
+
+            fetch('https://cors-anywhere.herokuapp.com/https://api.openligadb.de/getmatchdata/dfb/2024')
+                .then(response => response.json())
+                .then(dfbData => {
+                    console.log("Filtering matches involving 1. FC Kaiserslautern in the DFB Pokal...");
+                    const fckDFBMatches = dfbData.filter(match => 
+                        match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" || 
+                        match.team2.teamName.toLowerCase() === "1. fc kaiserslautern"
+                    );
+
+                    // Combine Bundesliga and DFB Pokal matches
+                    const fckMatches = [...fckBL2Matches, ...fckDFBMatches];
+                    console.log("Combined FCK matches:", fckMatches);
+
+                    if (fckMatches.length > 0) {
+                        updateLeagueTable();
+                        updateNextMatch(fckMatches);
+                        updateUpcomingMatches(fckMatches);
+                        updateLastMatches(fckMatches);
+                        updateUndefeatedSeries(fckMatches);
+                    } else {
+                        console.error("No matches found for 1. FC Kaiserslautern.");
                     }
-                });
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return await response.json();
-            }
+                })
+                .catch(error => console.error('Error fetching DFB Pokal data:', error));
+        }
 
-            // Function to fetch standings data for a specific league
-            async function fetchStandings(leagueId) {
-                const url = `https://v3.football.api-sports.io/standings?league=${leagueId}&season=${season}`;
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: { 
-                        'x-apisports-key': apiKey,
-                    }
-                });
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return await response.json();
-            }
+        function updateLeagueTable() {
+            console.log("Fetching Bundesliga table...");
 
-            // Function to format the team name for the logo filename
-            function getTeamLogo(teamName) {
-                const specialCharsMap = {
-                    'ä': 'ae',
-                    'ö': 'oe',
-                    'ü': 'ue',
-                    'ß': 'ss',
-                    'Ä': 'Ae',
-                    'Ö': 'Oe',
-                    'Ü': 'Ue'
-                };
-                
-                const formattedName = teamName.replace(/\s+/g, '_') // Replace spaces with underscores
-                    .replace(/[äöüßÄÖÜ]/g, char => specialCharsMap[char]); // Replace special characters
+            fetch('https://cors-anywhere.herokuapp.com/https://api.openligadb.de/getbltable/bl2/2024')
+                .then(response => response.json())
+                .then(tableData => {
+                    console.log("Bundesliga table data:", tableData);
 
-                return `logos/${formattedName}.png`; // Path to the logo directory
-            }
+                    const tableBody = document.querySelector("#league-table-list tbody");
 
-            try {
-                // Fetch standings data for each league
-                const standingsData = await fetchStandings(leagues[0]); // Assuming you want to show the first league standings
+                    // Clear any existing table rows
+                    tableBody.innerHTML = '';
 
-                // Update the league table
-                const leagueTableBox = document.getElementById('league-table-box');
-                const standings = standingsData.response[0].league.standings[0]; // Assuming first group of standings
-                leagueTableBox.innerHTML += '<ul>' + standings.map(team => 
-                    `<li>
-                        <img src="${getTeamLogo(team.team.name)}" alt="${team.team.name}" class="team-logo">
-                        ${team.rank}. ${team.team.name} - ${team.points} Punkte
-                    </li>`
-                ).join('') + '</ul>';
+                    // Iterate over the tableData and create rows for each team
+                    tableData.forEach((team, index) => {
+                        const row = document.createElement("tr");
 
-                // Fetch data for each league (matches and upcoming games)
-                for (const leagueId of leagues) {
-                    const matchesResponse = await fetchLeagueData(leagueId, 'FT');
-                    matchesData.push(...matchesResponse.response);
+                        // Add highlight class if the team is FCK
+                        if (team.teamName.toLowerCase() === "1. fc kaiserslautern") {
+                            row.classList.add("fck-highlight");
+                        }
 
-                    const upcomingResponse = await fetchLeagueData(leagueId, 'NS');
-                    upcomingData.push(...upcomingResponse.response);
-                }
+                        row.innerHTML = `
+                            <td>${index + 1}.</td> <!-- Platzierung -->
+                            <td><img class="team-logo-small" src="${team.teamIconUrl}" alt="${team.teamName}"> ${team.teamName}</td>
+                            <td>${team.points} Punkte</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching Bundesliga table:', error));
+        }
 
-                // Sort matches by date (Past matches)
-                matchesData.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
-                // Sort upcoming matches
-                upcomingData.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
+        function updateNextMatch(matches) {
+            console.log("Updating next match information...");
 
-                // Update unbeaten matches
-                const unstoppableCount = matchesData.filter(match =>
-                    (match.teams.home.name === '1. FC Kaiserslautern' && match.score.fulltime.home >= match.score.fulltime.away) ||
-                    (match.teams.away.name === '1. FC Kaiserslautern' && match.score.fulltime.away >= match.score.fulltime.home)
-                ).length;
-                document.getElementById('unstoppable-count').innerText = unstoppableCount;
+            const nextMatch = matches.find(match => !match.matchIsFinished);
 
-                // Update last matches
-                const matchesList = document.getElementById('matches-list');
-                const lastMatches = matchesData.slice(-5); // Get the last 5 matches
-                lastMatches.forEach(match => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = 
-                        `<span>
-                            <img src="${getTeamLogo(match.teams.home.name)}" alt="${match.teams.home.name}" class="team-logo">
-                            ${match.teams.home.name} 
-                            <span style="color: #e30613; font-weight: bold;">${match.score.fulltime.home} - ${match.score.fulltime.away}</span>
-                            <img src="${getTeamLogo(match.teams.away.name)}" alt="${match.teams.away.name}" class="team-logo">
-                            ${match.teams.away.name}
-                        </span>
-                        <span>${new Date(match.fixture.date).toLocaleDateString()}</span>`;
-                    matchesList.appendChild(listItem);
-                });
+            if (nextMatch) {
+                const team1 = nextMatch.team1.teamName;
+                const team2 = nextMatch.team2.teamName;
+                const matchDate = new Date(nextMatch.matchDateTime);
 
-                // Update upcoming matches
-                const upcomingList = document.getElementById('upcoming-list');
-                upcomingData.forEach(match => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = 
-                        `<span>
-                            <img src="${getTeamLogo(match.teams.home.name)}" alt="${match.teams.home.name}" class="team-logo">
-                            ${match.teams.home.name} vs ${match.teams.away.name}
-                            <img src="${getTeamLogo(match.teams.away.name)}" alt="${match.teams.away.name}" class="team-logo">
-                        </span>
-                        <span>${new Date(match.fixture.date).toLocaleDateString()}</span>`;
-                    upcomingList.appendChild(listItem);
-                });
+                // Use the URLs provided by the API for the team logos
+                document.querySelector("#next-match-box .team-logo-large").src = nextMatch.team1.teamIconUrl;
+                document.querySelector("#next-match-box .match-teams img[alt='Team 2']").src = nextMatch.team2.teamIconUrl;
 
-                // Update the next match (Top Middle)
-                const nextMatch = upcomingData[0];
-                document.querySelector('#next-match-box .team-logo-large:nth-child(1)').src = getTeamLogo(nextMatch.teams.home.name);
-                document.querySelector('#next-match-box .team-logo-large:nth-child(1)').alt = nextMatch.teams.home.name;
-                document.querySelector('#next-match-box .team-logo-large:nth-child(3)').src = getTeamLogo(nextMatch.teams.away.name);
-                document.querySelector('#next-match-box .team-logo-large:nth-child(3)').alt = nextMatch.teams.away.name;
-                document.querySelector('#next-match-box .match-date').innerText = new Date(nextMatch.fixture.date).toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                // Format the date and time in the desired format
+                const options = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+                const formattedDate = matchDate.toLocaleDateString('de-DE', options);
 
-            } catch (error) {
-                console.error('Error fetching data:', error);
+                // Replace the default comma separator with "um"
+                const formattedDateTime = formattedDate.replace(',', ' um');
+
+                // Set the formatted date and time
+                document.querySelector("#next-match-box .match-date").textContent = formattedDateTime;
+            } else {
+                console.warn("No upcoming matches found.");
             }
         }
 
-        fetchData();
+        function updateUpcomingMatches(matches) {
+            console.log("Updating upcoming matches...");
+
+            const upcomingList = document.getElementById("upcoming-list");
+
+            // Clear any existing match items
+            upcomingList.innerHTML = '';
+
+            const upcomingMatches = matches.filter(match => !match.matchIsFinished);
+
+            // Sort by date to show the nearest upcoming matches
+            upcomingMatches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
+
+            // Limit to the next 7 matches
+            upcomingMatches.slice(0, 7).forEach(match => {
+                const team1 = match.team1.teamName;
+                const team2 = match.team2.teamName;
+                const matchDate = new Date(match.matchDateTime);
+                
+                // Format the date without the time
+                const formattedDate = matchDate.toLocaleDateString('de-DE', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric' 
+                });
+
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <img class="team-logo-small" src="${match.team1.teamIconUrl}" alt="${team1}">
+                    <span>${team1} vs ${team2}</span>
+                    <img class="team-logo-small" src="${match.team2.teamIconUrl}" alt="${team2}">
+                    <span>${formattedDate}</span>
+                `;
+                upcomingList.appendChild(li);
+            });
+        }
+
+        function updateLastMatches(matches) {
+            console.log("Updating last matches...");
+
+            const lastMatchList = document.getElementById("last-match-list");
+
+            // Clear any existing match items
+            lastMatchList.innerHTML = '';
+
+            const lastMatches = matches.filter(match => match.matchIsFinished);
+
+            // Sort by date to show the most recent matches first
+            lastMatches.sort((a, b) => new Date(b.matchDateTime) - new Date(a.matchDateTime));
+
+            // Limit to the last 7 matches
+            lastMatches.slice(0, 7).forEach(match => {
+                const team1 = match.team1.teamName;
+                const team2 = match.team2.teamName;
+                const team1Goals = match.matchResults[1].pointsTeam1;
+                const team2Goals = match.matchResults[1].pointsTeam2;
+
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <img class="team-logo-small" src="${match.team1.teamIconUrl}" alt="${team1}">
+                    <span>${team1}</span>
+                    <span class="match-result">${team1Goals} - ${team2Goals}</span>
+                    <span>${team2}</span>
+                    <img class="team-logo-small" src="${match.team2.teamIconUrl}" alt="${team2}">
+                `;
+                lastMatchList.appendChild(li);
+            });
+        }
+
+        function updateUndefeatedSeries(matches) {
+            console.log("Calculating undefeated series...");
+
+            const undefeatedSeries = matches.reduce((count, match) => {
+                if (match.matchIsFinished) {
+                    const team1Goals = match.matchResults[1].pointsTeam1;
+                    const team2Goals = match.matchResults[1].pointsTeam2;
+                    const isFCK = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern";
+
+                    // Bedingung für ungeschlagen: Sieg oder Unentschieden
+                    if ((isFCK && team1Goals >= team2Goals) || (!isFCK && team2Goals >= team1Goals)) {
+                        return count + 1;
+                    }
+                }
+                return count;
+            }, 0);
+
+            document.getElementById("unstoppable-stats").textContent = undefeatedSeries;
+        }
     </script>
 </body>
 </html>
