@@ -166,13 +166,28 @@
             align-items: center;
             border: 1px solid #e30613;
         }
+        .upcoming li span:last-child {
+            margin-left: 5px; /* Adjust this value as needed */
+            margin-right: 5px; /* Adjust this value as needed */
+            font-size: 0.7em;
+        }
+
+        .upcoming li span {
+            margin-left: 5px; /* Adjust this value as needed */
+            margin-right: 5px; /* Adjust this value as needed */
+            font-size: 0.8em;
+        }
         .matches li span {
             flex: 1;
             text-align: center;
+            margin-left: 5px; /* Increase space between logo and text */
+            margin-right: 5px; /* Increase space between text and logo */
+            font-size: 0.8em; /* Reduce the font size of the team names */
         }
         .match-result {
             color: red;
             font-weight: bold;
+            font-size: 0.7em;
         }
         .stats {
             font-size: 4em;
@@ -216,9 +231,9 @@
             <div class="box" id="next-match-box">
                 <h2>Nächstes Spiel</h2>
                 <div class="match-teams">
-                    <img src="logos/default.png" alt="Team 1" class="team-logo-large">
+                    <img src="icons/default.png" alt="Team 1" class="team-logo-large">
                     <span>vs</span>
-                    <img src="logos/default.png" alt="Team 2" class="team-logo-large">
+                    <img src="icons/default.png" alt="Team 2" class="team-logo-large">
                 </div>
                 <p class="match-date">-/-</p>
             </div>
@@ -260,7 +275,7 @@
             console.log("Document loaded, fetching match data...");
 
             // Fetch match data from the OpenLigaDB API
-            fetch('https://cors-anywhere.herokuapp.com/https://www.openligadb.de/api/getmatchdata/bl2/2024')
+            fetch('https://corsproxy.io/?https://www.openligadb.de/api/getmatchdata/bl2/2024')
                 .then(response => response.json())
                 .then(data => {
                     console.log("Parsed JSON data:", data);
@@ -276,7 +291,7 @@
                 match.team2.teamName.toLowerCase() === "1. fc kaiserslautern"
             );
 
-            fetch('https://cors-anywhere.herokuapp.com/https://api.openligadb.de/getmatchdata/dfb/2024')
+            fetch('https://corsproxy.io/?https://api.openligadb.de/getmatchdata/dfb/2024')
                 .then(response => response.json())
                 .then(dfbData => {
                     console.log("Filtering matches involving 1. FC Kaiserslautern in the DFB Pokal...");
@@ -305,7 +320,7 @@
         function updateLeagueTable() {
             console.log("Fetching Bundesliga table...");
 
-            fetch('https://cors-anywhere.herokuapp.com/https://api.openligadb.de/getbltable/bl2/2024')
+            fetch('https://corsproxy.io/?https://api.openligadb.de/getbltable/bl2/2024')
                 .then(response => response.json())
                 .then(tableData => {
                     console.log("Bundesliga table data:", tableData);
@@ -376,10 +391,10 @@
             // Sort by date to show the nearest upcoming matches
             upcomingMatches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
 
-            // Limit to the next 7 matches
-            upcomingMatches.slice(0, 7).forEach(match => {
-                const team1 = match.team1.teamName;
-                const team2 = match.team2.teamName;
+            // Limit to the next 11 matches
+            upcomingMatches.slice(0, 11).forEach(match => {
+                const team1 = match.team1.shortName || match.team1.teamName;
+                const team2 = match.team2.shortName || match.team2.teamName;
                 const matchDate = new Date(match.matchDateTime);
                 
                 // Format the date without the time
@@ -392,7 +407,7 @@
                 const li = document.createElement("li");
                 li.innerHTML = `
                     <img class="team-logo-small" src="${match.team1.teamIconUrl}" alt="${team1}">
-                    <span>${team1} vs ${team2}</span>
+                    <span>${team1} vs ${team2} </span>
                     <img class="team-logo-small" src="${match.team2.teamIconUrl}" alt="${team2}">
                     <span>${formattedDate}</span>
                 `;
@@ -413,10 +428,10 @@
             // Sort by date to show the most recent matches first
             lastMatches.sort((a, b) => new Date(b.matchDateTime) - new Date(a.matchDateTime));
 
-            // Limit to the last 7 matches
-            lastMatches.slice(0, 7).forEach(match => {
-                const team1 = match.team1.teamName;
-                const team2 = match.team2.teamName;
+            // Limit to the last 11 matches
+            lastMatches.slice(0, 11).forEach(match => {
+                const team1 = match.team1.shortName || match.team1.teamName;
+                const team2 = match.team2.shortName || match.team2.teamName;
                 const team1Goals = match.matchResults[1].pointsTeam1;
                 const team2Goals = match.matchResults[1].pointsTeam2;
 
