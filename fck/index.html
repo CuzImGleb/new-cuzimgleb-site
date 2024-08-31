@@ -422,8 +422,8 @@
             // Sort by date to show the nearest upcoming matches
             upcomingMatches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
 
-            // Limit to the next 11 matches
-            upcomingMatches.slice(0, 11).forEach(match => {
+            // Limit to the next 9 matches
+            upcomingMatches.slice(0, 9).forEach(match => {
                 const team1 = match.team1.shortName || match.team1.teamName;
                 const team2 = match.team2.shortName || match.team2.teamName;
                 const matchDate = new Date(match.matchDateTime);
@@ -459,8 +459,8 @@
             // Sort by date to show the most recent matches first
             lastMatches.sort((a, b) => new Date(b.matchDateTime) - new Date(a.matchDateTime));
 
-            // Limit to the last 11 matches
-            lastMatches.slice(0, 11).forEach(match => {
+            // Limit to the last 9 matches
+            lastMatches.slice(0, 9).forEach(match => {
                 const team1 = match.team1.shortName || match.team1.teamName;
                 const team2 = match.team2.shortName || match.team2.teamName;
                 const team1Goals = match.matchResults[1].pointsTeam1;
