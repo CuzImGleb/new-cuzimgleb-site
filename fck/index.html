@@ -341,7 +341,7 @@
 
         function updateLeagueTable() {
             console.log("Fetching Bundesliga table...");
-            fetch('https://corsproxy.io/?https://api.openligadb.de/getbltable/bl2/2024')
+            fetch('https://api.allorigins.win/raw?url=https://api.openligadb.de/getbltable/bl2/2024')
                 .then(response => response.json())
                 .then(tableData => {
                     console.log("Bundesliga table data:", tableData);
