@@ -481,20 +481,34 @@
         function updateUndefeatedSeries(matches) {
             console.log("Calculating undefeated series...");
 
-            const undefeatedSeries = matches.reduce((count, match) => {
+            let undefeatedSeries = 0;
+            let isSeriesActive = true;
+
+            // Gehe durch die Liste der Spiele
+            for (const match of matches) {
                 if (match.matchIsFinished) {
-                    const team1Goals = match.matchResults[2].pointsTeam1;
-                    const team2Goals = match.matchResults[2].pointsTeam2;
-                    const isFCK = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern";
+                    const team1Goals = match.matchResults[1].pointsTeam1;
+                    const team2Goals = match.matchResults[1].pointsTeam2;
+
+                    // Überprüfe, ob FCK Team1 oder Team2 ist
+                    const isFCKTeam1 = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern";
+                    const isFCKTeam2 = match.team2.teamName.toLowerCase() === "1. fc kaiserslautern";
 
                     // Bedingung für ungeschlagen: Sieg oder Unentschieden
-                    if ((isFCK && team1Goals >= team2Goals) || (!isFCK && team2Goals >= team1Goals)) {
-                        return count + 1;
+                    if ((isFCKTeam1 && team1Goals >= team2Goals) || (isFCKTeam2 && team2Goals >= team1Goals)) {
+                        if (isSeriesActive) {
+                            undefeatedSeries++;
+                        }
+                    } else {
+                        // Serie beenden und Counter auf 0 setzen, da das Spiel verloren wurde
+                        undefeatedSeries = 0;
+                        isSeriesActive = false;
+                        break;
                     }
                 }
-                return count;
-            }, 0);
+            }
 
+            // Aktualisiere die Anzeige des ungeschlagenen Scores
             document.getElementById("unstoppable-stats").textContent = undefeatedSeries;
         }
     </script>
