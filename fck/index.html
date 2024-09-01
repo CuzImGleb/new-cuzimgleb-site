@@ -297,7 +297,7 @@
             console.log("Document loaded, fetching match data...");
 
             // Fetch match data from the OpenLigaDB API
-            fetch('https://api.allorigins.win/raw?url=https://www.openligadb.de/api/getmatchdata/bl2/2024')
+            fetch('https://corsproxy.io/?https://www.openligadb.de/api/getmatchdata/bl2/2024')
                 .then(response => response.json())
                 .then(data => {
                     console.log("Parsed JSON data:", data);
@@ -313,7 +313,7 @@
                 match.team2.teamName.toLowerCase() === "1. fc kaiserslautern"
             );
 
-            fetch('https://api.allorigins.win/raw?url=https://api.openligadb.de/getmatchdata/dfb/2024')
+            fetch('https://corsproxy.io/?https://api.openligadb.de/getmatchdata/dfb/2024')
                 .then(response => response.json())
                 .then(dfbData => {
                     console.log("Filtering matches involving 1. FC Kaiserslautern in the DFB Pokal...");
@@ -341,7 +341,7 @@
 
         function updateLeagueTable() {
             console.log("Fetching Bundesliga table...");
-            fetch('https://api.allorigins.win/raw?url=https://api.openligadb.de/getbltable/bl2/2024')
+            fetch('https://corsproxy.io/?https://api.openligadb.de/getbltable/bl2/2024')
                 .then(response => response.json())
                 .then(tableData => {
                     console.log("Bundesliga table data:", tableData);
