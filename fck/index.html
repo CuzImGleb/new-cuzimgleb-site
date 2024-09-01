@@ -275,7 +275,7 @@
 
             <!-- Free Space -->
             <div class="box" id="free-space-box">
-                <div id="scoreaxis-widget-44f4e" style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#2c2c2c;container:1px"><iframe id="Iframe" src="https://www.scoreaxis.com/widget/live-match/19154884?autoHeight=1&amp;bodyBackground=%232c2c2c&amp;textColor=%23ffffff&amp;lang=de&amp;inst=44f4e" style="width:100%;border:none;transition:all 300ms ease"></iframe><script>window.addEventListener("DOMContentLoaded",event=>{window.addEventListener("message",event=>{if(event.data.appHeight&&"44f4e"==event.data.inst){let container=document.querySelector("#scoreaxis-widget-44f4e iframe");container&&(container.style.height=parseInt(event.data.appHeight)+"px")}},!1)});</script></div><div style="font-size: 12px; font-family: Arial, sans-serif; text-align: left;"></div>
+                <div id="scoreaxis-widget-48b60" style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#2c2c2c"><iframe id="Iframe" src="https://www.scoreaxis.com/widget/live-match/19154891?autoHeight=1&amp;bodyBackground=%232c2c2c&amp;textColor=%23ffffff&amp;lang=de&amp;inst=48b60" style="width:100%;border:none;transition:all 300ms ease"></iframe><script>window.addEventListener("DOMContentLoaded",event=>{window.addEventListener("message",event=>{if(event.data.appHeight&&"48b60"==event.data.inst){let container=document.querySelector("#scoreaxis-widget-48b60 iframe");container&&(container.style.height=parseInt(event.data.appHeight)+"px")}},!1)});</script></div><div style="font-size: 12px; font-family: Arial, sans-serif; text-align: left;"></div>
             </div>
 
             <!-- Last Matches -->
@@ -483,8 +483,8 @@
 
             const undefeatedSeries = matches.reduce((count, match) => {
                 if (match.matchIsFinished) {
-                    const team1Goals = match.matchResults[1].pointsTeam1;
-                    const team2Goals = match.matchResults[1].pointsTeam2;
+                    const team1Goals = match.matchResults[2].pointsTeam1;
+                    const team2Goals = match.matchResults[2].pointsTeam2;
                     const isFCK = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern";
 
                     // Bedingung für ungeschlagen: Sieg oder Unentschieden
