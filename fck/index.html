@@ -275,7 +275,7 @@
 
             <!-- Free Space -->
             <div class="box" id="free-space-box">
-                <div id="scoreaxis-widget-48b60" style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#2c2c2c"><iframe id="Iframe" src="https://www.scoreaxis.com/widget/live-match/19154901?autoHeight=1&amp;bodyBackground=%232c2c2c&amp;textColor=%23ffffff&amp;lang=de&amp;inst=48b60" style="width:100%;border:none;transition:all 300ms ease"></iframe><script>window.addEventListener("DOMContentLoaded",event=>{window.addEventListener("message",event=>{if(event.data.appHeight&&"48b60"==event.data.inst){let container=document.querySelector("#scoreaxis-widget-48b60 iframe");container&&(container.style.height=parseInt(event.data.appHeight)+"px")}},!1)});</script></div><div style="font-size: 12px; font-family: Arial, sans-serif; text-align: left;"></div>
+                <div id="scoreaxis-widget-ba283" style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#2c2c2c"><iframe id="Iframe" src="https://www.scoreaxis.com/widget/live-match/19154919?autoHeight=1&amp;bodyBackground=%232c2c2c&amp;textColor=%23ffffff&amp;lang=de&amp;inst=ba283" style="width:100%;border:none;transition:all 300ms ease"></iframe><script>window.addEventListener("DOMContentLoaded",event=>{window.addEventListener("message",event=>{if(event.data.appHeight&&"ba283"==event.data.inst){let container=document.querySelector("#scoreaxis-widget-ba283 iframe");container&&(container.style.height=parseInt(event.data.appHeight)+"px")}},!1)});</script></div><div style="font-size: 12px; font-family: Arial, sans-serif; text-align: left;"></div>
             </div>
 
             <!-- Last Matches -->
@@ -484,32 +484,53 @@
             let undefeatedSeries = 0;
             let isSeriesActive = true;
 
-            // Gehe durch die Liste der Spiele
+            // Loop through the list of matches
             for (const match of matches) {
                 if (match.matchIsFinished) {
+                    // Access the final match result (index [1] for full-time result)
                     const team1Goals = match.matchResults[1].pointsTeam1;
                     const team2Goals = match.matchResults[1].pointsTeam2;
 
-                    // Überprüfe, ob FCK Team1 oder Team2 ist
-                    const isFCKTeam1 = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern";
-                    const isFCKTeam2 = match.team2.teamName.toLowerCase() === "1. fc kaiserslautern";
+                    // Check if FCK is team1 or team2
+                    const isFCKTeam1 = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team1.shortName.toLowerCase() === "kaiserslautern";
+                    const isFCKTeam2 = match.team2.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team2.shortName.toLowerCase() === "kaiserslautern";
 
-                    // Bedingung für ungeschlagen: Sieg oder Unentschieden
+                    console.log(`Match ID: ${match.matchID}, FCK as Team1: ${isFCKTeam1}, FCK as Team2: ${isFCKTeam2}`);
+                    console.log(`Team1 Goals: ${team1Goals}, Team2 Goals: ${team2Goals}`);
+
+                    // Condition for undefeated: either win or tie
                     if ((isFCKTeam1 && team1Goals >= team2Goals) || (isFCKTeam2 && team2Goals >= team1Goals)) {
-                        if (isSeriesActive) {
+                        if (!isSeriesActive) {
+                            // If the series was reset due to a loss, restart the series
+                            undefeatedSeries = 0;
+                            isSeriesActive = true;
+                            console.log("FCK wins or ties after a loss, restarting streak.");
+                        } else {
                             undefeatedSeries++;
+                            console.log("Undefeated series continues, incrementing count.");
                         }
                     } else {
-                        // Serie beenden und Counter auf 0 setzen, da das Spiel verloren wurde
+                        // If FCK loses, reset the streak and pause the series
                         undefeatedSeries = 0;
                         isSeriesActive = false;
-                        break;
+                        console.log("FCK lost, pausing the series.");
                     }
                 }
             }
 
-            // Aktualisiere die Anzeige des ungeschlagenen Scores
-            document.getElementById("unstoppable-stats").textContent = undefeatedSeries;
+            // Debug: Check final value of undefeatedSeries before updating HTML
+            console.log(`Final undefeated series count: ${undefeatedSeries}`);
+
+            // Update the HTML element with the undefeated series count
+            const unstoppableElement = document.getElementById("unstoppable-stats");
+            if (unstoppableElement) {
+                unstoppableElement.textContent = undefeatedSeries;
+                console.log("Updated unstoppable-stats element in DOM.");
+            } else {
+                console.log("Element with id 'unstoppable-stats' not found.");
+            }
+
+            return undefeatedSeries;
         }
     </script>
 </body>
