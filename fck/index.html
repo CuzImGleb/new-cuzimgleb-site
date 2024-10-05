@@ -340,45 +340,82 @@
         }
 
         function updateLeagueTable() {
-            console.log("Fetching Bundesliga table...");
-            fetch('https://corsproxy.io/?https://api.openligadb.de/getbltable/bl2/2024')
-                .then(response => response.json())
-                .then(tableData => {
-                    console.log("Bundesliga table data:", tableData);
+            console.log("Fetching Bundesliga table from both sources...");
 
-                    const tableBody = document.querySelector("#league-table-list tbody");
+            // Define both API URLs
+            const api1 = 'https://corsproxy.io/?https://api.openligadb.de/getbltable/bl2/2024';
+            const api2 = 'https://api.allorigins.win/raw?url=https://api.openligadb.de/getbltable/bl2/2024';
 
-                    // Clear any existing table rows
-                    tableBody.innerHTML = '';
+            // Fetch data from both APIs in parallel
+            Promise.all([
+                fetch(api1).then(response => response.json()).catch(error => { console.error('Error fetching from API 1:', error); return null; }),
+                fetch(api2).then(response => response.json()).catch(error => { console.error('Error fetching from API 2:', error); return null; })
+            ])
+            .then(([data1, data2]) => {
+                console.log("Data from API 1:", data1);
+                console.log("Data from API 2:", data2);
 
-                    // Iterate over the tableData and create rows for each team
-                    tableData.forEach((team, index) => {
-                        const row = document.createElement("tr");
+                // Compare both datasets and select the one with the most up-to-date points
+                let selectedData = compareTableData(data1, data2);
 
-                        // Add highlight class based on the team's position
-                        const position = index + 1;
-                        if (position === 1 || position === 2) {
-                            row.classList.add("promotion");
-                        } else if (position === 3 || position === 16) {
-                            row.classList.add("relegation-playoff");
-                        } else if (position === 17 || position === 18) {
-                            row.classList.add("relegation");
-                        }
+                // If there's no valid data, show an error
+                if (!selectedData) {
+                    console.error('No valid data fetched from either API.');
+                    return;
+                }
 
-                        // Add highlight class if the team is FCK
-                        if (team.teamName.toLowerCase() === "1. fc kaiserslautern") {
-                            row.classList.add("fck-highlight");
-                        }
+                // Update the table with the selected data
+                const tableBody = document.querySelector("#league-table-list tbody");
 
-                        row.innerHTML = `
-                            <td>${position}.</td> <!-- Platzierung -->
-                            <td><img class="team-logo-small" src="${team.teamIconUrl}" alt="${team.teamName}"> ${team.teamName}</td>
-                            <td>${team.points} Punkte</td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Error fetching Bundesliga table:', error));
+                // Clear any existing table rows
+                tableBody.innerHTML = '';
+
+                // Iterate over the selectedData and create rows for each team
+                selectedData.forEach((team, index) => {
+                    const row = document.createElement("tr");
+
+                    // Add highlight class based on the team's position
+                    const position = index + 1;
+                    if (position === 1 || position === 2) {
+                        row.classList.add("promotion");
+                    } else if (position === 3 || position === 16) {
+                        row.classList.add("relegation-playoff");
+                    } else if (position === 17 || position === 18) {
+                        row.classList.add("relegation");
+                    }
+
+                    // Add highlight class if the team is FCK
+                    if (team.teamName.toLowerCase() === "1. fc kaiserslautern") {
+                        row.classList.add("fck-highlight");
+                    }
+
+                    row.innerHTML = `
+                        <td>${position}.</td> <!-- Platzierung -->
+                        <td><img class="team-logo-small" src="${team.teamIconUrl}" alt="${team.teamName}"> ${team.teamName}</td>
+                        <td>${team.points} Punkte</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching Bundesliga table:', error));
+        }
+
+        // Function to compare two datasets and select the one with the highest points
+        function compareTableData(data1, data2) {
+            // If one of the datasets is null, return the other one
+            if (!data1) return data2;
+            if (!data2) return data1;
+
+            // Find the total points from each dataset (sum of points of all teams)
+            const totalPoints1 = data1.reduce((sum, team) => sum + team.points, 0);
+            const totalPoints2 = data2.reduce((sum, team) => sum + team.points, 0);
+
+            // Log the total points for comparison
+            console.log("Total points from API 1:", totalPoints1);
+            console.log("Total points from API 2:", totalPoints2);
+
+            // Select the dataset with the higher total points
+            return totalPoints1 >= totalPoints2 ? data1 : data2;
         }
 
         function updateNextMatch(matches) {
