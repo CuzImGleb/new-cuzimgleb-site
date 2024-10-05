@@ -214,6 +214,12 @@
             font-size: 4em;
             font-weight: bold;
         }
+        .highscore {
+            font-size: 1.2em;
+            color: #e0e0e0;
+            font-style: italic;
+            margin-top: 10px;
+        }
         .footer {
             margin-top: 20px;
             text-align: center;
@@ -271,6 +277,7 @@
             <div class="box" id="unstoppable-box">
                 <h2>Ungeschlagene Spiele</h2>
                 <p class="stats" id="unstoppable-stats">0</p>
+                <p class="highscore" id="highscore-stats">Die längste Serie war xx Spiele am xx.xx.xxxx</p>
             </div>
 
             <!-- Free Space -->
@@ -437,7 +444,7 @@
                 const formattedDate = matchDate.toLocaleDateString('de-DE', options);
 
                 // Replace the default comma separator with "um"
-                const formattedDateTime = formattedDate.replace(',', ' um');
+                const formattedDateTime = formattedDate.replace(',', ' am');
 
                 // Set the formatted date and time
                 document.querySelector("#next-match-box .match-date").textContent = formattedDateTime;
@@ -518,56 +525,87 @@
         function updateUndefeatedSeries(matches) {
             console.log("Calculating undefeated series...");
 
-            let undefeatedSeries = 0;
+            // Matches nach Datum sortieren (aufsteigend)
+            matches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
+
+            let currentSeries = 0;
+            let longestSeries = 0;
             let isSeriesActive = true;
+            let currentSeriesEndDate = null;
+            let longestSeriesEndDate = null;
 
             // Loop through the list of matches
             for (const match of matches) {
                 if (match.matchIsFinished) {
-                    // Access the final match result (index [1] for full-time result)
+                    console.log(match);
+
+                    const matchDate = match.matchDateTime ? new Date(match.matchDateTime).toLocaleDateString() : "Datum unbekannt";
+                    console.log(`Match Date: ${matchDate}`);
+
                     const team1Goals = match.matchResults[1].pointsTeam1;
                     const team2Goals = match.matchResults[1].pointsTeam2;
 
-                    // Check if FCK is team1 or team2
                     const isFCKTeam1 = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team1.shortName.toLowerCase() === "kaiserslautern";
                     const isFCKTeam2 = match.team2.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team2.shortName.toLowerCase() === "kaiserslautern";
 
                     console.log(`Match ID: ${match.matchID}, FCK as Team1: ${isFCKTeam1}, FCK as Team2: ${isFCKTeam2}`);
                     console.log(`Team1 Goals: ${team1Goals}, Team2 Goals: ${team2Goals}`);
 
-                    // Condition for undefeated: either win or tie
+                    // Wenn FCK ungeschlagen ist (Gewinn oder Unentschieden)
                     if ((isFCKTeam1 && team1Goals >= team2Goals) || (isFCKTeam2 && team2Goals >= team1Goals)) {
                         if (!isSeriesActive) {
-                            // If the series was reset due to a loss, restart the series
-                            undefeatedSeries = 0;
+                            currentSeries = 1;
                             isSeriesActive = true;
+                            currentSeriesEndDate = matchDate;
                             console.log("FCK wins or ties after a loss, restarting streak.");
                         } else {
-                            undefeatedSeries++;
+                            currentSeries++;
+                            currentSeriesEndDate = matchDate;
                             console.log("Undefeated series continues, incrementing count.");
                         }
+
+                        if (currentSeries > longestSeries) {
+                            longestSeries = currentSeries;
+                            longestSeriesEndDate = currentSeriesEndDate;
+                            console.log(`New longest undefeated series: ${longestSeries}, ending on: ${longestSeriesEndDate}`);
+                        }
                     } else {
-                        // If FCK loses, reset the streak and pause the series
-                        undefeatedSeries = 0;
+                        // Wenn FCK verliert, Serie pausieren
+                        currentSeries = 0;
                         isSeriesActive = false;
                         console.log("FCK lost, pausing the series.");
                     }
                 }
             }
 
-            // Debug: Check final value of undefeatedSeries before updating HTML
-            console.log(`Final undefeated series count: ${undefeatedSeries}`);
+            console.log(`Final longest undefeated series count: ${longestSeries}, series end date: ${longestSeriesEndDate}`);
+            console.log(`Current undefeated series count: ${currentSeries}`);
 
-            // Update the HTML element with the undefeated series count
+            // Update der UI
             const unstoppableElement = document.getElementById("unstoppable-stats");
             if (unstoppableElement) {
-                unstoppableElement.textContent = undefeatedSeries;
+                unstoppableElement.textContent = currentSeries;
                 console.log("Updated unstoppable-stats element in DOM.");
             } else {
                 console.log("Element with id 'unstoppable-stats' not found.");
             }
 
-            return undefeatedSeries;
+            const highscoreElement = document.getElementById("highscore-stats");
+            if (highscoreElement) {
+                if (longestSeriesEndDate) {
+                    highscoreElement.textContent = `Die längste Serie war ${longestSeries} Spiele am ${longestSeriesEndDate}`;
+                } else {
+                    highscoreElement.textContent = `Keine längste Serie vorhanden.`;
+                }
+                console.log("Updated highscore-stats element in DOM.");
+            } else {
+                console.log("Element mit id 'highscore-stats' not found.");
+            }
+
+            return {
+                currentSeries,
+                longestSeries
+            };
         }
     </script>
 </body>
