@@ -282,7 +282,7 @@
 
             <!-- Free Space -->
             <div class="box" id="free-space-box">
-                <div id="scoreaxis-widget-22d6c" style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#2c2c2c"><iframe id="Iframe" src="https://www.scoreaxis.com/widget/live-match/19154934?autoHeight=1&amp;lang=de&amp;bodyBackground=%232c2c2c&amp;textColor=%23ffffff&amp;inst=22d6c" style="width:100%;border:none;transition:all 300ms ease"></iframe><script>window.addEventListener("DOMContentLoaded",event=>{window.addEventListener("message",event=>{if(event.data.appHeight&&"22d6c"==event.data.inst){let container=document.querySelector("#scoreaxis-widget-22d6c iframe");container&&(container.style.height=parseInt(event.data.appHeight)+"px")}},!1)});</script></div><div style="font-size: 12px; font-family: Arial, sans-serif; text-align: left;"></div>
+                <div id="scoreaxis-widget-356aa" style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#2c2c2c"><iframe id="Iframe" src="https://www.scoreaxis.com/widget/live-match/19296590?autoHeight=1&amp;lang=de&amp;bodyBackground=%232c2c2c&amp;textColor=%23ffffff&amp;inst=356aa" style="width:100%;border:none;transition:all 300ms ease"></iframe><script>window.addEventListener("DOMContentLoaded",event=>{window.addEventListener("message",event=>{if(event.data.appHeight&&"356aa"==event.data.inst){let container=document.querySelector("#scoreaxis-widget-356aa iframe");container&&(container.style.height=parseInt(event.data.appHeight)+"px")}},!1)});</script></div><div style="font-size: 12px; font-family: Arial, sans-serif; text-align: left;"></div>
             </div>
 
             <!-- Last Matches -->
@@ -295,7 +295,7 @@
         </div>
 
         <div class="footer">
-            <p>&copy; 2024 1. FC Kaiserslautern Dashboard. All rights reserved.</p>
+            <p>&copy; 2024 mit ❤️ entwickelt von CuzImGleb. Alle Rechte vorbehalten. Teamnamen und Logos sind Eigentum der jeweiligen Vereine und Rechteinhaber. Diese Seite ist eine Fan-Community und steht in keinem Zusammenhang mit offiziellen Markenrechten.</p>
         </div>
     </div>
 
@@ -428,8 +428,10 @@
         function updateNextMatch(matches) {
             console.log("Updating next match information...");
 
-            const nextMatch = matches.find(match => !match.matchIsFinished);
-
+            const nextMatch = matches
+                .filter(match => !match.matchIsFinished)
+                .sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime))[0]; // Sortiert nach Datum und nimmt das nächste Spiel
+                
             if (nextMatch) {
                 const team1 = nextMatch.team1.teamName;
                 const team2 = nextMatch.team2.teamName;
@@ -439,12 +441,17 @@
                 document.querySelector("#next-match-box .team-logo-large").src = nextMatch.team1.teamIconUrl;
                 document.querySelector("#next-match-box .match-teams img[alt='Team 2']").src = nextMatch.team2.teamIconUrl;
 
-                // Format the date and time in the desired format
-                const options = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-                const formattedDate = matchDate.toLocaleDateString('de-DE', options);
+                // Manuelle Formatierung des Datums
+                const daysOfWeek = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+                const dayName = daysOfWeek[matchDate.getDay()];
+                const day = String(matchDate.getDate()).padStart(2, '0');
+                const month = String(matchDate.getMonth() + 1).padStart(2, '0'); // Monate sind nullbasiert
+                const year = matchDate.getFullYear();
+                const hours = String(matchDate.getHours()).padStart(2, '0');
+                const minutes = String(matchDate.getMinutes()).padStart(2, '0');
 
-                // Replace the default comma separator with "um"
-                const formattedDateTime = formattedDate.replace(',', ' am');
+                // Zusammenbauen des Datumsformats
+                const formattedDateTime = `${dayName} am ${day}.${month}.${year} um ${hours}:${minutes}`;
 
                 // Set the formatted date and time
                 document.querySelector("#next-match-box .match-date").textContent = formattedDateTime;
@@ -480,6 +487,13 @@
                 });
 
                 const li = document.createElement("li");
+
+                // Überprüfen, ob das Spiel ein DFB-Pokal-Spiel ist
+                if (match.leagueShortcut && match.leagueShortcut.toLowerCase() === "dfb") {
+                    li.style.backgroundColor = "#138f30c0"; // Grüner Hintergrund für DFB-Pokal
+                    li.style.color = "#FFFFFF"; // Weiße Schriftfarbe für bessere Lesbarkeit im Dark Mode
+                }
+
                 li.innerHTML = `
                     <img class="team-logo-small" src="${match.team1.teamIconUrl}" alt="${team1}">
                     <span>${team1} vs ${team2} </span>
