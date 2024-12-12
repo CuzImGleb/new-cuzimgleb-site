@@ -304,7 +304,7 @@
             console.log("Document loaded, fetching match data...");
 
             // Fetch match data from the OpenLigaDB API
-            fetch('https://corsproxy.io/?https://www.openligadb.de/api/getmatchdata/bl2/2024')
+            fetch('https://corsproxy.io/?url=https://www.openligadb.de/api/getmatchdata/bl2/2024')
                 .then(response => response.json())
                 .then(data => {
                     console.log("Parsed JSON data:", data);
@@ -350,7 +350,7 @@
             console.log("Fetching Bundesliga table from both sources...");
 
             // Define both API URLs
-            const api1 = 'https://corsproxy.io/?https://api.openligadb.de/getbltable/bl2/2024';
+            const api1 = 'https://corsproxy.io/?url=https://api.openligadb.de/getbltable/bl2/2024';
             const api2 = 'https://api.allorigins.win/raw?url=https://api.openligadb.de/getbltable/bl2/2024';
 
             // Fetch data from both APIs in parallel
