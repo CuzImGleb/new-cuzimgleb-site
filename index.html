@@ -4,56 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CuzImGleb</title>
-    <!-- Favicon -->
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <!-- Font Awesome für Icons -->
+    <link rel="icon" href="logo.ico" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="logo">
-            <!-- Ersetze Text durch SVG-Icon -->
-            <a href="#">
-                <img src="logo.png" alt="CuzImGleb Logo" class="logo-img">
+    <header class="header">
+        <div class="container">
+            <a href="https://cuzimgleb.de/" class="logo">
+                <img src="logo.png" alt="CuzImGleb Logo">
             </a>
+            <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <nav id="nav-menu">
+                <ul class="nav-list">
+                    <li><a href="https://cuzimgleb.de/">Home</a></li>
+                    <li><a href="#projects">Projekte</a></li>
+                    <li><a href="https://status.cuzimgleb.de/">Services Status</a></li>
+                    <li><a href="#about">Über mich</a></li>
+                    <li><a href="#contact">Kontakt</a></li>
+                </ul>
+            </nav>
         </div>
-        <button class="menu-toggle" id="menu-toggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <nav id="nav-menu">
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#projects">Projekte</a></li>
-                <li><a href="https://status.cuzimgleb.de">Services Status</a></li>
-                <li><a href="#services">Test</a></li>
-                <li><a href="#contact">Test</a></li>
-            </ul>
-        </nav>
     </header>
-
-    <!-- Hauptinhalt -->
-    <main>
-        <div class="content-center">
-            <h1>CuzImGleb</h1>
-            <p>Washed Reseller, Coding Staff für Dealomat</p>
-        </div>
-    </main>
-
-    <!-- Social Media Box -->
-    <aside class="social-media">
-        <a href="https://www.twitter.com/cuzimgleb" target="_blank"><i class="fab fa-twitter"></i></a>
-        <a href="https://www.instagram.com/cuzimgleb" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.youtube.com/@cuzimgleb" target="_blank"><i class="fab fa-youtube"></i></a>
-    </aside>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 cuzimgleb.de. Alle Rechte vorbehalten.</p>
+    <div class="hero">
+        <h1>CuzImGleb</h1>
+        <p>Washed Reseller, Coding Staff für Dealomat</p>
+        <a href="#projects" class="btn">Start</a>
+    </div>
+    <footer class="footer">
+        <p>Folge mir auf Social Media:</p>
+        <a href="https://www.twitter.com/heycuzimgleb"><i class="fab fa-x"></i></a>
+        <a href="https://www.instagram.com/heycuzimgleb"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.youtube.com/@heycuzimgleb"><i class="fab fa-youtube"></i></a>
+        <p>© 2024-2025 CuzImGleb | Made by Gleb</p>
     </footer>
-
-    <!-- JavaScript-Datei verlinken -->
-    <script src="script.js"></script>
+    <script>
+        function toggleMenu() {
+            document.getElementById('nav-menu').classList.toggle('active');
+        }
+    </script>
 </body>
 </html>
