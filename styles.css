@@ -382,16 +382,29 @@ html {
     }
 
     /* 🔥 Über mich */
-    .about {
-        padding: 40px 15px;
+    .about .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     .about h2 {
-        font-size: 22px;
+        position: relative;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px; /* Abstand nach oben */
+        color: white;
+        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
     }
 
     .about p {
         font-size: 15px;
+        max-width: 600px;
+        line-height: 1.6;
+        color: white; /* Falls dein Hintergrund dunkel ist */
     }
 
     /* 🎬 Projekte & Slider */
@@ -570,16 +583,29 @@ html {
     }
 
     /* 🔥 Über mich */
-    .about {
-        padding: 40px 15px;
+    .about .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     .about h2 {
-        font-size: 22px;
+        position: relative;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px; /* Abstand nach oben */
+        color: white;
+        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
     }
 
     .about p {
         font-size: 15px;
+        max-width: 600px;
+        line-height: 1.6;
+        color: white; /* Falls dein Hintergrund dunkel ist */
     }
 
     /* 🎬 Projekte & Slider */
