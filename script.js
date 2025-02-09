@@ -19,6 +19,22 @@ document.getElementById("scrollToTop").addEventListener("click", function(event)
     });
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    function scrollToTop(event) {
+        event.preventDefault(); // Verhindert das Neuladen der Seite
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth" // Sanfter Scroll-Effekt
+        });
+    }
+
+    // Event-Listener für das Logo
+    document.querySelector(".logo").addEventListener("click", scrollToTop);
+
+    // Event-Listener für den Home-Button
+    document.getElementById("scrollToTop").addEventListener("click", scrollToTop);
+});
+
 function toggleMenu() {
     var menu = document.getElementById('nav-menu');
     menu.classList.toggle('active');
