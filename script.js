@@ -100,7 +100,47 @@ document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
     });
 });
 
+// About Me
+
+document.addEventListener("DOMContentLoaded", function () {
+    const aboutSection = document.querySelector(".about");
+    let lastScrollY = window.scrollY;
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                aboutSection.classList.add("show");
+                aboutSection.classList.remove("hide");
+            } else {
+                if (window.scrollY < lastScrollY) { // Prüft, ob der User hochscrollt
+                    aboutSection.classList.add("hide");
+                }
+                aboutSection.classList.remove("show");
+            }
+            lastScrollY = window.scrollY;
+        });
+    }, { threshold: 0.3 });
+
+    observer.observe(aboutSection);
+});
+
 // Projekte Funktion
+
+document.addEventListener("DOMContentLoaded", function () {
+    const projectsSection = document.querySelector(".projects");
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                projectsSection.classList.add("show");
+            } else {
+                projectsSection.classList.remove("show");
+            }
+        });
+    }, { threshold: 0.1 });
+
+    observer.observe(projectsSection);
+});
 
 function showSlide(index) {
     const slides = document.querySelector('.slides');
