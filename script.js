@@ -37,8 +37,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function toggleMenu() {
     var menu = document.getElementById('nav-menu');
-    menu.classList.toggle('active');
+    var toggleButton = document.querySelector('.menu-toggle i');
+
+    // Menü umschalten
+    menu.classList.toggle('show');
+
+    // Icon umschalten
+    if (menu.classList.contains('show')) {
+        toggleButton.classList.replace('fa-bars', 'fa-times'); // Hamburger → X
+    } else {
+        toggleButton.classList.replace('fa-times', 'fa-bars'); // X → Hamburger
+    }
 }
+
+// Schließt das Menü, wenn ein Link angeklickt wird
+document.querySelectorAll('.nav-list a').forEach(link => {
+    link.addEventListener('click', () => {
+        var menu = document.getElementById('nav-menu');
+        var toggleButton = document.querySelector('.menu-toggle i');
+
+        if (menu.classList.contains('show')) { // Nur wenn Menü offen ist
+            menu.classList.remove('show'); // Menü schließen
+        }
+        
+        // Icon immer zurücksetzen auf Hamburger
+        toggleButton.classList.replace('fa-times', 'fa-bars');
+    });
+});
 
 document.querySelector(".btn").addEventListener("click", function(event) {
     event.preventDefault(); // Verhindert das Setzen von #about in der URL
