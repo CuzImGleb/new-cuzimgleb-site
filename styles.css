@@ -184,9 +184,100 @@ html {
 }
 
 /* Abschnitt: Projekte */
-.projects { 
-    background: #2a2a2a; 
+.projects {
+    background: #2a2a2a;
+    text-align: center; /* Zentriert den Text */
 }
+
+.projects container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Zentriert die Inhalte horizontal */
+    justify-content: center;
+}
+
+.projects p {
+    margin-bottom: 20px;
+}
+
+.slider {
+    position: relative;
+    width: 80%; /* Etwas schmaler, um es besser zu zentrieren */
+    max-width: 800px; /* Optional: Begrenzung der Breite */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Zentriert die Slides */
+}
+
+.slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    text-align: center;
+    padding: 20px;
+}
+
+.slide p {
+    max-width: 600px; /* Begrenzung der Breite */
+    word-wrap: break-word; /* Falls lange Wörter das Layout sprengen */
+    text-align: center; /* Sorgt dafür, dass der Text immer zentriert bleibt */
+    margin: 0 auto; /* Stellt sicher, dass der Text mittig bleibt */
+}
+
+.slide a {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.2); /* Dezente Transparenz */
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 20px; /* Größere Pfeile */
+}
+
+/* Hover-Effekt */
+.prev:hover, .next:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-50%) scale(1.1); /* Leichte Vergrößerung */
+}
+
+.prev { left: 20px; }
+.next { right: 20px; }
+
+.dots {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 5px;
+    background: gray;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.dot.active { background: black; }
 
 /* Footer */
 .footer {
@@ -222,10 +313,11 @@ html {
 }
 
 @media (max-width: 768px) {
+    /* 🌟 Navigation */
     .menu-toggle {
         display: block;
     }
-    
+
     #nav-menu {
         display: none;
         flex-direction: column;
@@ -240,39 +332,342 @@ html {
     }
 
     #nav-menu.show {
-        display: flex; /* Menü wird sichtbar */
+        display: flex;
     }
 
     .nav-list {
-        display: flex;
         flex-direction: column;
-        align-items: center; /* ZENTRIERT DIE BUTTONS */
+        align-items: center;
+        gap: 8px;
         width: 100%;
-        gap: 5px; /* ABSTAND ZWISCHEN BUTTONS */
-        padding: 0;
-        margin: 0;
     }
 
     .nav-list li {
-        width: 80%; /* BUTTONS MACHEN 80% DER BILDSCHIRMBREITE AUS */
-        max-width: 250px; /* MAXIMALE BREITE */
+        width: 90%;
+        max-width: 300px;
     }
 
     .nav-list a {
-        display: block;
-        text-align: center;
-        color: white;
-        text-decoration: none;
-        font-size: 14px;
-        padding: 10px 15px;
-        background: transparent;
-        border: 1px solid white;
-        border-radius: 4px;
-        width: 100%; /* BUTTONS FÜLLEN DIE GANZE BREITE DES LI-ELEMENTS */
+        font-size: 16px;
+        padding: 12px;
+        width: 100%;
+        border-radius: 8px;
     }
 
-    .nav-list a:hover {
-        background: white;
-        color: black;
+    /* 🎯 Hero-Section */
+    .hero {
+        padding: 80px 15px;
+        min-height: 85vh;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+    /* 🔥 Über mich */
+    .about {
+        padding: 40px 15px;
+    }
+
+    .about h2 {
+        font-size: 22px;
+    }
+
+    .about p {
+        font-size: 15px;
+    }
+
+    /* 🎬 Projekte & Slider */
+    .projects .container h2 {
+        position: relative;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px; /* Abstand nach oben */
+        color: white;
+        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
+    }
+
+    .projects .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .slider {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+    
+    .slide {
+        flex: 0 0 100%;
+        text-align: center;
+        padding: 20px;
+        scroll-snap-align: center;
+        min-height: auto
+    }
+
+    .slide p {
+        font-size: 12px; /* Kleinere Schrift für mobile Ansicht */
+        line-height: 1.4; /* Erhöhte Zeilenhöhe für bessere Lesbarkeit */
+        word-wrap: break-word; /* Lange Wörter umbrechen */
+        overflow-wrap: break-word; /* Alternative für bessere Unterstützung */
+        white-space: normal; /* Falls Text nicht umbricht */
+        max-width: 60%; /* Breite auf 90% des Containers begrenzen */
+        margin: 0 auto; /* Zentriert den Text */
+        text-align: center; /* Text bleibt mittig */
+    }
+    
+    .slide img {
+        max-width: 90%; /* Damit das Bild nicht über den Rand hinausgeht */
+        height: auto;
+    }
+    
+    .prev, .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 10;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+    
+    .prev:hover, .next:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .prev { left: 10px; }
+    .next { right: 10px; }
+    
+    .dots {
+        text-align: center;
+        margin-top: 10px;
+    }
+    
+    .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin: 5px;
+        background: gray;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .dot.active { background: white; }
+
+    /* 🎭 Footer */
+    .footer {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 1200px) {
+    /* 🌟 Navigation */
+    .menu-toggle {
+        display: block;
+    }
+
+    #nav-menu {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        background: rgba(30, 30, 30, 0.95);
+        width: 100%;
+        left: 0;
+        top: 60px;
+        padding: 20px 0;
+        text-align: center;
+        z-index: 1000;
+    }
+
+    #nav-menu.show {
+        display: flex;
+    }
+
+    .nav-list {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .nav-list li {
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .nav-list a {
+        font-size: 16px;
+        padding: 12px;
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    /* 🎯 Hero-Section */
+    .hero {
+        padding: 80px 15px;
+        min-height: 85vh;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+    /* 🔥 Über mich */
+    .about {
+        padding: 40px 15px;
+    }
+
+    .about h2 {
+        font-size: 22px;
+    }
+
+    .about p {
+        font-size: 15px;
+    }
+
+    /* 🎬 Projekte & Slider */
+    .projects .container h2 {
+        position: relative;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px; /* Abstand nach oben */
+        color: white;
+        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
+    }
+
+    .projects .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .slider {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+    
+    .slide {
+        flex: 0 0 100%;
+        text-align: center;
+        padding: 20px;
+        scroll-snap-align: center;
+        min-height: auto
+    }
+
+    .slide p {
+        font-size: 12px; /* Kleinere Schrift für mobile Ansicht */
+        line-height: 1.4; /* Erhöhte Zeilenhöhe für bessere Lesbarkeit */
+        word-wrap: break-word; /* Lange Wörter umbrechen */
+        overflow-wrap: break-word; /* Alternative für bessere Unterstützung */
+        white-space: normal; /* Falls Text nicht umbricht */
+        max-width: 60%; /* Breite auf 90% des Containers begrenzen */
+        margin: 0 auto; /* Zentriert den Text */
+        text-align: center; /* Text bleibt mittig */
+    }
+    
+    .slide img {
+        max-width: 90%; /* Damit das Bild nicht über den Rand hinausgeht */
+        height: auto;
+    }
+    
+    .prev, .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 10;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+    
+    .prev:hover, .next:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .prev { left: 10px; }
+    .next { right: 10px; }
+    
+    .dots {
+        text-align: center;
+        margin-top: 10px;
+    }
+    
+    .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin: 5px;
+        background: gray;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .dot.active { background: white; }
+
+    /* 🎭 Footer */
+    .footer {
+        font-size: 12px;
+        padding: 8px;
     }
 }

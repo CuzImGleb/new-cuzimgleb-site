@@ -60,9 +60,43 @@
     </section>
     <section id="projects" class="projects">
         <div class="container">
-            <h2>Über mich</h2>
-            <p>Hey! Ich bin Gleb – Washed Reseller, Streamer & Coding Enthusiast.</p>
-            <p>Hier findest du meine aktuellen Projekte und mehr über mich.</p>
+            <h2>Meine Projekte</h2>
+            <div class="slider">
+                <button class="prev" onclick="prevSlide()">&#10094;</button>
+                <div class="slides">
+                    <div class="slide">
+                        <img src="logo.png" alt="Projekt 1 Bild">
+                        <h3>CuzImGleb Landing Page</h3>
+                        <p>Der Hauptpunkt für alle meine Projekte und Infos über mich!</p>
+                        <a href="#" class="btn">Du bist schon bereits hier -_-</a>
+                    </div>
+                    <div class="slide">
+                        <img src="content/landing-page/Logo_1_FC_Kaiserslautern.svg" alt="Projekt 2 Bild">
+                        <h3>1. FC Kaiserslautern - Dashboard</h3>
+                        <p>CuzImGleb’s FCK-Dashboard bietet dir eine detaillierte Übersicht über die 2. Bundesliga Tabelle, ungeschlagene Serien, kommende Spiele und mehr – alles rund um den 1. FC Kaiserslautern. Schau vorbei und überzeuge dich selbst!</p>
+                        <a href="https://cuzimgleb.de/fck" class="btn">Mehr erfahren</a>
+                    </div>
+                    <div class="slide">
+                        <img src="logo.png" alt="Projekt 3 Bild">
+                        <h3>Projekt 3</h3>
+                        <p>Beschreibung von Projekt 3</p>
+                        <a href="https://projekt3.com" class="btn">Mehr erfahren</a>
+                    </div>
+                    <div class="slide">
+                        <img src="logo.png" alt="Projekt 4 Bild">
+                        <h3>Projekt 4</h3>
+                        <p>Beschreibung von Projekt 4</p>
+                        <a href="https://projekt3.com" class="btn">Mehr erfahren</a>
+                    </div>
+                </div>
+                <button class="next" onclick="nextSlide()">&#10095;</button>
+            </div>
+            <div class="dots">
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+                <span class="dot" onclick="currentSlide(4)"></span>
+            </div>
         </div>
     </section>
     <footer class="footer">

@@ -1,3 +1,10 @@
+let currentIndex = 0;
+let slideInterval;
+let startX = 0;
+let endX = 0;
+
+// Main Page + Buttons + Transition
+
 window.onload = function () {
     // Entfernt den Anker (z. B. #about, #projects) aus der URL
     if (window.location.hash) {
@@ -35,6 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("scrollToTop").addEventListener("click", scrollToTop);
 });
 
+// Mobile UI
+
 function toggleMenu() {
     var menu = document.getElementById('nav-menu');
     var toggleButton = document.querySelector('.menu-toggle i');
@@ -65,6 +74,8 @@ document.querySelectorAll('.nav-list a').forEach(link => {
     });
 });
 
+// URL Modify
+
 document.querySelector(".btn").addEventListener("click", function(event) {
     event.preventDefault(); // Verhindert das Setzen von #about in der URL
     document.getElementById("about").scrollIntoView({
@@ -84,4 +95,99 @@ document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+
+// Projekte Funktion
+
+function showSlide(index) {
+    const slides = document.querySelector('.slides');
+    const dots = document.querySelectorAll('.dot');
+    const totalSlides = dots.length;
+
+    if (index >= totalSlides) {
+        currentIndex = 0;
+    } else if (index < 0) {
+        currentIndex = totalSlides - 1;
+    } else {
+        currentIndex = index;
+    }
+
+    slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+    dots.forEach(dot => dot.classList.remove('active'));
+    dots[currentIndex].classList.add('active');
+
+    resetAutoSlide();
+}
+
+function nextSlide() {
+    showSlide(currentIndex + 1);
+}
+
+function prevSlide() {
+    showSlide(currentIndex - 1);
+}
+
+function currentSlide(index) {
+    showSlide(index - 1);
+}
+
+function startAutoSlide() {
+    stopAutoSlide();
+    slideInterval = setInterval(() => {
+        nextSlide();
+    }, 5000);
+}
+
+function stopAutoSlide() {
+    clearInterval(slideInterval);
+}
+
+function resetAutoSlide() {
+    stopAutoSlide();
+    startAutoSlide();
+}
+
+// Touch Event Handling für mobiles Swipen
+function handleTouchStart(event) {
+    startX = event.touches[0].clientX;
+}
+
+function handleTouchMove(event) {
+    endX = event.touches[0].clientX;
+}
+
+function handleTouchEnd() {
+    const diffX = startX - endX;
+    if (diffX > 50) {
+        nextSlide(); // Nach links wischen -> nächste Slide
+    } else if (diffX < -50) {
+        prevSlide(); // Nach rechts wischen -> vorherige Slide
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    showSlide(0);
+    startAutoSlide();
+
+    const slider = document.querySelector('.slider');
+
+    slider.addEventListener('mouseenter', stopAutoSlide);
+    slider.addEventListener('mouseleave', startAutoSlide);
+
+    document.querySelectorAll('.slide img, .slide p, .prev, .next').forEach(element => {
+        element.addEventListener('mouseenter', stopAutoSlide);
+        element.addEventListener('mouseleave', startAutoSlide);
+    });
+
+    document.querySelector('.prev').addEventListener('click', resetAutoSlide);
+    document.querySelector('.next').addEventListener('click', resetAutoSlide);
+    document.querySelectorAll('.dot').forEach(dot => {
+        dot.addEventListener('click', resetAutoSlide);
+    });
+
+    // Touch Events für mobile Geräte
+    slider.addEventListener('touchstart', handleTouchStart, false);
+    slider.addEventListener('touchmove', handleTouchMove, false);
+    slider.addEventListener('touchend', handleTouchEnd, false);
 });
