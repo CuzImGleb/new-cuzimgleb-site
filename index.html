@@ -17,7 +17,7 @@
             <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
             <nav id="nav-menu">
                 <ul class="nav-list">
-                    <li><a href="https://cuzimgleb.de/">Home</a></li>
+                    <li><a href="#" id="scrollToTop">Home</a></li>
                     <li><a href="#about">Über mich</a></li>
                     <li><a href="#projects">Projekte</a></li>
                     <li><a href="https://status.cuzimgleb.de/">Services Status</a></li>
@@ -29,8 +29,15 @@
     <div class="hero">
         <h1>CuzImGleb</h1>
         <p>Washed Reseller, Washed Streamer, Coding Staff</p>
-        <a href="#projects" class="btn">Start</a>
+        <a href="#about" class="btn">Start</a>
     </div>
+    <section id="about" class="about">
+        <div class="container">
+            <h2>Über mich</h2>
+            <p>Hey! Ich bin Gleb – Washed Reseller, Streamer & Coding Enthusiast.</p>
+            <p>Hier findest du meine aktuellen Projekte und mehr über mich.</p>
+        </div>
+    </section>
     <footer class="footer">
         <p>Folge mir auf Social Media:</p>
         <a href="https://www.twitter.com/heycuzimgleb"><i class="fab fa-x"></i></a>
@@ -38,11 +45,6 @@
         <a href="https://www.youtube.com/@heycuzimgleb"><i class="fab fa-youtube"></i></a>
         <p>© 2024-2025 CuzImGleb | Made by Gleb</p>
     </footer>
-    <script>
-        function toggleMenu() {
-            var menu = document.getElementById('nav-menu');
-            menu.classList.toggle('active');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

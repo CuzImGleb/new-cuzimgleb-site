@@ -18,6 +18,12 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }
 
 /* Header */
@@ -102,6 +108,8 @@ body {
     align-items: center;
     text-align: center;
     padding: 120px 20px;
+    min-height: 100vh; /* Volle Bildschirmhöhe */
+    width: 99vw; /* Volle Breite */
 }
 
 .hero h1 {
@@ -132,6 +140,47 @@ body {
     color: #181818;
 }
 
+/* Allgemeine Section-Einstellungen */
+section {
+    min-height: 100vh;  /* Volle Bildschirmhöhe */
+    width: 100vw;       /* Volle Breite */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Abschnitt: Über mich */
+.about {
+    background: #242424;
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.about h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.about p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
 /* Footer */
 .footer {
     background: rgba(30, 30, 30, 0.9);
@@ -140,7 +189,6 @@ body {
     width: 100%;
     backdrop-filter: blur(10px);
     font-size: 14px;
-    position: fixed;
     bottom: 0;
     left: 0;
 }
