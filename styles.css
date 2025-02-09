@@ -368,6 +368,14 @@ html {
         font-size: 16px;
     }
 
+    .btn:focus,
+    .btn:active {
+        outline: none !important;
+        box-shadow: none !important;
+        background: none !important;
+        color: white !important;
+    }
+
     .btn {
         font-size: 16px;
         padding: 10px 20px;
@@ -546,6 +554,14 @@ html {
 
     .hero p {
         font-size: 16px;
+    }
+
+    .btn:focus,
+    .btn:active {
+        outline: none !important;
+        box-shadow: none !important;
+        background: none !important;
+        color: white !important;
     }
 
     .btn {
