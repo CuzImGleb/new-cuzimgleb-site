@@ -111,7 +111,7 @@ body {
     text-align: center;
     padding: 120px 20px;
     min-height: 100vh; /* Volle Bildschirmhöhe */
-    width: 99vw; /* Volle Breite */
+    width: 100vw; /* Volle Breite */
 }
 
 .hero h1 {
@@ -357,7 +357,7 @@ html {
     /* 🎯 Hero-Section */
     .hero {
         padding: 80px 15px;
-        min-height: 85vh;
+        min-height: 100svh;
     }
 
     .hero h1 {
@@ -537,7 +537,7 @@ html {
     /* 🎯 Hero-Section */
     .hero {
         padding: 80px 15px;
-        min-height: 85vh;
+        min-height: 100svh;
     }
 
     .hero h1 {
