@@ -40,6 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Event-Listener für den Home-Button
     document.getElementById("scrollToTop").addEventListener("click", scrollToTop);
+    
+    // Event-Listener für den Home-Button
+    document.getElementById("backHomepage").addEventListener("click", scrollToTop);
 });
 
 // Mobile UI
