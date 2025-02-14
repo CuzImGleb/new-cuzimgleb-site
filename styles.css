@@ -26,6 +26,45 @@ body {
     display: none;
 }
 
+/* Loader mit dunklerem, nicht zu hellem Hintergrund */
+#loader {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(62, 70, 87, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 2.5s cubic-bezier(0.65, 0, 0.35, 1), background-color 2.5s ease-out;
+}
+
+/* Spinner-Animation */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Nach dem Laden */
+.loaded #loader {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loaded #loader::after {
+    opacity: 1;
+}
+
 /* Header */
 .header {
     position: fixed;
@@ -110,11 +149,10 @@ body {
     align-items: center;
     text-align: center;
     padding: 120px 20px;
-    min-height: 100vh; /* Volle Bildschirmhöhe */
-    width: 100vw; /* Volle Breite */
+    min-height: 100vh;
+    width: 100vw;
     opacity: 0;
     transform: translateY(-50px);
-    animation: dropIn 0.8s ease-out forwards;
 }
 
 .hero h1 {
@@ -124,7 +162,6 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     opacity: 0;
     transform: translateY(-50px);
-    animation: dropIn 0.8s ease-out forwards;
 }
 
 .hero p {
@@ -133,7 +170,6 @@ body {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
     opacity: 0;
     transform: translateY(-50px);
-    animation: dropIn 0.8s ease-out forwards;
     animation-delay: 0.3s;
 }
 
@@ -169,8 +205,8 @@ body {
 
 /* Allgemeine Section-Einstellungen */
 section {
-    min-height: 100vh;  /* Volle Bildschirmhöhe */
-    width: 100vw;       /* Volle Breite */
+    min-height: 100vh;
+    width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -234,7 +270,7 @@ section {
     transition-delay: 0.8s;
 }
 
-/* ✨ Neu: Runter-Animation beim Hochscrollen ✨ */
+/* Runter-Animation beim Hochscrollen */
 .about.hide {
     opacity: 0;
     transform: translateY(0px);
@@ -254,7 +290,7 @@ html {
 /* Abschnitt: Projekte */
 .projects {
     background: #2a2a2a;
-    text-align: center; /* Zentriert den Text */
+    text-align: center;
     opacity: 0;
     transform: translateY(0);
     transition: opacity 0.8s ease-out, transform 0.8s ease-out;
@@ -287,7 +323,7 @@ html {
 .projects container {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Zentriert die Inhalte horizontal */
+    align-items: center;
     justify-content: center;
 }
 
@@ -297,12 +333,12 @@ html {
 
 .slider {
     position: relative;
-    width: 80%; /* Etwas schmaler, um es besser zu zentrieren */
-    max-width: 800px; /* Optional: Begrenzung der Breite */
+    width: 80%;
+    max-width: 800px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Zentriert die Slides */
+    align-items: center;
 }
 
 .slides {
@@ -317,10 +353,10 @@ html {
 }
 
 .slide p {
-    max-width: 600px; /* Begrenzung der Breite */
-    word-wrap: break-word; /* Falls lange Wörter das Layout sprengen */
-    text-align: center; /* Sorgt dafür, dass der Text immer zentriert bleibt */
-    margin: 0 auto; /* Stellt sicher, dass der Text mittig bleibt */
+    max-width: 600px;
+    word-wrap: break-word;
+    text-align: center;
+    margin: 0 auto;
 }
 
 .slide a {
@@ -332,7 +368,7 @@ html {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.2); /* Dezente Transparenz */
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
     border: none;
     padding: 15px;
@@ -345,13 +381,13 @@ html {
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    font-size: 20px; /* Größere Pfeile */
+    font-size: 20px;
 }
 
 /* Hover-Effekt */
 .prev:hover, .next:hover {
     background-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-50%) scale(1.1); /* Leichte Vergrößerung */
+    transform: translateY(-50%) scale(1.1);
 }
 
 .prev { left: 20px; }
@@ -490,16 +526,16 @@ html {
         text-align: center;
         font-size: 24px;
         font-weight: bold;
-        margin-top: 10px; /* Abstand nach oben */
+        margin-top: 10px;
         color: white;
-        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
+        z-index: 10;
     }
 
     .about p {
         font-size: 15px;
         max-width: 600px;
         line-height: 1.6;
-        color: white; /* Falls dein Hintergrund dunkel ist */
+        color: white;
     }
 
     /* 🎬 Projekte & Slider */
@@ -508,9 +544,9 @@ html {
         text-align: center;
         font-size: 24px;
         font-weight: bold;
-        margin-top: 10px; /* Abstand nach oben */
+        margin-top: 10px;
         color: white;
-        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
+        z-index: 10;
     }
 
     .projects .container {
@@ -543,18 +579,18 @@ html {
     }
 
     .slide p {
-        font-size: 12px; /* Kleinere Schrift für mobile Ansicht */
-        line-height: 1.4; /* Erhöhte Zeilenhöhe für bessere Lesbarkeit */
-        word-wrap: break-word; /* Lange Wörter umbrechen */
-        overflow-wrap: break-word; /* Alternative für bessere Unterstützung */
-        white-space: normal; /* Falls Text nicht umbricht */
-        max-width: 60%; /* Breite auf 90% des Containers begrenzen */
-        margin: 0 auto; /* Zentriert den Text */
-        text-align: center; /* Text bleibt mittig */
+        font-size: 12px;
+        line-height: 1.4;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        max-width: 60%;
+        margin: 0 auto;
+        text-align: center;
     }
     
     .slide img {
-        max-width: 90%; /* Damit das Bild nicht über den Rand hinausgeht */
+        max-width: 90%;
         height: auto;
     }
     
@@ -691,16 +727,16 @@ html {
         text-align: center;
         font-size: 24px;
         font-weight: bold;
-        margin-top: 10px; /* Abstand nach oben */
+        margin-top: 10px;
         color: white;
-        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
+        z-index: 10;
     }
 
     .about p {
         font-size: 15px;
         max-width: 600px;
         line-height: 1.6;
-        color: white; /* Falls dein Hintergrund dunkel ist */
+        color: white;
     }
 
     /* 🎬 Projekte & Slider */
@@ -709,9 +745,9 @@ html {
         text-align: center;
         font-size: 24px;
         font-weight: bold;
-        margin-top: 10px; /* Abstand nach oben */
+        margin-top: 10px;
         color: white;
-        z-index: 10; /* Damit es nicht von anderen Elementen verdeckt wird */
+        z-index: 10;
     }
 
     .projects .container {
@@ -744,18 +780,18 @@ html {
     }
 
     .slide p {
-        font-size: 12px; /* Kleinere Schrift für mobile Ansicht */
-        line-height: 1.4; /* Erhöhte Zeilenhöhe für bessere Lesbarkeit */
-        word-wrap: break-word; /* Lange Wörter umbrechen */
-        overflow-wrap: break-word; /* Alternative für bessere Unterstützung */
-        white-space: normal; /* Falls Text nicht umbricht */
-        max-width: 60%; /* Breite auf 90% des Containers begrenzen */
-        margin: 0 auto; /* Zentriert den Text */
-        text-align: center; /* Text bleibt mittig */
+        font-size: 12px;
+        line-height: 1.4;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        max-width: 60%;
+        margin: 0 auto;
+        text-align: center;
     }
     
     .slide img {
-        max-width: 90%; /* Damit das Bild nicht über den Rand hinausgeht */
+        max-width: 90%;
         height: auto;
     }
     

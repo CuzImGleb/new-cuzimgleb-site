@@ -3,6 +3,61 @@ let slideInterval;
 let startX = 0;
 let endX = 0;
 
+// Loader Remove
+document.addEventListener("DOMContentLoaded", () => {
+    const backgroundImage = new Image();
+    backgroundImage.src = "background.jpg";
+
+    const connection = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
+    let delayTime = 2000;
+
+    if (connection) {
+        if (connection.effectiveType === "slow-2g" || connection.effectiveType === "2g") {
+            delayTime = 5000;
+        } else if (connection.effectiveType === "3g") {
+            delayTime = 3500;
+        }
+    }
+
+    backgroundImage.onload = () => {
+        setTimeout(() => { 
+            document.body.classList.add("loaded");
+
+            setTimeout(() => {
+                document.getElementById("loader").classList.add("hidden");
+                startAnimations();
+            }, delayTime);
+        }, 1000);
+    };
+});
+
+function startAnimations() {
+    document.querySelectorAll(".hero, .hero h1, .hero p, .hero .btn").forEach(element => {
+        element.style.opacity = "1";
+        element.style.transform = "translateY(0)";
+        element.style.transition = "opacity 0.8s ease-out, transform 0.8s ease-out";
+    });
+}
+
+// Loader entfernen und sofort die Animationen starten
+function removeLoader() {
+    const loader = document.querySelector(".loader");
+    if (loader) {
+        loader.style.opacity = "0";
+        loader.style.transition = "opacity 0.3s ease-out";
+        setTimeout(() => {
+            loader.remove();
+            startAnimations();
+        }, 300);
+    }
+}
+
+// Eventlistener für den Ladevorgang
+window.addEventListener("load", () => {
+    setTimeout(removeLoader, 100);
+});
+
+
 // Main Page + Buttons + Transition
 
 window.onload = function () {
@@ -14,7 +69,7 @@ window.onload = function () {
     // Scrollt nach oben
     window.scrollTo({
         top: 0,
-        behavior: "smooth" // Sofortiges Hochscrollen (alternativ "smooth" für sanftes Scrollen)
+        behavior: "smooth"
     });
 };
 
@@ -28,10 +83,10 @@ document.getElementById("scrollToTop").addEventListener("click", function(event)
 
 document.addEventListener("DOMContentLoaded", function () {
     function scrollToTop(event) {
-        event.preventDefault(); // Verhindert das Neuladen der Seite
+        event.preventDefault();
         window.scrollTo({
             top: 0,
-            behavior: "smooth" // Sanfter Scroll-Effekt
+            behavior: "smooth"
         });
     }
 
@@ -112,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 aboutSection.classList.add("show");
                 aboutSection.classList.remove("hide");
             } else {
-                if (window.scrollY < lastScrollY) { // Prüft, ob der User hochscrollt
+                if (window.scrollY < lastScrollY) {
                     aboutSection.classList.add("hide");
                 }
                 aboutSection.classList.remove("show");
