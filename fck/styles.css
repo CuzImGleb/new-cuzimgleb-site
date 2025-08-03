@@ -1,0 +1,366 @@
+/* === Farbvariablen & Layoutgrößen === */
+:root {
+  --primary-bg: #0f2c3f;
+  --secondary-bg: #14374d;
+  --accent-color: #e30613;
+  --text-color: #e0e0e0;
+  --box-bg: rgba(20, 55, 77, 0.95);
+  --sidebar-width: 250px;
+}
+
+/* === Globale Einstellungen === */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f2c3f 0%, #102737 100%);
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+
+body.loaded {
+  opacity: 1;
+}
+
+@keyframes highlightFlash {
+  0%   { box-shadow: 0 0 0px rgba(255, 255, 255, 0); }
+  50%  { box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.4); }
+  100% { box-shadow: 0 0 0px rgba(255, 255, 255, 0); }
+}
+
+.highlight-effect {
+  animation: highlightFlash 1s ease-out;
+}
+
+
+/* === Sidebar === */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--secondary-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-size: 1.4em;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar nav a {
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background-color: #1c4865;
+}
+
+/* === Hauptbereich (Main) Layout === */
+main {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 30px;
+  align-items: stretch;
+}
+
+.layout-wrapper {
+  display: flex;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.top-boxes {
+  display: flex;
+  gap: 10px;
+}
+
+#last-matches, 
+#undefeated-series {
+  flex: 1;
+  min-height: 200px; /* kleiner als vorher */
+}
+
+#news-box {
+  min-height: 250px; /* nimmt komplette Breite darunter */
+}
+
+/* === Karten-Design (z.B. Tabelle, Spiele etc.) === */
+.card {
+  background-color: var(--box-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--accent-color);
+  font-size: 1.3em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 5px;
+}
+
+/* === Tabellen-Styles === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.team-logo-small {
+  width: 15px;
+  height: auto;
+  vertical-align: middle;
+}
+
+.highlight-fck {
+  color: white;
+  font-weight: bold;
+}
+
+.place-green {
+  background-color: rgba(0, 128, 0, 0.3) !important;
+}
+
+.place-yellow {
+  background-color: rgba(255, 204, 0, 0.3) !important;
+}
+
+.place-red {
+  background-color: rgba(255, 0, 0, 0.3) !important;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* === Match-Box (Nächstes Spiel) === */
+.match-teams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.match-teams img {
+  width: 40px;
+}
+
+.match-date {
+  font-size: 0.95em;
+  margin-top: 10px;
+  color: #cccccc;
+  text-align: center;
+}
+
+/* === Spiel-Listen (vergangene / kommende Spiele) === */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+ul li {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8em;
+}
+
+/* === Ungeschlagene Serie (Statistik) === */
+.stats {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
+}
+
+.highscore {
+  font-size: 0.9em;
+  color: #cccccc;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* === News === */
+#news-list a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+#news-list a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+#news-list small {
+  color: #bbb; /* etwas helleres Grau für die Quelle */
+}
+
+#news-box a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+#news-box a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+#news-box small {
+  color: #bbb; /* etwas helleres Grau für die Quelle */
+} 
+
+#news-box .more-news-link {
+  margin-top: 12px;
+  text-align: right;
+}
+
+#news-box .more-news-link a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+/* === Responsive Layout für Mobilgeräte === */
+@media (max-width: 1180px) {
+  /* Sidebar nach oben statt links */
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 10px;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .sidebar nav a {
+    padding: 8px 10px;
+    font-size: 0.85em;
+  }
+
+  .layout-wrapper {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  main {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .top-boxes,
+  .right-column {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .match-teams {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .match-teams img {
+    width: 30px;
+  }
+
+  .team-logo-small {
+    width: 12px;
+  }
+
+  ul li {
+    font-size: 0.75em;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+  }
+
+  .stats {
+    font-size: 2em;
+  }
+
+  .footer {
+    font-size: 0.7em;
+    padding: 10px;
+  }
+}
+
+/* === Footer === */
+.footer {
+  text-align: center;
+  font-size: 0.75em;
+  color: #aaaaaa;
+  background-color: #102737;
+  padding: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}

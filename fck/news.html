@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FCK News</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>⚽ FCK Dashboard</h2>
+    <nav>
+      <a href="index.html">🏠 Start</a>
+      <a href="index.html#tabelle-box">📈 Tabelle</a>
+      <a href="index.html#next-match-box">📅 Spiele</a>
+      <a href="index.html#undefeated-series">⚡ Serien</a>
+      <a href="news.html" class="active">📰 News</a>
+      <a href="index.html#footer">ℹ️ Info</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="card">
+      <h3>📰 Aktuelle News zum FCK</h3>
+      <ul id="news-list">
+        <li>News werden geladen...</li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="news.js"></script>
+  <script>
+    window.addEventListener("load", () => {
+      document.body.classList.add("loaded");
+    });
+  </script>
+</body>
+</html>
