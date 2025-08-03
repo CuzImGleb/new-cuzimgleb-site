@@ -102,13 +102,19 @@ async function loadNews() {
     const data = await res.json();
 
     if (data && data.items && data.items.length > 0) {
+      data.items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+      
       newsList.innerHTML = "";
 
-      data.items.slice(0, 5).forEach(item => {
+      data.items.slice(0, 6).forEach(item => {
         // Datum formatieren
         const date = new Date(item.pubDate);
         const formattedDate = date.toLocaleDateString("de-DE", {
-          day: "2-digit", month: "2-digit", year: "numeric"
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
         });
 
         // Quelle extrahieren
