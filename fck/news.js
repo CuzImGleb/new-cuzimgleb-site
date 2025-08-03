@@ -10,7 +10,7 @@ function extractSourceFromTitle(title) {
   return "Unbekannte Quelle";
 }
 
-if (window.location.pathname.endsWith("news.html")) {
+if (window.location.pathname.endsWith('news') || window.location.pathname.endsWith('news.html')) {
   console.log(`[${new Date().toISOString()}] news.html geladen – beginne mit Abrufen der News.`);
 
   // Nur auf news.html ausführen
