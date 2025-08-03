@@ -5,28 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FCK News</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/png" href="/web-icons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/web-icons/favicon.svg" />
+  <link rel="shortcut icon" href="/web-icons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/web-icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/web-icons/site.webmanifest" />
 </head>
 <body>
-  <aside class="sidebar">
-    <h2>⚽ FCK Dashboard</h2>
-    <nav>
-      <a href="index.html">🏠 Start</a>
-      <a href="index.html#tabelle-box">📈 Tabelle</a>
-      <a href="index.html#next-match-box">📅 Spiele</a>
-      <a href="index.html#undefeated-series">⚡ Serien</a>
-      <a href="news.html" class="active">📰 News</a>
-      <a href="index.html#footer">ℹ️ Info</a>
-    </nav>
-  </aside>
+  <div class="layout-wrapper">
+    <aside class="sidebar">
+      <h2>⚽ FCK Dashboard</h2>
+      <nav>
+        <a href="index.html">🏠 Start</a>
+        <a href="index.html#tabelle-box">📈 Tabelle</a>
+        <a href="index.html#next-match-box">📅 Spiele</a>
+        <a href="index.html#undefeated-series">⚡ Serien</a>
+        <a href="news.html" class="active">📰 News</a>
+        <a href="index.html#footer">ℹ️ Info</a>
+      </nav>
+    </aside>
 
-  <main>
-    <div class="card">
-      <h3>📰 Aktuelle News zum FCK</h3>
-      <ul id="news-list">
-        <li>News werden geladen...</li>
-      </ul>
-    </div>
-  </main>
+    <main>
+      <div class="card full-width-news">
+        <h3>📰 Aktuelle News zum FCK</h3>
+        <ul id="news-list">
+          <li>News werden geladen...</li>
+        </ul>
+      </div>
+    </main>
+  </div>
 
   <script src="news.js"></script>
   <script>

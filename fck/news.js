@@ -10,62 +10,63 @@ function extractSourceFromTitle(title) {
   return "Unbekannte Quelle";
 }
 
-Promise.all([
-  fetch(rssApiUrl).then(res => res.json()),
-  fetch(gnewsApiUrl).then(res => res.json())
-])
-  .then(([rssData, gnewsData]) => {
-    const newsList = document.getElementById("news-list");
-    newsList.innerHTML = "";
+if (window.location.pathname.endsWith("news.html")) {
+  // Nur auf news.html ausführen
+  Promise.all([
+    fetch(rssApiUrl).then(res => res.json()),
+    fetch(gnewsApiUrl).then(res => res.json())
+  ])
+    .then(([rssData, gnewsData]) => {
+      const newsList = document.getElementById("news-list");
+      newsList.innerHTML = "";
 
-    const rssItems = (rssData.items || []).map(item => ({
-      title: item.title,
-      link: item.link,
-      pubDate: new Date(item.pubDate),
-      source: extractSourceFromTitle(item.title), // Nur für RSS!
-      image: null // keine Bilder bei RSS
-    }));
+      const rssItems = (rssData.items || []).map(item => ({
+        title: item.title,
+        link: item.link,
+        pubDate: new Date(item.pubDate),
+        source: extractSourceFromTitle(item.title),
+        image: null
+      }));
 
-    const gnewsItems = (gnewsData.articles || []).map(article => ({
+      const gnewsItems = (gnewsData.articles || []).map(article => ({
         title: article.title,
         link: article.url,
         pubDate: new Date(article.publishedAt),
         source: article.source.name,
         image: article.image
-    }));
+      }));
 
-    // Zusammenführen und sortieren
-    const allItems = [...rssItems, ...gnewsItems].sort((a, b) => b.pubDate - a.pubDate);
+      const allItems = [...rssItems, ...gnewsItems].sort((a, b) => b.pubDate - a.pubDate);
 
-    allItems.slice(0, 15).forEach((item, i) => {
-      const li = document.createElement("li");
-      li.style.setProperty("--i", i);
+      allItems.slice(0, 15).forEach((item, i) => {
+        const li = document.createElement("li");
+        li.style.setProperty("--i", i);
 
-      const formattedDate = item.pubDate.toLocaleDateString("de-DE", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
+        const formattedDate = item.pubDate.toLocaleDateString("de-DE", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
 
-      li.innerHTML = `
-        <a href="${item.link}" target="_blank" rel="noopener" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+        li.innerHTML = `
+          <a href="${item.link}" target="_blank" rel="noopener" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
             ${item.image ? `<img src="${item.image}" alt="Thumbnail" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; border-radius: 6px;">` : ""}
             <div style="display: flex; flex-direction: column;">
-            <span style="font-weight: bold;">${item.title}</span>
-            <small style="color: #888;">Quelle: ${item.source} | ${formattedDate}</small>
+              <span style="font-weight: bold;">${item.title}</span>
+              <small style="color: #888;">Quelle: ${item.source} | ${formattedDate}</small>
             </div>
-        </a>
+          </a>
         `;
-
-      newsList.appendChild(li);
+        newsList.appendChild(li);
+      });
+    })
+    .catch(err => {
+      document.getElementById("news-list").innerHTML = "<li>Fehler beim Laden der News.</li>";
+      console.error("Fehler beim Abrufen der News:", err);
     });
-  })
-  .catch(err => {
-    document.getElementById("news-list").innerHTML = "<li>Fehler beim Laden der News.</li>";
-    console.error("Fehler beim Abrufen der News:", err);
-  });
+}
 
 async function loadNews() {
   const newsList = document.getElementById("news-list2");

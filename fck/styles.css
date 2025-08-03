@@ -236,6 +236,15 @@ ul li {
 }
 
 /* === News === */
+.full-width-news {
+  width: 85vw; /* komplette Bildschirmbreite */
+  margin: 0;
+  padding: 30px 40px; /* Abstand innen */
+  background-color: var(--box-bg);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
 #news-list a {
   color: white;
   text-decoration: none;
