@@ -11,12 +11,35 @@ function extractSourceFromTitle(title) {
 }
 
 if (window.location.pathname.endsWith("news.html")) {
+  console.log(`[${new Date().toISOString()}] news.html geladen – beginne mit Abrufen der News.`);
+
   // Nur auf news.html ausführen
-  Promise.all([
-    fetch(rssApiUrl).then(res => res.json()),
-    fetch(gnewsApiUrl).then(res => res.json())
-  ])
-    .then(([rssData, gnewsData]) => {
+  fetch(rssApiUrl)
+    .then(res => {
+      console.log(`[${new Date().toISOString()}] RSS-API aufgerufen: ${rssApiUrl}`);
+      if (!res.ok) throw new Error(`RSS-API-Fehler: ${res.status} ${res.statusText}`);
+      return res.json();
+    })
+    .then(async (rssData) => {
+      let gnewsItems = [];
+      try {
+        const gnewsRes = await fetch(gnewsApiUrl);
+        console.log(`[${new Date().toISOString()}] GNews-API aufgerufen: ${gnewsApiUrl}`);
+        if (!gnewsRes.ok) throw new Error(`GNews-API-Fehler: ${gnewsRes.status} ${gnewsRes.statusText}`);
+        const gnewsData = await gnewsRes.json();
+
+        gnewsItems = (gnewsData.articles || []).map(article => ({
+          title: article.title,
+          link: article.url,
+          pubDate: new Date(article.publishedAt),
+          source: article.source.name,
+          image: article.image
+        }));
+      } catch (gnewsErr) {
+        console.warn(`[${new Date().toISOString()}] GNews konnte nicht geladen werden: ${gnewsErr.message}`);
+        gnewsItems = []; // leere Liste, wenn GNews scheitert
+      }
+
       const newsList = document.getElementById("news-list");
       newsList.innerHTML = "";
 
@@ -28,15 +51,8 @@ if (window.location.pathname.endsWith("news.html")) {
         image: null
       }));
 
-      const gnewsItems = (gnewsData.articles || []).map(article => ({
-        title: article.title,
-        link: article.url,
-        pubDate: new Date(article.publishedAt),
-        source: article.source.name,
-        image: article.image
-      }));
-
       const allItems = [...rssItems, ...gnewsItems].sort((a, b) => b.pubDate - a.pubDate);
+      console.log(`[${new Date().toISOString()}] Insgesamt ${allItems.length} Newsartikel geladen.`);
 
       allItems.slice(0, 15).forEach((item, i) => {
         const li = document.createElement("li");
@@ -63,10 +79,16 @@ if (window.location.pathname.endsWith("news.html")) {
       });
     })
     .catch(err => {
-      document.getElementById("news-list").innerHTML = "<li>Fehler beim Laden der News.</li>";
-      console.error("Fehler beim Abrufen der News:", err);
+      const errorMsg = `[${new Date().toISOString()}] Fehler beim Abrufen der News: ${err.message}`;
+      console.error(errorMsg, err);
+      const newsList = document.getElementById("news-list");
+      if (newsList) {
+        newsList.innerHTML = `<li>Fehler beim Laden der News</li>`;
+      }
     });
 }
+
+
 
 async function loadNews() {
   const newsList = document.getElementById("news-list2");
