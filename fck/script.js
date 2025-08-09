@@ -151,9 +151,11 @@ function updateNextMatch(matches) {
     return;
   }
 
+  const fallbackIcon = "icons/default.png";
+
   // Logos aktualisieren
-  document.querySelector("#next-match-box img[alt='Team 1']").src = nextMatch.team1.teamIconUrl;
-  document.querySelector("#next-match-box img[alt='Team 2']").src = nextMatch.team2.teamIconUrl;
+    document.querySelector("#next-match-box img[alt='Team 1']").src = nextMatch.team1?.teamIconUrl || fallbackIcon;
+    document.querySelector("#next-match-box img[alt='Team 2']").src = nextMatch.team2?.teamIconUrl || fallbackIcon;
 
   // Datum & Uhrzeit formatieren
   const matchDate = new Date(nextMatch.matchDateTime);
@@ -172,6 +174,7 @@ function updateNextMatch(matches) {
 // Zeigt die nächsten 10 Spiele an
 function updateUpcomingMatches(matches) {
   const upcomingList = document.getElementById("upcoming-list");
+  const fallbackIcon = "icons/default.png";
   upcomingList.innerHTML = '';
 
   const upcomingMatches = matches
@@ -192,9 +195,9 @@ function updateUpcomingMatches(matches) {
 
     const li = document.createElement("li");
     li.innerHTML = `
-      <img class="team-logo-small" src="${match.team1.teamIconUrl}" alt="${team1}">
+      <img class="team-logo-small" src="${match.team1?.teamIconUrl || fallbackIcon}" alt="${team1}">
       <span>${team1} vs ${team2}</span>
-      <img class="team-logo-small" src="${match.team2.teamIconUrl}" alt="${team2}">
+      <img class="team-logo-small" src="${match.team2?.teamIconUrl || fallbackIcon}" alt="${team2}">
       <span>${formattedDate}</span>
     `;
 
