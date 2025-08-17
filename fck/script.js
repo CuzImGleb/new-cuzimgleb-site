@@ -213,6 +213,7 @@ function updateUpcomingMatches(matches) {
 // Zeigt die letzten 5 Spiele (mit Ergebnis) an
 function updateLastMatches(matches) {
   const lastMatchList = document.getElementById("last-match-list");
+  const fallbackIcon = "icons/default.png";
   lastMatchList.innerHTML = '';
 
   const lastMatches = matches
@@ -234,10 +235,16 @@ function updateLastMatches(matches) {
 
     const li = document.createElement("li");
     li.innerHTML = `
-      <img class="team-logo-small" src="${match.team1.teamIconUrl}" alt="${team1}">
+      <img class="team-logo-small" src="${match.team1.teamIconUrl || fallbackIcon}" alt="${team1}">
       <span>${team1} ${team1Goals} - ${team2Goals} ${team2}</span>
-      <img class="team-logo-small" src="${match.team2.teamIconUrl}" alt="${team2}">
+      <img class="team-logo-small" src="${match.team2.teamIconUrl || fallbackIcon}" alt="${team2}">
     `;
+
+    if (match.leagueShortcut?.toLowerCase() === "dfb") {
+      li.style.backgroundColor = "#138f30c0";
+      li.style.color = "#FFFFFF";
+    }
+
     lastMatchList.appendChild(li);
   });
 }
@@ -245,6 +252,7 @@ function updateLastMatches(matches) {
 // Analyse der aktuellen und längsten Serie ohne Niederlage
 function updateUndefeatedSeries(matches) {
 
+  // Spiele nach Datum sortieren
   matches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
 
   let currentSeries = 0;
@@ -263,10 +271,12 @@ function updateUndefeatedSeries(matches) {
     const isFCKTeam1 = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team1.shortName?.toLowerCase() === "kaiserslautern";
     const isFCKTeam2 = match.team2.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team2.shortName?.toLowerCase() === "kaiserslautern";
 
-    const matchDate = match.matchDateTime ? new Date(match.matchDateTime).toLocaleDateString() : "Datum unbekannt";
+    const matchDate = match.matchDateTime ? new Date(match.matchDateTime).toLocaleDateString("de-DE") : "Datum unbekannt";
 
     // Ungeschlagen = Sieg oder Unentschieden
-    if ((isFCKTeam1 && team1Goals >= team2Goals) || (isFCKTeam2 && team2Goals >= team1Goals)) {
+    let isUndefeated = (isFCKTeam1 && team1Goals >= team2Goals) || (isFCKTeam2 && team2Goals >= team1Goals);
+
+    if (isUndefeated) {
       if (!isSeriesActive) {
         currentSeries = 1;
         isSeriesActive = true;
@@ -283,8 +293,10 @@ function updateUndefeatedSeries(matches) {
       currentSeries = 0;
       isSeriesActive = false;
     }
+
   }
 
+  // UI-Update
   const unstoppableElement = document.getElementById("undefeated-series-count");
   if (unstoppableElement) {
     unstoppableElement.textContent = currentSeries;
@@ -301,4 +313,5 @@ function updateUndefeatedSeries(matches) {
 
   return { currentSeries, longestSeries };
 }
+
 
