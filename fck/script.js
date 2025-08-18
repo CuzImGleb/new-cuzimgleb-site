@@ -117,6 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
       updateUpcomingMatches(fckMatches2025);
       updateLastMatches(allFckMatches);
       updateUndefeatedSeries(allFckMatches);
+      renderUndefeatedSeriesVisual(allFckMatches);
     })
     .catch(error => console.error("Fehler beim Laden der Daten:", error));
 });
@@ -252,7 +253,6 @@ function updateLastMatches(matches) {
 // Analyse der aktuellen und längsten Serie ohne Niederlage
 function updateUndefeatedSeries(matches) {
 
-  // Spiele nach Datum sortieren
   matches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
 
   let currentSeries = 0;
@@ -273,7 +273,6 @@ function updateUndefeatedSeries(matches) {
 
     const matchDate = match.matchDateTime ? new Date(match.matchDateTime).toLocaleDateString("de-DE") : "Datum unbekannt";
 
-    // Ungeschlagen = Sieg oder Unentschieden
     let isUndefeated = (isFCKTeam1 && team1Goals >= team2Goals) || (isFCKTeam2 && team2Goals >= team1Goals);
 
     if (isUndefeated) {
@@ -313,5 +312,167 @@ function updateUndefeatedSeries(matches) {
 
   return { currentSeries, longestSeries };
 }
+
+
+function renderUndefeatedSeriesVisual(matches) {
+  const currentContainer = document.getElementById("undefeated-current-list");
+  const longestContainer = document.getElementById("undefeated-longest-list");
+  currentContainer.innerHTML = "";
+  longestContainer.innerHTML = "";
+
+  matches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
+
+  let currentSeries = [];
+  let longestSeries = [];
+  let tempSeries = [];
+
+  for (const match of matches) {
+    if (match.leagueName?.toLowerCase().includes("dfb")) continue;
+    if (!match.matchIsFinished) continue;
+
+    const isFCKTeam1 =
+      match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" ||
+      match.team1.shortName?.toLowerCase() === "kaiserslautern";
+    const isFCKTeam2 =
+      match.team2.teamName.toLowerCase() === "1. fc kaiserslautern" ||
+      match.team2.shortName?.toLowerCase() === "kaiserslautern";
+
+    if (!isFCKTeam1 && !isFCKTeam2) continue;
+
+    const team1Goals = match.matchResults?.[1]?.pointsTeam1 ?? null;
+    const team2Goals = match.matchResults?.[1]?.pointsTeam2 ?? null;
+
+    let fckGoals, opponentGoals, opponent;
+    if (isFCKTeam1) {
+      fckGoals = team1Goals;
+      opponentGoals = team2Goals;
+      opponent = match.team2;
+    } else {
+      fckGoals = team2Goals;
+      opponentGoals = team1Goals;
+      opponent = match.team1;
+    }
+
+    let resultType = null;
+    if (fckGoals > opponentGoals) {
+      resultType = "win";
+    } else if (fckGoals === opponentGoals) {
+      resultType = "draw";
+    } else {
+      if (tempSeries.length > longestSeries.length) longestSeries = [...tempSeries];
+      tempSeries = [];
+      continue;
+    }
+
+    const matchDate = match.matchDateTime
+      ? new Date(match.matchDateTime).toLocaleDateString()
+      : "Datum unbekannt";
+
+    const logoUrl = opponent.teamIconUrl || "icons/default.png";
+    const opponentName = opponent.teamName;
+
+    tempSeries.push({
+      type: resultType,
+      date: matchDate,
+      logo: logoUrl,
+      opponent: opponentName,
+      result: `${fckGoals}:${opponentGoals}`,
+      tournament: match.leagueName || match.group?.groupName || "Unbekannt"
+    });
+  }
+
+  if (tempSeries.length > longestSeries.length) longestSeries = [...tempSeries];
+  currentSeries = [...tempSeries];
+
+function renderSeries(container, series) {
+  for (const game of series) {
+    const item = document.createElement("div");
+    item.classList.add("series-item");
+    const symbol = game.type === "win" ? "✔" : "–";
+    const circleClass = game.type === "win" ? "series-win" : "series-draw";
+
+    const tooltipText = `
+      Gegner: ${game.opponent}<br>
+      Ergebnis: ${game.result}<br>
+      Turnier: ${game.tournament}
+    `;
+
+    item.innerHTML = `
+      <div class="match-date">${game.date}</div>
+      <img src="${game.logo}" alt="${game.opponent}" 
+          style="width:24px;height:24px;border-radius:50%;margin-top:2px;">
+      <div class="opponent-name">${game.opponent}</div>
+      <div class="series-circle ${circleClass}">${symbol}</div>
+      <div class="series-tooltip">${tooltipText}</div>
+    `;
+
+    const tooltip = item.querySelector(".series-tooltip");
+
+    // Hilfsfunktion: Tooltip-Position für Desktop anpassen
+    function adjustTooltipPosition() {
+      tooltip.style.left = "50%";
+      tooltip.style.right = "auto";
+      tooltip.style.transform = "translateX(-50%)";
+
+      const rect = tooltip.getBoundingClientRect();
+
+      if (rect.left < 0) {
+        tooltip.style.left = "0px";
+        tooltip.style.transform = "none";
+      } else if (rect.right > window.innerWidth) {
+        tooltip.style.left = "auto";
+        tooltip.style.right = "0px";
+        tooltip.style.transform = "none";
+      }
+    }
+
+    // Desktop: Hover
+    item.addEventListener("mouseenter", () => {
+      if (window.innerWidth > 768) {
+        tooltip.style.display = "block";
+        adjustTooltipPosition();
+      }
+    });
+
+    item.addEventListener("mouseleave", () => {
+      tooltip.style.display = "none";
+      tooltip.style.left = "50%";
+      tooltip.style.right = "auto";
+      tooltip.style.transform = "translateX(-50%)";
+    });
+
+    // Mobile: Klick → Modal
+    item.addEventListener("click", () => {
+      if (window.innerWidth <= 768) {
+        const existingModal = document.getElementById("tooltip-modal");
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement("div");
+        modal.id = "tooltip-modal";
+        modal.innerHTML = `
+          <div class="tooltip-modal-content">
+            <button class="close-tooltip">&times;</button>
+            <div class="tooltip-text">${tooltipText}</div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector(".close-tooltip").addEventListener("click", () => {
+          modal.remove();
+        });
+      }
+    });
+
+    container.appendChild(item);
+  }
+}
+
+
+  renderSeries(currentContainer, currentSeries);
+  renderSeries(longestContainer, longestSeries);
+}
+
+
+
 
 
