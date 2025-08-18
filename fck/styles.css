@@ -38,6 +38,7 @@ body.loaded {
 
 .highlight-effect {
   animation: highlightFlash 1s ease-out;
+  animation-fill-mode: none;
 }
 
 
