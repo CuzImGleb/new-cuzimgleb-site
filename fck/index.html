@@ -27,33 +27,52 @@
       </nav>
     </aside>
     <main>
-      <div class="card" id="tabelle-box">
-        <h3>2. Bundesliga Tabelle</h3>
-        <table id="table">
-          <thead>
-            <tr><th>Platz</th><th>Team</th><th>Punkte</th></tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="3">Lade Daten...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card" id="next-match-box">
+        <div class="card" id="tabelle-box">
+          <h3>2. Bundesliga Tabelle</h3>
+          <table id="table">
+            <thead>
+              <tr><th>Platz</th><th>Team</th><th>Punkte</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="3">Lade Daten...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" id="next-match-box">
           <h3>Nächstes Spiel</h3>
           <div class="match-teams">
-              <img class="team-logo-large" src="icons/default.png" alt="Team 1">
-              <span>vs</span>
-              <img class="team-logo-large" src="icons/default.png" alt="Team 2">
+            <img class="team-logo-large" src="icons/default.png" alt="Team 1">
+            <span>vs</span>
+            <img class="team-logo-large" src="icons/default.png" alt="Team 2">
           </div>
           <p class="match-date">Lade Daten...</p>
-          <div id="scoreaxis-widget-ab6fe" style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#0f2c3f"><iframe id="Iframe" src="https://www.scoreaxis.com/widget/live-match/19433967?autoHeight=1&amp;lang=de&amp;bodyBackground=%230f2c3f&amp;textColor=%23ffffff&amp;inst=ab6fe" style="width:100%;border:none;transition:all 300ms ease"></iframe><script>window.addEventListener("DOMContentLoaded",event=>{window.addEventListener("message",event=>{if(event.data.appHeight&&"ab6fe"==event.data.inst){let container=document.querySelector("#scoreaxis-widget-ab6fe iframe");container&&(container.style.height=parseInt(event.data.appHeight)+"px")}},!1)});</script></div><div style="font-size: 12px; font-family: Arial, sans-serif; text-align: left;"></div>
-      </div>
-      <div class="card" id="upcoming-match-box">
+          <div id="scoreaxis-widget-ab6fe" 
+              style="border-width:1px;border-color:rgba(0, 0, 0, 0.15);border-style:solid;border-radius:8px;padding:10px;background:rgb(255, 255, 255);width:100%;background-color:#0f2c3f">
+            <iframe id="Iframe" 
+                    src="https://www.scoreaxis.com/widget/live-match/19433967?autoHeight=1&amp;lang=de&amp;bodyBackground=%230f2c3f&amp;textColor=%23ffffff&amp;inst=ab6fe" 
+                    style="width:100%;border:none;transition:all 300ms ease">
+            </iframe>
+            <script>
+              window.addEventListener("DOMContentLoaded",event=>{
+                window.addEventListener("message",event=>{
+                  if(event.data.appHeight && "ab6fe"==event.data.inst){
+                    let container=document.querySelector("#scoreaxis-widget-ab6fe iframe");
+                    if(container) container.style.height=parseInt(event.data.appHeight)+"px";
+                  }
+                },!1)
+              });
+            </script>
+          </div>
+
+        <div class="card" id="upcoming-match-box">
           <h3>Nächste Spiele</h3>
           <ul id="upcoming-list">
-              <li>Lade Daten...</li>
+            <li>Lade Daten...</li>
           </ul>
+        </div>
       </div>
+
 
     <div class="right-column">
       <div class="top-boxes">

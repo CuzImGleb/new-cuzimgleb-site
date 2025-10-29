@@ -96,50 +96,72 @@ async function fetchTable() {
 fetchTable();
 
 // Nach dem Laden der Seite Daten abrufen und verarbeiten
-document.addEventListener("DOMContentLoaded", function () {
-  const season2024 = "2024";
-  const season2025 = "2025";
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const seasons = ["2024", "2025"];
+    const allMatches = [];
 
-  // Spiele aus beiden Saisons abrufen
-  Promise.all([
-    fetchSeasonData(season2024),
-    fetchSeasonData(season2025)
-  ])
-    .then(([matches2024, matches2025]) => {
-      // Nur FCK-Spiele extrahieren
-      const fckMatches2024 = filterFCKMatches(matches2024);
-      const fckMatches2025 = filterFCKMatches(matches2025);
-      const allFckMatches = [...fckMatches2024, ...fckMatches2025]
-        .sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
+    // Alle Saisons laden
+    for (const season of seasons) {
+      const seasonMatches = await fetchSeasonData(season);
+      allMatches.push(...seasonMatches);
+    }
 
-      // Funktionen zur Anzeige aufrufen
-      updateNextMatch(fckMatches2025);
-      updateUpcomingMatches(fckMatches2025);
-      updateLastMatches(allFckMatches);
-      updateUndefeatedSeries(allFckMatches);
-      renderUndefeatedSeriesVisual(allFckMatches);
-    })
-    .catch(error => console.error("Fehler beim Laden der Daten:", error));
+    // --- Filter ---
+    const filteredMatches = filterRelevantMatches(allMatches);
+
+    const allSortedMatches = [...filteredMatches].sort(
+      (a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime)
+    );
+
+    // --- Render ---
+    updateNextMatch(filteredMatches);
+    updateUpcomingMatches(filteredMatches);
+    updateLastMatches(allSortedMatches);
+    updateUndefeatedSeries(allSortedMatches);
+    renderUndefeatedSeriesVisual(allSortedMatches);
+  } catch (error) {
+    console.error("❌ Fehler beim Laden der Daten:", error);
+  }
 });
 
-// Daten aus BL2 und DFB-Pokal abrufen
-function fetchSeasonData(season) {
-  const urlBL2 = `https://corsproxy.io/?url=https://www.openligadb.de/api/getmatchdata/bl2/${season}`;
-  const urlDFB = `https://corsproxy.io/?url=https://api.openligadb.de/getmatchdata/dfb/${season}`;
 
-  return Promise.all([
-    fetch(urlBL2).then(res => res.json()).catch(() => []),
-    fetch(urlDFB).then(res => res.json()).catch(() => [])
-  ]).then(([bl2, dfb]) => [...bl2, ...dfb]); // Zusammenführen der Spiele
+// Daten aus BL2, DFB-Pokal und Länderspielen abrufen
+async function fetchSeasonData(season) {
+  const leagues = ["bl2", "dfb", "dfbnat2526"];
+  const results = [];
+
+  for (const league of leagues) {
+    const url = `https://corsproxy.io/?url=https://api.openligadb.de/getmatchdata/${league}/${season}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Fehler bei ${league.toUpperCase()}: ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data)) results.push(...data);
+    } catch (err) {
+      console.warn(`⚠️ ${league.toUpperCase()} konnte nicht geladen werden (${season}):`, err.message);
+    }
+  }
+
+  return results;
 }
 
-// Filtert alle Spiele mit Beteiligung vom FCK
-function filterFCKMatches(matches) {
-  return matches.filter(match =>
-    match.team1.teamName.toLowerCase().includes("kaiserslautern") ||
-    match.team2.teamName.toLowerCase().includes("kaiserslautern")
-  );
+
+// Filtert alle relevanten Spiele (FCK + Deutschland)
+function filterRelevantMatches(matches) {
+  return matches.filter(match => {
+    const team1 = (match.team1?.teamName || "").toLowerCase();
+    const team2 = (match.team2?.teamName || "").toLowerCase();
+
+    return (
+      team1.includes("kaiserslautern") ||
+      team2.includes("kaiserslautern") ||
+      team1.includes("deutschland") ||
+      team2.includes("deutschland")
+    );
+  });
 }
+
 
 // Zeigt das nächste FCK-Spiel an
 function updateNextMatch(matches) {
@@ -189,8 +211,12 @@ function updateUpcomingMatches(matches) {
   }
 
   upcomingMatches.forEach(match => {
-    const team1 = match.team1.shortName || match.team1.teamName;
-    const team2 = match.team2.shortName || match.team2.teamName;
+    const isNational = match.leagueShortcut?.toLowerCase() === "dfbnat2526";
+
+    // Wenn Nationalspiel → immer voller Teamname
+    const team1 = isNational ? match.team1.teamName : (match.team1.shortName || match.team1.teamName);
+    const team2 = isNational ? match.team2.teamName : (match.team2.shortName || match.team2.teamName);
+
     const matchDate = new Date(match.matchDateTime);
     const formattedDate = matchDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 
@@ -203,7 +229,10 @@ function updateUpcomingMatches(matches) {
     `;
 
     if (match.leagueShortcut?.toLowerCase() === "dfb") {
-      li.style.backgroundColor = "#138f30c0";
+      li.style.backgroundColor = "#138f30c0"; // grün für Pokal
+      li.style.color = "#FFFFFF";
+    } else if (isNational) {
+      li.style.backgroundColor = "#808080c0"; // grau für Länderspiele
       li.style.color = "#FFFFFF";
     }
 
@@ -220,7 +249,7 @@ function updateLastMatches(matches) {
   const lastMatches = matches
     .filter(match => match.matchIsFinished)
     .sort((a, b) => new Date(b.matchDateTime) - new Date(a.matchDateTime))
-    .slice(0, 5);
+    .slice(0, 10);
 
   if (lastMatches.length === 0) {
     lastMatchList.innerHTML = "<li>Keine vergangenen Spiele gefunden.</li>";
@@ -244,7 +273,11 @@ function updateLastMatches(matches) {
     if (match.leagueShortcut?.toLowerCase() === "dfb") {
       li.style.backgroundColor = "#138f30c0";
       li.style.color = "#FFFFFF";
+    } else if (match.leagueShortcut?.toLowerCase() === "dfbnat2526") {
+      li.style.backgroundColor = "#808080c0";
+      li.style.color = "#FFFFFF";
     }
+
 
     lastMatchList.appendChild(li);
   });
