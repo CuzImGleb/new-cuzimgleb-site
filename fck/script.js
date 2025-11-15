@@ -257,8 +257,10 @@ function updateLastMatches(matches) {
   }
 
   lastMatches.forEach(match => {
-    const team1 = match.team1.shortName || match.team1.teamName;
-    const team2 = match.team2.shortName || match.team2.teamName;
+    const isNational = match.leagueShortcut?.toLowerCase() === "dfbnat2526";
+    const team1 = isNational ? match.team1.teamName : (match.team1.shortName || match.team1.teamName);
+    const team2 = isNational ? match.team2.teamName : (match.team2.shortName || match.team2.teamName);
+
     const result = match.matchResults.find(r => r.resultName === "Endergebnis") || match.matchResults[0];
     const team1Goals = result.pointsTeam1;
     const team2Goals = result.pointsTeam2;
