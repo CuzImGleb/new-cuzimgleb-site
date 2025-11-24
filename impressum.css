@@ -192,6 +192,14 @@ body {
     animation-delay: 0.25s;
 }
 
+.hero a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    background: transparent;
+    display: inline-block;
+}
+
 .hero p,
 .hero h3,
 .hero h1 {
