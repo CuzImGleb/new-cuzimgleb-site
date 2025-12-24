@@ -462,6 +462,23 @@ html, body {
     background: transparent;
 }
 
+/* 🚫 Cookiebot KOMPLETT verstecken */
+#CybotCookiebotDialog,
+#CybotCookiebotDialogBodyUnderlay {
+    display: none !important;
+}
+
+/* ✅ Cookiebot erst nach Spinner erlauben */
+.show-cookiebot #CybotCookiebotDialog,
+.show-cookiebot #CybotCookiebotDialogBodyUnderlay {
+    display: block !important;
+}
+
+/* 🔥 Overlay Abdunklung sicher über allem */
+#CybotCookiebotDialogBodyUnderlay {
+    background: rgba(0, 0, 0, 0.6) !important;
+}
+
 @media (max-width: 768px) {
     /* 🌟 Navigation */
     .menu-toggle {

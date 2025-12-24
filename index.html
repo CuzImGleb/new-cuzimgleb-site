@@ -120,27 +120,31 @@
         document.body.style.overflow = "hidden";
 
         let pageLoaded = false;
-        let cookiebotReady = false;
+        let cookiebotLoaded = false;
 
-        function tryHideLoader() {
-            if (pageLoaded && cookiebotReady) {
+        function tryFinishLoading() {
+            if (pageLoaded && cookiebotLoaded) {
+                // Spinner weg
                 document.body.classList.add("loaded");
+
+                // Cookiebot Overlay freigeben
+                document.body.classList.add("show-cookiebot");
             }
         }
 
-        // 1️⃣ Alles geladen (inkl. CDN, Bilder, CSS)
+        // 1️⃣ Alles geladen (inkl. CDN & Bilder)
         window.addEventListener("load", () => {
             pageLoaded = true;
-            tryHideLoader();
+            tryFinishLoading();
         });
 
-        // 2️⃣ Cookiebot initialisiert
+        // 2️⃣ Cookiebot ist INITIALISIERT (noch unsichtbar)
         function CookiebotCallback_OnLoad() {
-            cookiebotReady = true;
-            tryHideLoader();
+            cookiebotLoaded = true;
+            tryFinishLoading();
         }
 
-        // Scroll erst nach Consent freigeben
+        // Scroll & Klicks erst nach Auswahl erlauben
         function CookiebotCallback_OnAccept() {
             enablePage();
         }
