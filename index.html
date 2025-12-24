@@ -34,8 +34,6 @@
 </head>
 
 <body>
-    <div id="page-blocker"></div>
-
     <div id="loader">
         <div class="spinner"></div>
     </div>
@@ -113,53 +111,5 @@
         <p>© 2024-2025 CuzImGleb | Made by Gleb</p>
     </footer>
     <script src="script.js"></script>
-
-    <script>
-        // Scroll blockieren
-        document.documentElement.style.overflow = "hidden";
-        document.body.style.overflow = "hidden";
-
-        let pageLoaded = false;
-        let cookiebotLoaded = false;
-
-        function tryFinishLoading() {
-            if (pageLoaded && cookiebotLoaded) {
-                // Spinner weg
-                document.body.classList.add("loaded");
-
-                // Cookiebot Overlay freigeben
-                document.body.classList.add("show-cookiebot");
-            }
-        }
-
-        // 1️⃣ Alles geladen (inkl. CDN & Bilder)
-        window.addEventListener("load", () => {
-            pageLoaded = true;
-            tryFinishLoading();
-        });
-
-        // 2️⃣ Cookiebot ist INITIALISIERT (noch unsichtbar)
-        function CookiebotCallback_OnLoad() {
-            cookiebotLoaded = true;
-            tryFinishLoading();
-        }
-
-        // Scroll & Klicks erst nach Auswahl erlauben
-        function CookiebotCallback_OnAccept() {
-            enablePage();
-        }
-
-        function CookiebotCallback_OnDecline() {
-            enablePage();
-        }
-
-        function enablePage() {
-            document.documentElement.style.overflow = "auto";
-            document.body.style.overflow = "auto";
-
-            const blocker = document.getElementById("page-blocker");
-            if (blocker) blocker.remove();
-        }
-    </script>
 </body>
 </html>

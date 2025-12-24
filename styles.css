@@ -449,36 +449,6 @@ html {
     pointer-events: none;
 }
 
-/* Scroll initial sperren */
-html, body {
-    overflow: hidden;
-}
-
-/* Klick-Blocker */
-#page-blocker {
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
-    background: transparent;
-}
-
-/* 🚫 Cookiebot initial UNSICHTBAR, aber aktiv */
-#CybotCookiebotDialog,
-#CybotCookiebotDialogBodyUnderlay {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-}
-
-/* ✅ Nach Spinner: Cookiebot anzeigen */
-.show-cookiebot #CybotCookiebotDialog,
-.show-cookiebot #CybotCookiebotDialogBodyUnderlay {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
 @media (max-width: 768px) {
     /* 🌟 Navigation */
     .menu-toggle {
