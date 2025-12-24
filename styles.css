@@ -443,6 +443,25 @@ html {
     color: #ff0077;
 }
 
+/* 🔒 Initial Scroll sperren */
+html, body {
+    overflow: hidden;
+}
+
+/* 🔒 Klick-Blocker */
+#page-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: transparent;
+}
+
+/* Loader verschwindet sauber */
+.loaded #loader {
+    opacity: 0;
+    pointer-events: none;
+}
+
 @media (max-width: 768px) {
     /* 🌟 Navigation */
     .menu-toggle {
