@@ -449,6 +449,19 @@ html {
     pointer-events: none;
 }
 
+/* Scroll initial sperren */
+html, body {
+    overflow: hidden;
+}
+
+/* Klick-Blocker */
+#page-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: transparent;
+}
+
 @media (max-width: 768px) {
     /* 🌟 Navigation */
     .menu-toggle {

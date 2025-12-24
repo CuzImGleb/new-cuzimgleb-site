@@ -34,6 +34,7 @@
 </head>
 
 <body>
+    <div id="page-blocker"></div>
 
     <div id="loader">
         <div class="spinner"></div>
@@ -112,5 +113,49 @@
         <p>© 2024-2025 CuzImGleb | Made by Gleb</p>
     </footer>
     <script src="script.js"></script>
+
+    <script>
+        // Scroll blockieren
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+
+        let pageLoaded = false;
+        let cookiebotReady = false;
+
+        function tryHideLoader() {
+            if (pageLoaded && cookiebotReady) {
+                document.body.classList.add("loaded");
+            }
+        }
+
+        // 1️⃣ Alles geladen (inkl. CDN, Bilder, CSS)
+        window.addEventListener("load", () => {
+            pageLoaded = true;
+            tryHideLoader();
+        });
+
+        // 2️⃣ Cookiebot initialisiert
+        function CookiebotCallback_OnLoad() {
+            cookiebotReady = true;
+            tryHideLoader();
+        }
+
+        // Scroll erst nach Consent freigeben
+        function CookiebotCallback_OnAccept() {
+            enablePage();
+        }
+
+        function CookiebotCallback_OnDecline() {
+            enablePage();
+        }
+
+        function enablePage() {
+            document.documentElement.style.overflow = "auto";
+            document.body.style.overflow = "auto";
+
+            const blocker = document.getElementById("page-blocker");
+            if (blocker) blocker.remove();
+        }
+    </script>
 </body>
 </html>
