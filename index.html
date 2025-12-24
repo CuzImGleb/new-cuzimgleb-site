@@ -111,31 +111,6 @@
         <a href="https://www.youtube.com/@heycuzimgleb"><i class="fab fa-youtube"></i></a>
         <p>© 2024-2025 CuzImGleb | Made by Gleb</p>
     </footer>
-    <!-- ✅ Cookie + Spinner Steuerung -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Scroll blockieren
-            document.body.style.overflow = "hidden";
-
-            // Spinner anzeigen, dann Cookiebot
-            setTimeout(() => {
-                document.body.classList.add("loaded");
-
-                if (window.Cookiebot) {
-                    Cookiebot.show();
-                }
-            }, 2000); // Spinner-Dauer
-        });
-
-        function enablePage() {
-            document.body.style.overflow = "auto";
-            const blocker = document.getElementById("page-blocker");
-            if (blocker) blocker.remove();
-        }
-
-        window.addEventListener("CookiebotOnAccept", enablePage);
-        window.addEventListener("CookiebotOnDecline", enablePage);
-    </script>
     <script src="script.js"></script>
 </body>
 </html>
