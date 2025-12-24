@@ -462,21 +462,21 @@ html, body {
     background: transparent;
 }
 
-/* 🚫 Cookiebot KOMPLETT verstecken */
+/* 🚫 Cookiebot initial UNSICHTBAR, aber aktiv */
 #CybotCookiebotDialog,
 #CybotCookiebotDialogBodyUnderlay {
-    display: none !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
 }
 
-/* ✅ Cookiebot erst nach Spinner erlauben */
+/* ✅ Nach Spinner: Cookiebot anzeigen */
 .show-cookiebot #CybotCookiebotDialog,
 .show-cookiebot #CybotCookiebotDialogBodyUnderlay {
-    display: block !important;
-}
-
-/* 🔥 Overlay Abdunklung sicher über allem */
-#CybotCookiebotDialogBodyUnderlay {
-    background: rgba(0, 0, 0, 0.6) !important;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 @media (max-width: 768px) {
