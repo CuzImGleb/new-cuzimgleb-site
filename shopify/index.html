@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopify Kalkulator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a38;
+    --accent: #00e5a0;
+    --accent2: #7c4dff;
+    --warn: #ff6b35;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --red: #ff4466;
+    --green: #00e5a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, rgba(0,229,160,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(124,77,255,0.06) 0%, transparent 50%);
+  }
+
+  /* ── APP SHELL ── */
+  .app-shell {
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    max-width: 1280px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  header {
+    grid-column: 1 / -1;
+    padding: 24px 24px 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--text) 40%, var(--muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    margin-left: auto;
+  }
+
+  /* ── COLUMNS ── */
+  .inputs-col {
+    grid-column: 1;
+    grid-row: 2;
+    overflow-y: auto;
+    height: calc(100vh - 65px);
+    padding: 16px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .results-col {
+    grid-column: 2;
+    grid-row: 2;
+    overflow-y: auto;
+    height: calc(100vh - 65px);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* ── CARDS (tighter) ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-prefix {
+    position: absolute;
+    left: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+
+  .input-suffix {
+    position: absolute;
+    right: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    padding: 9px 44px 9px 30px;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  input[type="number"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,229,160,0.1);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .radio-opt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .radio-opt:hover { border-color: var(--muted); }
+
+  .radio-opt input[type="radio"] { display: none; }
+
+  .radio-opt.active {
+    border-color: var(--accent);
+    background: rgba(0,229,160,0.08);
+    color: var(--accent);
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    margin-top: 10px;
+    gap: 4px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    text-align: center;
+    padding: 7px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    transition: all 0.2s;
+    user-select: none;
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toggle-btn.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: bold;
+  }
+
+  .calc-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .calc-btn:hover {
+    background: #00ffb3;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,229,160,0.25);
+  }
+
+  .results {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .result-row:last-child { border-bottom: none; }
+
+  .result-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .result-label small {
+    display: block;
+    font-size: 10px;
+    margin-top: 2px;
+    opacity: 0.6;
+  }
+
+  .result-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 80px;
+    max-width: 50%;
+    overflow: hidden;
+  }
+
+  .result-value.neg { color: var(--red); }
+  .result-value.pos { color: var(--green); }
+  .result-value.warn { color: var(--warn); }
+  .result-value.accent2 { color: var(--accent2); }
+
+  .profit-hero {
+    background: linear-gradient(135deg, rgba(0,229,160,0.1), rgba(124,77,255,0.1));
+    border: 1px solid rgba(0,229,160,0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .profit-hero-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 6px;
+  }
+
+  .profit-hero-value {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .profit-hero-margin {
+    text-align: right;
+  }
+
+  .profit-hero-margin .big {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .profit-hero-margin small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .recommend-card {
+    background: linear-gradient(135deg, rgba(124,77,255,0.12), rgba(124,77,255,0.05));
+    border: 1px solid rgba(124,77,255,0.3);
+    border-radius: 12px;
+    padding: 14px;
+    flex-shrink: 0;
+  }
+
+  .recommend-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 16px;
+  }
+
+  .recommend-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .recommend-item {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .recommend-item .r-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .recommend-item .r-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent2);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .recommend-item .r-margin {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-top: 4px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  .vat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.3);
+    color: var(--warn);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  /* CATEGORY SELECTOR */
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    flex-shrink: 0;
+  }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .cat-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .cat-btn:hover {
+    border-color: rgba(124,77,255,0.4);
+    transform: translateY(-1px);
+  }
+
+  .cat-btn.active {
+    border-color: var(--accent2);
+    background: rgba(124,77,255,0.1);
+  }
+
+  .cat-btn .c-emoji { font-size: 22px; display: block; margin-bottom: 6px; }
+  .cat-btn .c-name  { font-size: 12px; font-weight: 700; color: var(--text); display: block; }
+  .cat-btn .c-range { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted); display: block; margin-top: 3px; }
+  .cat-btn.active .c-range { color: var(--accent2); }
+
+  .cat-info-box {
+    display: none;
+    margin-top: 16px;
+    background: rgba(124,77,255,0.07);
+    border: 1px solid rgba(124,77,255,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    line-height: 1.6;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .cat-info-box strong { color: var(--accent2); }
+
+  .cost-type-toggle {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    margin-top: 8px;
+    gap: 4px;
+  }
+
+  .cost-type-btn {
+    flex: 1;
+    text-align: center;
+    padding: 6px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    transition: all 0.2s;
+    user-select: none;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .cost-type-btn.active {
+    background: rgba(124,77,255,0.3);
+    color: var(--accent2);
+    font-weight: bold;
+  }
+
+  .recommend-item {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+    position: relative;
+  }
+
+  .recommend-item:hover {
+    border-color: rgba(124,77,255,0.4);
+    background: rgba(124,77,255,0.08);
+    transform: translateY(-2px);
+  }
+
+  .recommend-item:active { transform: scale(0.97); }
+
+  .recommend-item .r-click-hint {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    margin-top: 5px;
+    opacity: 0.6;
+    letter-spacing: 0.5px;
+  }
+
+  .ek-vat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .ek-vat-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
+  .ek-vat-field input {
+    width: 48px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    text-align: center;
+    -moz-appearance: textfield;
+    padding: 0;
+  }
+
+  .ek-vat-field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .ek-vat-toggle {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    gap: 3px;
+  }
+
+  .ek-vat-btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    transition: all 0.2s;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .ek-vat-btn.active {
+    background: rgba(0,229,160,0.2);
+    color: var(--green);
+  }
+
+  .ek-vat-btn.active-off {
+    background: rgba(255,68,102,0.15);
+    color: var(--red);
+  }
+
+  .result-row.pos-row .result-value { color: var(--green); }
+
+  /* COMPETITOR */
+  .comp-input-card {
+    background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(124,77,255,0.03));
+    border: 1px solid rgba(124,77,255,0.25);
+    border-radius: 12px;
+    padding: 16px;
+    flex-shrink: 0;
+  }
+
+  .comp-hint {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .comp-analysis {
+    display: none;
+    margin-bottom: 16px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .comp-analysis-card {
+    background: var(--surface);
+    border: 1px solid rgba(124,77,255,0.25);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .comp-analysis-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .comp-analysis-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(124,77,255,0.2);
+  }
+
+  .comp-strategies {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .comp-strat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+
+  .comp-strat:hover {
+    border-color: rgba(124,77,255,0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124,77,255,0.15);
+  }
+
+  .comp-strat:active { transform: scale(0.97); }
+
+  .comp-strat.winner {
+    border-color: var(--accent2);
+    background: rgba(124,77,255,0.1);
+  }
+
+  .comp-strat .s-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .comp-strat.winner .s-label { color: var(--accent2); }
+
+  .comp-strat .s-price {
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .comp-strat.winner .s-price { color: var(--accent2); }
+
+  .comp-strat .s-diff {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
+  .comp-strat .s-margin {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    margin-top: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .comp-strat.winner .s-margin {
+    background: rgba(124,77,255,0.2);
+    color: var(--accent2);
+  }
+
+  .comp-verdict {
+    background: rgba(124,77,255,0.08);
+    border: 1px solid rgba(124,77,255,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .comp-verdict strong { color: var(--accent2); }
+
+  .comp-vs-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 12px;
+    overflow: hidden;
+    flex-wrap: wrap;
+  }
+
+  .comp-vs-item {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .comp-vs-item .cv-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .comp-vs-item .cv-val {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .comp-vs-sep {
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 300;
+    flex-shrink: 0;
+  }
+
+  .comp-vs-diff-badge {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .comp-vs-diff-badge.badge-red    { background: rgba(255,68,102,0.15); color: #ff4466; }
+  .comp-vs-diff-badge.badge-green  { background: rgba(0,229,160,0.15);  color: var(--green); }
+  .comp-vs-diff-badge.badge-yellow { background: rgba(255,193,7,0.15);  color: #ffc107; }
+
+  .sim-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(124,77,255,0.12);
+    border: 1px solid rgba(124,77,255,0.35);
+    border-radius: 12px;
+    padding: 16px 14px;
+    margin-bottom: 12px;
+    animation: fadeIn 0.3s ease;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .sim-banner-label {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    flex: 1 1 auto;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .sim-banner-label strong { font-size: 13px; color: var(--text); white-space: nowrap; }
+
+  .sim-reset-btn {
+    background: transparent;
+    border: 1px solid rgba(124,77,255,0.4);
+    color: var(--accent2);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  @media (max-width: 860px) {
+    .sim-reset-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .sim-reset-btn:hover {
+    background: rgba(124,77,255,0.15);
+    border-color: var(--accent2);
+  }
+
+  .comp-strat .s-click-hint {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    margin-top: 6px;
+    opacity: 0.6;
+    letter-spacing: 0.5px;
+  }
+
+  .comp-strat.winner .s-click-hint { color: var(--accent2); opacity: 0.8; }
+
+  /* AMPEL SYSTEM */
+  .ampel-wrap {
+    display: none;
+    margin-bottom: 16px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .ampel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .ampel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .ampel-light {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #1a1a24;
+    border: 2px solid #2a2a38;
+    transition: all 0.4s ease;
+    position: relative;
+  }
+
+  .ampel-light.on-red {
+    background: #ff4466;
+    border-color: #ff4466;
+    box-shadow: 0 0 16px rgba(255,68,102,0.7), 0 0 32px rgba(255,68,102,0.3);
+  }
+
+  .ampel-light.on-yellow {
+    background: #ffc107;
+    border-color: #ffc107;
+    box-shadow: 0 0 16px rgba(255,193,7,0.7), 0 0 32px rgba(255,193,7,0.3);
+  }
+
+  .ampel-light.on-green {
+    background: #00e5a0;
+    border-color: #00e5a0;
+    box-shadow: 0 0 16px rgba(0,229,160,0.7), 0 0 32px rgba(0,229,160,0.3);
+  }
+
+  .ampel-info {
+    flex: 1;
+  }
+
+  .ampel-status {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .ampel-status.red { color: #ff4466; }
+  .ampel-status.yellow { color: #ffc107; }
+  .ampel-status.green { color: #00e5a0; }
+
+  .ampel-desc {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.5;
+  }
+
+  .ampel-bar-wrap {
+    margin-top: 14px;
+  }
+
+  .ampel-bar-track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface2);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ampel-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1), background 0.4s;
+  }
+
+  .ampel-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
+  .ampel-bar-labels span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .ampel-bar-labels span::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .ampel-bar-labels .l-red::before { background: #ff4466; }
+  .ampel-bar-labels .l-yellow::before { background: #ffc107; }
+  .ampel-bar-labels .l-green::before { background: #00e5a0; }
+
+  .ampel-housing {
+    background: #0d0d14;
+    border: 2px solid #2a2a38;
+    border-radius: 14px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .calc-trace {
+    display: block;
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    opacity: 0.55;
+    margin-top: 2px;
+    letter-spacing: 0.2px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    max-width: 100%;
+  }
+
+  .rec-reset-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.3);
+    border-radius: 12px;
+    padding: 10px 16px;
+    margin-top: 12px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .rec-reset-label {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rec-reset-label strong { font-size: 14px; color: var(--text); }
+
+  .rec-reset-btn {
+    background: transparent;
+    border: 1px solid rgba(0,229,160,0.4);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .rec-reset-btn:hover {
+    background: rgba(0,229,160,0.15);
+    border-color: var(--accent);
+  }
+
+  /* ── MOBILE TAB SYSTEM ── */
+  .mob-tabs {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mob-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  .mob-tab.active { color: var(--accent); }
+  .mob-tab svg { width: 18px; height: 18px; stroke-width: 2; fill: none; stroke: currentColor; }
+
+  /* profit mini bar shown in inputs tab on mobile */
+  .mob-profit-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+  }
+
+  .mob-profit-bar .mpb-label { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted); }
+  .mob-profit-bar .mpb-val   { font-size: 20px; font-weight: 800; color: var(--accent); font-family: 'DM Mono', monospace; }
+  .mob-profit-bar .mpb-margin { font-size: 13px; font-weight: 700; font-family: 'DM Mono', monospace; }
+
+  @media (max-width: 860px) {
+    html, body { height: 100%; overflow: hidden; }
+
+    .app-shell {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+      max-width: 100%;
+    }
+
+    header {
+      padding: 12px 14px;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    h1 { font-size: 20px; }
+    .subtitle { display: none; }
+
+    .inputs-col {
+      grid-column: 1;
+      border-right: none;
+      height: 100%;
+      padding: 10px 12px 70px;
+    }
+
+    .results-col {
+      grid-column: 1;
+      grid-row: 2;
+      height: 100%;
+      padding: 10px 12px 70px;
+      display: none;
+    }
+
+    .results-col.mob-active { display: flex; }
+    .inputs-col.mob-hidden  { display: none; }
+
+    .mob-tabs { display: grid; }
+    .mob-profit-bar { display: flex; }
+
+    .grid-2 { grid-template-columns: 1fr; }
+    .recommend-grid { grid-template-columns: 1fr 1fr; }
+    .cat-grid { grid-template-columns: repeat(3, 1fr); }
+    .comp-strategies { grid-template-columns: 1fr; gap: 6px; }
+    .profit-hero { flex-direction: row; }
+    .profit-hero-value { font-size: 28px; }
+    .profit-hero-margin .big { font-size: 22px; }
+  }
+
+  @media (max-width: 480px) {
+    .recommend-grid { grid-template-columns: 1fr; }
+    .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header>
+    <div class="logo">// Shopify</div>
+    <h1>Fee <span>Rechner</span></h1>
+    <div class="subtitle">inkl. MwSt · Netto/Brutto · Empfehlungspreise</div>
+  </header>
+
+  <!-- LEFT: INPUTS -->
+  <div class="inputs-col" id="inputsCol">
+    <div class="mob-profit-bar" id="mobProfitBarTop">
+      <div><div class="mpb-label">Reingewinn</div><div class="mpb-val" id="mobProfit2">—</div></div>
+      <div class="mpb-margin" id="mobMargin2" style="color:var(--accent)">—</div>
+    </div>
+
+  <!-- VERKAUFSPREIS -->
+  <div class="card">
+    <div class="card-title">Verkauf</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Verkaufspreis</label>
+        <div class="input-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="salePrice" value="50.00" step="0.01" min="0">
+          <span class="input-suffix">EUR</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Versandkosten (Kunde zahlt)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="shippingCharged" value="5.00" step="0.01" min="0">
+          <span class="input-suffix">EUR</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="toggle-row">
+        <div class="toggle-btn active" id="btnBrutto" onclick="setPriceType('brutto')">Brutto (inkl. MwSt)</div>
+        <div class="toggle-btn" id="btnNetto" onclick="setPriceType('netto')">Netto (zzgl. MwSt)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MWST -->
+  <div class="card">
+    <div class="card-title">MwSt / Steuer</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>MwSt-Satz</label>
+        <div class="radio-group" id="vatGroup">
+          <label class="radio-opt active" onclick="setVat(19, this)">
+            <input type="radio" name="vat" value="19" checked> 19% (DE Standard)
+          </label>
+          <label class="radio-opt" onclick="setVat(7, this)">
+            <input type="radio" name="vat" value="7"> 7% (ermäßigt)
+          </label>
+          <label class="radio-opt" onclick="setVat(0, this)">
+            <input type="radio" name="vat" value="0"> 0%
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Eigener MwSt-Satz</label>
+        <div class="input-wrap">
+          <span class="input-prefix">%</span>
+          <input type="number" id="customVat" placeholder="z.B. 20" step="0.1" min="0" max="100" style="padding-left:36px;" oninput="setVatCustom(this.value)">
+        </div>
+        <div id="vatInfo" style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:6px;">
+          Aktiv: <span id="vatDisplay" style="color:var(--warn);">19%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPIFY PLAN -->
+  <div class="card">
+    <div class="card-title">Shopify Plan</div>
+    <div class="field">
+      <label>Plan wählen</label>
+      <div class="radio-group" id="planGroup">
+        <label class="radio-opt active" onclick="setPlan(39, 2.9, 0.30, 0, this)">
+          <input type="radio" name="plan" checked> Basic (39€/mo)
+        </label>
+        <label class="radio-opt" onclick="setPlan(105, 2.6, 0.30, 0, this)">
+          <input type="radio" name="plan"> Shopify (105€/mo)
+        </label>
+        <label class="radio-opt" onclick="setPlan(399, 2.4, 0.30, 0, this)">
+          <input type="radio" name="plan"> Advanced (399€/mo)
+        </label>
+      </div>
+    </div>
+    <div class="field" style="margin-top:16px;">
+      <label>Payment Processor</label>
+      <div class="radio-group" id="processorGroup">
+        <label class="radio-opt active" onclick="setProcessor('shopify', this)">
+          <input type="radio" name="processor" checked> Shopify Payments
+        </label>
+        <label class="radio-opt" onclick="setProcessor('third', this)">
+          <input type="radio" name="processor"> Third-Party (PayPal, Stripe...)
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- KATEGORIE -->
+  <div class="cat-card">
+    <div class="card-title">Kategorie <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:1px;">(optional — füllt Richtwerte vor)</span></div>
+    <div class="cat-grid">
+      <div class="cat-btn" onclick="setCategory('elektronik', this)">
+        <span class="c-emoji">📱</span>
+        <span class="c-name">Elektronik</span>
+        <span class="c-range">5–15%</span>
+      </div>
+      <div class="cat-btn" onclick="setCategory('gaming', this)">
+        <span class="c-emoji">🎮</span>
+        <span class="c-name">Gaming</span>
+        <span class="c-range">8–60%</span>
+      </div>
+      <div class="cat-btn" onclick="setCategory('collectibles', this)">
+        <span class="c-emoji">🧸</span>
+        <span class="c-name">Collectibles</span>
+        <span class="c-range">40–80%</span>
+      </div>
+      <div class="cat-btn" onclick="setCategory('haushalt', this)">
+        <span class="c-emoji">🏠</span>
+        <span class="c-name">Haushalt</span>
+        <span class="c-range">20–45%</span>
+      </div>
+      <div class="cat-btn" onclick="setCategory('spielzeug', this)">
+        <span class="c-emoji">👶</span>
+        <span class="c-name">Spielzeug</span>
+        <span class="c-range">20–60%</span>
+      </div>
+      <div class="cat-btn" onclick="setCategory('mode', this)">
+        <span class="c-emoji">👟</span>
+        <span class="c-name">Mode</span>
+        <span class="c-range">50–80%</span>
+      </div>
+    </div>
+    <div class="cat-info-box" id="catInfoBox"></div>
+  </div>
+
+  <!-- KOSTEN -->
+  <div class="card">
+    <div class="card-title">Kosten</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Einkaufspreis (Produktkosten)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="productCost" value="15.00" step="0.01" min="0">
+          <span class="input-suffix">EUR</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Tatsächliche Versandkosten</label>
+        <div class="input-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="actualShipping" value="4.00" step="0.01" min="0">
+          <span class="input-suffix">EUR</span>
+        </div>
+      </div>
+    </div>
+    <div class="cost-type-toggle" style="margin-top:10px;">
+      <div class="cost-type-btn active" id="btnCostNetto" onclick="setCostType('netto')">Netto EK</div>
+      <div class="cost-type-btn" id="btnCostBrutto" onclick="setCostType('brutto')">Brutto EK (inkl. MwSt)</div>
+    </div>
+    <div class="ek-vat-row">
+      <div class="ek-vat-field">
+        <span>EK MwSt</span>
+        <input type="number" id="ekVatRate" value="19" min="0" max="100" step="0.1" oninput="ekVatRateChanged()">
+        <span>%</span>
+      </div>
+      <div class="ek-vat-toggle">
+        <div class="ek-vat-btn active" id="btnEkVatOn" onclick="setEkVat(true)">Vorsteuer ✓</div>
+        <div class="ek-vat-btn" id="btnEkVatOff" onclick="setEkVat(false)">ohne</div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:16px;">
+      <div class="field">
+        <label>Werbekosten pro Bestellung (optional)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="adCost" value="0.00" step="0.01" min="0">
+          <span class="input-suffix">EUR</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Sonstige Kosten (optional)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="otherCost" value="0.00" step="0.01" min="0">
+          <span class="input-suffix">EUR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KONKURRENZ -->
+  <div class="comp-input-card">
+    <div class="card-title" style="color:var(--accent2);">Konkurrenz (optional)</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Niedrigster Konkurrenzpreis</label>
+        <div class="input-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="compPrice" placeholder="z.B. 45.00" step="0.01" min="0">
+          <span class="input-suffix">EUR</span>
+        </div>
+        <div class="comp-hint">💡 Brutto-Preis des günstigsten Mitbewerbers</div>
+      </div>
+      <div class="field">
+        <label>Strategie</label>
+        <div class="radio-group" id="compStratGroup">
+          <label class="radio-opt active" onclick="setCompStrat('under', this)" style="border-color:rgba(124,77,255,0.3);">
+            <input type="radio" name="compstrat" checked> Unterbieten
+          </label>
+          <label class="radio-opt" onclick="setCompStrat('match', this)" style="">
+            <input type="radio" name="compstrat"> Angleichen
+          </label>
+          <label class="radio-opt" onclick="setCompStrat('premium', this)" style="">
+            <input type="radio" name="compstrat"> Premium
+          </label>
+        </div>
+        <div class="comp-hint" id="compStratHint">5% unter Konkurrenz → günstigster Anbieter</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calculate(); if(window.innerWidth<=860) switchTab('results')">Berechnen →</button>
+  </div><!-- /inputs-col -->
+
+  <!-- RIGHT: RESULTS -->
+  <div class="results-col" id="resultsCol">
+    <!-- KONKURRENZ ANALYSE -->
+    <div class="comp-analysis" id="compAnalysis">
+      <div class="comp-analysis-card">
+        <div class="comp-analysis-title">// Konkurrenz-Analyse</div>
+
+        <div class="comp-vs-bar" id="compVsBar">
+          <div class="comp-vs-item">
+            <div class="cv-label">DEIN PREIS</div>
+            <div class="cv-val" id="cvYours" style="color:var(--accent)">—</div>
+          </div>
+          <div class="comp-vs-sep">vs</div>
+          <div class="comp-vs-item">
+            <div class="cv-label">KONKURRENZ</div>
+            <div class="cv-val" id="cvComp" style="color:var(--accent2)">—</div>
+          </div>
+          <div class="comp-vs-diff-badge" id="cvDiffBadge">—</div>
+        </div>
+
+        <div class="comp-strategies" id="compStrategies">
+          <div class="comp-strat" id="cStrat1" onclick="applyStrategy('under')">
+            <div class="s-label">UNTERBIETEN −5%</div>
+            <div class="s-price" id="cs1Price">—</div>
+            <div class="s-diff" id="cs1Diff">—</div>
+            <div class="s-margin" id="cs1Margin">—</div>
+            <div class="s-click-hint">↑ klicken zum Simulieren</div>
+          </div>
+          <div class="comp-strat" id="cStrat2" onclick="applyStrategy('match')">
+            <div class="s-label">ANGLEICHEN</div>
+            <div class="s-price" id="cs2Price">—</div>
+            <div class="s-diff" id="cs2Diff">—</div>
+            <div class="s-margin" id="cs2Margin">—</div>
+            <div class="s-click-hint">↑ klicken zum Simulieren</div>
+          </div>
+          <div class="comp-strat" id="cStrat3" onclick="applyStrategy('premium')">
+            <div class="s-label">PREMIUM +10%</div>
+            <div class="s-price" id="cs3Price">—</div>
+            <div class="s-diff" id="cs3Diff">—</div>
+            <div class="s-margin" id="cs3Margin">—</div>
+            <div class="s-click-hint">↑ klicken zum Simulieren</div>
+          </div>
+        </div>
+
+        <div class="comp-verdict" id="compVerdict">—</div>
+      </div>
+    </div>
+
+  <!-- AMPEL -->
+    <div class="sim-banner" id="simBanner">
+      <div class="sim-banner-label">
+        📊 Simulation: <strong id="simStratLabel">—</strong>&nbsp;→&nbsp;<span id="simPriceLabel" style="color:var(--accent2)">—</span>
+      </div>
+      <button class="sim-reset-btn" onclick="resetToOriginal()">✕ Original zurück</button>
+    </div>
+
+    <div class="sim-banner" id="recResetBanner" style="background:rgba(0,229,160,0.09);border-color:rgba(0,229,160,0.35);">
+      <div class="sim-banner-label">
+        📌 Empfehlungspreis: <strong id="recOrigLabel" style="color:var(--muted)">—</strong>&nbsp;→&nbsp;<span id="recAppliedLabel" style="color:var(--accent)">—</span>
+      </div>
+      <button class="sim-reset-btn" onclick="resetRecPrice()" style="border-color:rgba(0,229,160,0.4);color:var(--accent);">✕ Originalpreis zurück</button>
+    </div>
+
+    <div class="ampel-wrap" id="ampelWrap">
+      <div class="ampel-card" id="ampelCard">
+        <div class="ampel-housing">
+          <div class="ampel-light" id="aRed"></div>
+          <div class="ampel-light" id="aYellow"></div>
+          <div class="ampel-light" id="aGreen"></div>
+        </div>
+        <div class="ampel-info">
+          <div class="ampel-status" id="ampelStatus">—</div>
+          <div class="ampel-desc" id="ampelDesc">—</div>
+          <div class="ampel-bar-wrap">
+            <div class="ampel-bar-track">
+              <div class="ampel-bar-fill" id="ampelBar" style="width:0%"></div>
+            </div>
+            <div class="ampel-bar-labels">
+              <span class="l-red">&lt; 20% kritisch</span>
+              <span class="l-yellow">20–40% okay</span>
+              <span class="l-green">&gt; 40% stark</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- Profit Hero -->
+    <div class="profit-hero" id="profitHero">
+      <div>
+        <div class="profit-hero-label">Dein Reingewinn</div>
+        <div class="profit-hero-value" id="rProfit">—</div>
+      </div>
+      <div class="profit-hero-margin">
+        <div class="big" id="rMargin">—</div>
+        <small>Marge (netto)</small>
+      </div>
+    </div>
+
+    <!-- Empfehlungspreise -->
+    <div class="recommend-card">
+      <div class="recommend-title" id="recTitle">// Empfohlene Verkaufspreise</div>
+      <div class="recommend-grid">
+        <div class="recommend-item" onclick="applyRecPrice('rec30')" title="Als Verkaufspreis übernehmen">
+          <div class="r-label" id="recLabel1">30% Marge</div>
+          <div class="r-val" id="rec30">—</div>
+          <div class="r-margin" id="rec30m"></div>
+          <div class="r-click-hint">↑ als Preis übernehmen</div>
+        </div>
+        <div class="recommend-item" onclick="applyRecPrice('rec50')" title="Als Verkaufspreis übernehmen">
+          <div class="r-label" id="recLabel2">50% Marge</div>
+          <div class="r-val" id="rec50">—</div>
+          <div class="r-margin" id="rec50m"></div>
+          <div class="r-click-hint">↑ als Preis übernehmen</div>
+        </div>
+        <div class="recommend-item" onclick="applyRecPrice('rec70')" title="Als Verkaufspreis übernehmen">
+          <div class="r-label" id="recLabel3">70% Marge</div>
+          <div class="r-val" id="rec70">—</div>
+          <div class="r-margin" id="rec70m"></div>
+          <div class="r-click-hint">↑ als Preis übernehmen</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Breakdown -->
+    <div class="card">
+      <div class="card-title">Aufschlüsselung</div>
+
+      <div class="result-row">
+        <div class="result-label">Brutto-Verkaufspreis<small>Kunde zahlt</small></div>
+        <div class="result-value" id="rBrutto">—<span class="calc-trace" id="trBrutto"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Netto-Verkaufspreis<small>ohne MwSt</small></div>
+        <div class="result-value" id="rNetto">—<span class="calc-trace" id="trNetto"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label" id="rVatLabel">MwSt (19%)<small>abzuführen ans Finanzamt</small></div>
+        <div class="result-value neg" id="rVat">—<span class="calc-trace" id="trVat"></span></div>
+      </div>
+      <div class="divider" style="margin:4px 0;"></div>
+      <div class="result-row">
+        <div class="result-label">Shopify Payment Fee<small id="rFeeFormula"></small></div>
+        <div class="result-value neg" id="rFee">—<span class="calc-trace" id="trFee"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Transaktionsgebühr<small id="rTxInfo">nur bei Drittanbieter</small></div>
+        <div class="result-value neg" id="rTx">—<span class="calc-trace" id="trTx"></span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <div class="result-label">Einkaufspreis (netto)<small id="rProductLabel">nach Vorsteuerabzug</small></div>
+        <div class="result-value neg" id="rProduct">—<span class="calc-trace" id="trProduct"></span></div>
+      </div>
+      <div class="result-row" id="rowEkVat">
+        <div class="result-label" style="color:var(--green)">Vorsteuer (EK MwSt)<small id="rEkVatLabel">erstattungsfähig</small></div>
+        <div class="result-value pos" id="rEkVat" style="color:var(--green)">—<span class="calc-trace" id="trEkVat"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Versandkosten (tatsächlich)</div>
+        <div class="result-value neg" id="rShip">—<span class="calc-trace" id="trShip"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Versand-Differenz<small>Kunde - tatsächlich</small></div>
+        <div class="result-value" id="rShipDiff">—<span class="calc-trace" id="trShipDiff"></span></div>
+      </div>
+      <div class="result-row" id="rowAd" style="display:none;">
+        <div class="result-label">Werbekosten</div>
+        <div class="result-value neg" id="rAd">—<span class="calc-trace" id="trAd"></span></div>
+      </div>
+      <div class="result-row" id="rowOther" style="display:none;">
+        <div class="result-label">Sonstiges</div>
+        <div class="result-value neg" id="rOther">—<span class="calc-trace" id="trOther"></span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <div class="result-label" style="color:var(--text);font-size:14px;">Gesamtgebühren (Shopify)</div>
+        <div class="result-value warn" id="rTotalFees">—<span class="calc-trace" id="trTotalFees"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label" style="color:var(--text);font-size:14px;">Gesamtkosten<small>alle Abzüge summiert</small></div>
+        <div class="result-value neg" id="rTotalCosts" style="font-size:18px;">—<span class="calc-trace" id="trTotalCosts"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label" style="color:var(--text);font-size:14px;">Gewinn (netto, nach Steuern)</div>
+        <div class="result-value" id="rProfitFinal" style="font-size:22px;font-weight:700;">—<span class="calc-trace" id="trProfit"></span></div>
+      </div>
+    </div>
+  </div><!-- /results-col -->
+
+  <!-- MOBILE TAB BAR -->
+  <nav class="mob-tabs" id="mobTabs">
+    <div class="mob-tab active" id="tabInputs" onclick="switchTab('inputs')">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Eingabe
+    </div>
+    <div class="mob-tab" id="tabResults" onclick="switchTab('results')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Ergebnis
+    </div>
+  </nav>
+</div><!-- /app-shell -->
+
+<script>
+  let compStrat = 'under';
+  let productCostType = 'netto'; // netto or brutto
+  let ekVatInclude = true;
+  let activeCategory = null;
+  let catTargets = [0.30, 0.50, 0.70]; // default rec targets
+  let lastCompPrice = 0;
+  let lastBaseCosts = 0;
+
+  // Last full calculation state for simulation
+  let lastState = null;
+
+  const CATEGORIES = {
+    elektronik:   { emoji:'📱', name:'Elektronik',      targets:[0.10,0.20,0.35], min:5,  max:40,  info:'Margen brutal niedrig (5–15%). Preissensible Kunden, starker Wettbewerb durch Amazon/MediaMarkt. <strong>Tipp:</strong> Eigenmarken-Gadgets (Kabel, Zubehör) können 30–40% erreichen.' },
+    gaming:       { emoji:'🎮', name:'Gaming',           targets:[0.15,0.35,0.55], min:8,  max:60,  info:'Konsolen & AAA-Spiele kaum Marge (2–8%). <strong>Tipp:</strong> Zubehör wie Controller-Aufsätze, Headsets aus China: 40–60% möglich. Merchandise & Nischenprodukte bis 70%.' },
+    collectibles: { emoji:'🧸', name:'Collectibles',     targets:[0.40,0.60,0.75], min:40, max:80,  info:'<strong>Einer der besten Bereiche!</strong> Margen 40–80% weil Kunden emotional kaufen. Limitierte Figuren sogar 100–300% Resale. Risiko: Lagerware die nicht geht.' },
+    haushalt:     { emoji:'🏠', name:'Haushalt',         targets:[0.25,0.40,0.55], min:20, max:45,  info:'Solide 20–45% realistisch. <strong>Tipp:</strong> Nischen wie minimalistische Küchenaccessoires oder Trendprodukte besser als Standard-Sortiment.' },
+    spielzeug:    { emoji:'👶', name:'Spielzeug',        targets:[0.25,0.40,0.60], min:20, max:60,  info:'Grundsortiment 20–35%. <strong>Tipp:</strong> Zu Weihnachten/Ostern können virale Produkte 60–80% bringen. Hohe Retourenquote beachten!' },
+    mode:         { emoji:'👟', name:'Mode/Streetwear',  targets:[0.50,0.65,0.75], min:50, max:80,  info:'50–80% Standard bei Eigendesigns/White-Label. <strong>Achtung:</strong> Extrem hohe Retouren (20–40%) drücken echte Marge massiv. Schuhe riskant wegen Größen.' },
+  };
+
+  function setCategory(key, el) {
+    if (activeCategory === key) {
+      // Deselect
+      activeCategory = null;
+      catTargets = [0.30, 0.50, 0.70];
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('catInfoBox').style.display = 'none';
+      document.getElementById('recTitle').textContent = '// Empfohlene Verkaufspreise';
+      return;
+    }
+    activeCategory = key;
+    catTargets = CATEGORIES[key].targets;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+
+    const cat = CATEGORIES[key];
+    const box = document.getElementById('catInfoBox');
+    box.style.display = 'block';
+    box.innerHTML = `<strong>${cat.emoji} ${cat.name}</strong> — Typische Marge: ${cat.min}–${cat.max}%<br>${cat.info}`;
+
+    // Update rec labels
+    document.getElementById('recTitle').textContent = `// Empfehlungspreise für ${cat.name}`;
+    document.getElementById('recLabel1').textContent = Math.round(cat.targets[0]*100) + '% Marge (Untergrenze)';
+    document.getElementById('recLabel2').textContent = Math.round(cat.targets[1]*100) + '% Marge (Ziel)';
+    document.getElementById('recLabel3').textContent = Math.round(cat.targets[2]*100) + '% Marge (Top)';
+  }
+
+  function setCostType(type) {
+    productCostType = type;
+    document.getElementById('btnCostNetto').classList.toggle('active', type === 'netto');
+    document.getElementById('btnCostBrutto').classList.toggle('active', type === 'brutto');
+  }
+
+  function getProductCostNetto() {
+    const raw = parseFloat(document.getElementById('productCost').value) || 0;
+    if (productCostType === 'brutto') return raw / (1 + vatRate / 100);
+    return raw;
+  }
+
+  function ekVatRateChanged() { /* just triggers on input, used live */ }
+
+  function setEkVat(on) {
+    ekVatInclude = on;
+    document.getElementById('btnEkVatOn').className = 'ek-vat-btn' + (on ? ' active' : '');
+    document.getElementById('btnEkVatOff').className = 'ek-vat-btn' + (!on ? ' active-off' : '');
+  }
+
+  function getEkVatRate() {
+    return parseFloat(document.getElementById('ekVatRate').value) || 0;
+  }
+
+  function getProductCostNetto() {
+    const raw = parseFloat(document.getElementById('productCost').value) || 0;
+    // First get to brutto
+    let bruttoEK = productCostType === 'brutto' ? raw : raw; // brutto toggle only changes display intent
+    // If user entered netto and we include VAT: netto is already netto
+    if (productCostType === 'netto') {
+      return raw; // already netto, EK VAT is on top (we track it separately)
+    } else {
+      // brutto EK: netto = brutto / (1 + ekVat%)
+      return raw / (1 + getEkVatRate() / 100);
+    }
+  }
+
+  function getEkVatAmount() {
+    if (!ekVatInclude) return 0;
+    const raw = parseFloat(document.getElementById('productCost').value) || 0;
+    const ekVat = getEkVatRate();
+    if (productCostType === 'brutto') {
+      // brutto entered: vat = brutto - netto
+      return raw - raw / (1 + ekVat / 100);
+    } else {
+      // netto entered: vat = netto * ekVat%
+      return raw * (ekVat / 100);
+    }
+  }
+
+  let origRecPriceValue = null;
+  let origRecPriceType = null;
+  let _applyingRec = false;
+
+  function applyRecPrice(recId) {
+    const el = document.getElementById(recId);
+    if (!el || el.childNodes[0].textContent.trim() === '—') return;
+    const priceStr = el.childNodes[0].textContent.replace('€','').trim();
+    const price = parseFloat(priceStr);
+    if (isNaN(price)) return;
+
+    // Save original price before any calculate() calls
+    const banner = document.getElementById('recResetBanner');
+    if (!origRecPriceValue) {
+      origRecPriceValue = document.getElementById('salePrice').value;
+      origRecPriceType = priceType;
+    }
+
+    document.getElementById('salePrice').value = price.toFixed(2);
+    setPriceType('brutto');
+
+    // Flash animation
+    el.style.transition = 'background 0.15s';
+    el.style.background = 'rgba(0,229,160,0.25)';
+    setTimeout(() => { el.style.background = ''; }, 300);
+
+    _applyingRec = true;
+    calculate();
+    _applyingRec = false;
+
+    // Update and show banner AFTER calculate()
+    document.getElementById('recOrigLabel').textContent = '€' + parseFloat(origRecPriceValue).toFixed(2);
+    document.getElementById('recAppliedLabel').textContent = '€' + price.toFixed(2);
+    banner.style.display = 'flex';
+
+    document.getElementById('ampelWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetRecPrice() {
+    if (origRecPriceValue === null) return;
+    document.getElementById('salePrice').value = origRecPriceValue;
+    setPriceType(origRecPriceType);
+    origRecPriceValue = null;
+    origRecPriceType = null;
+    document.getElementById('recResetBanner').style.display = 'none';
+    calculate();
+    document.getElementById('ampelWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function setCompStrat(s, el) {
+    compStrat = s;
+    document.querySelectorAll('#compStratGroup .radio-opt').forEach(e => e.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const hints = {
+      under: '5% unter Konkurrenz → günstigster Anbieter',
+      match: 'Gleicher Preis → auf Augenhöhe',
+      premium: '10% über Konkurrenz → Premium-Positionierung'
+    };
+    document.getElementById('compStratHint').textContent = hints[s];
+  }
+
+  // State
+  let vatRate = 19;
+  let priceType = 'brutto'; // brutto or netto
+  let planFeePercent = 2.9;
+  let planFeeFixed = 0.30;
+  let planTxRate = 0; // extra tx if 3rd party
+  let processor = 'shopify';
+
+  function setPriceType(type) {
+    priceType = type;
+    document.getElementById('btnBrutto').classList.toggle('active', type === 'brutto');
+    document.getElementById('btnNetto').classList.toggle('active', type === 'netto');
+  }
+
+  function setVat(rate, el) {
+    vatRate = rate;
+    document.getElementById('customVat').value = '';
+    document.getElementById('vatDisplay').textContent = rate + '%';
+    document.querySelectorAll('#vatGroup .radio-opt').forEach(e => e.classList.remove('active'));
+    if (el) el.classList.add('active');
+  }
+
+  function setVatCustom(val) {
+    if (val !== '' && !isNaN(val)) {
+      vatRate = parseFloat(val) || 0;
+      document.getElementById('vatDisplay').textContent = vatRate + '%';
+      document.querySelectorAll('#vatGroup .radio-opt').forEach(e => e.classList.remove('active'));
+    }
+  }
+
+  function setPlan(mo, pct, fixed, tx, el) {
+    planFeePercent = pct;
+    planFeeFixed = fixed;
+    document.querySelectorAll('#planGroup .radio-opt').forEach(e => e.classList.remove('active'));
+    if (el) el.classList.add('active');
+    updateTx();
+  }
+
+  function setProcessor(type, el) {
+    processor = type;
+    document.querySelectorAll('#processorGroup .radio-opt').forEach(e => e.classList.remove('active'));
+    if (el) el.classList.add('active');
+    updateTx();
+  }
+
+  function updateTx() {
+    if (processor === 'third') {
+      planTxRate = planFeePercent <= 2.4 ? 0.5 : planFeePercent <= 2.6 ? 1.0 : 2.0;
+    } else {
+      planTxRate = 0;
+    }
+  }
+
+  function fmt(n) {
+    return (n < 0 ? '−' : '') + '€' + Math.abs(n).toFixed(2);
+  }
+
+  function calcRecommendedPrice(targetMargin, vatR, baseCosts, shipCharged) {
+    shipCharged = shipCharged || 0;
+    let bruttoPrice = baseCosts; // starting guess
+    for (let i = 0; i < 20; i++) {
+      const totalBrutto = bruttoPrice + shipCharged;
+      const totalNetto  = totalBrutto / (1 + vatR / 100);
+      const payFee  = totalBrutto * (planFeePercent / 100) + planFeeFixed;
+      const txFee   = processor === 'third' ? totalBrutto * (planTxRate / 100) : 0;
+      const fees    = payFee + txFee;
+      // targetMargin = profit / totalNetto  →  totalNetto*(1−targetMargin) = fees + baseCosts
+      const neededTotalNetto  = (fees + baseCosts) / (1 - targetMargin);
+      const neededTotalBrutto = neededTotalNetto * (1 + vatR / 100);
+      const newBrutto = neededTotalBrutto - shipCharged;
+      if (Math.abs(newBrutto - bruttoPrice) < 0.001) break;
+      bruttoPrice = newBrutto;
+    }
+    return bruttoPrice;
+  }
+
+  function calculate() {
+    const salePriceInput = parseFloat(document.getElementById('salePrice').value) || 0;
+    const shippingCharged = parseFloat(document.getElementById('shippingCharged').value) || 0;
+    const productCostNetto = getProductCostNetto();
+    const ekVatAmt = getEkVatAmount(); // positive = refund we get back
+    const actualShipping = parseFloat(document.getElementById('actualShipping').value) || 0;
+    const adCost = parseFloat(document.getElementById('adCost').value) || 0;
+    const otherCost = parseFloat(document.getElementById('otherCost').value) || 0;
+    // Effective product cost after vorsteuer credit
+    const productCost = productCostNetto; // netto is what it costs after VAT refund
+
+    // Calculate brutto/netto
+    let brutto, netto;
+    if (priceType === 'brutto') {
+      brutto = salePriceInput;
+      netto = brutto / (1 + vatRate / 100);
+    } else {
+      netto = salePriceInput;
+      brutto = netto * (1 + vatRate / 100);
+    }
+
+    // DE-Pflicht: MwSt auf Gesamtbetrag (Produkt + Versand an Kunden)
+    const totalBrutto = brutto + shippingCharged;
+    const totalNetto  = totalBrutto / (1 + vatRate / 100);
+    const vatAmt = totalBrutto - totalNetto;
+
+    const payFeeBase = totalBrutto;
+    const payFee = payFeeBase * (planFeePercent / 100) + planFeeFixed;
+    const txFee = processor === 'third' ? payFeeBase * (planTxRate / 100) : 0;
+
+    const totalShopifyFees = payFee + txFee;
+    const shipDiff = shippingCharged - actualShipping;
+    const totalCosts = vatAmt + payFee + txFee + productCost + actualShipping + adCost + otherCost;
+    const profit = totalBrutto - totalCosts;
+    const margin = totalNetto > 0 ? (profit / totalNetto) * 100 : 0;
+
+    // results col always visible
+
+    // Recommended prices (dynamic based on category)
+    const baseCosts = productCost + actualShipping + adCost + otherCost;
+    const targets = catTargets;
+    const recPairs = [[targets[0],'rec30','rec30m',0],[targets[1],'rec50','rec50m',1],[targets[2],'rec70','rec70m',2]];
+    for (const [pct, id, idm, idx] of recPairs) {
+      const recBrutto = calcRecommendedPrice(pct, vatRate, baseCosts, shippingCharged);
+      document.getElementById(id).textContent = '€' + recBrutto.toFixed(2);
+      document.getElementById(idm).textContent = 'Brutto inkl. ' + vatRate + '% MwSt';
+      if (!activeCategory) {
+        const labels = ['30% Marge','50% Marge','70% Marge'];
+        document.getElementById(['recLabel1','recLabel2','recLabel3'][idx]).textContent = labels[idx];
+      }
+    }
+
+    // AMPEL
+    updateAmpel(margin);
+
+    // Update all result panels
+    updateResultPanels(brutto, netto, vatAmt, payFee, txFee, totalShopifyFees,
+      shippingCharged, shipDiff, profit, margin,
+      productCost, actualShipping, adCost, otherCost, ekVatAmt);
+
+    // KONKURRENZ
+    const compPrice = parseFloat(document.getElementById('compPrice').value);
+    if (!isNaN(compPrice) && compPrice > 0) {
+      lastCompPrice = compPrice;
+      updateCompAnalysis(compPrice, brutto, baseCosts, shippingCharged);
+    } else {
+      lastCompPrice = 0;
+      document.getElementById('compAnalysis').style.display = 'none';
+    }
+
+    // Save state for simulation
+    lastState = { brutto, netto, vatAmt, payFee, txFee, totalShopifyFees, shipDiff, 
+                  profit, margin, productCost, actualShipping, adCost, otherCost, 
+                  shippingCharged, baseCosts, ekVatAmt };
+    lastBaseCosts = baseCosts;
+
+    // Hide sim banner on fresh calculation
+    document.getElementById('simBanner').style.display = 'none';
+    if (!_applyingRec) {
+      document.getElementById('recResetBanner').style.display = 'none';
+      origRecPriceValue = null; origRecPriceType = null;
+    }
+    document.querySelectorAll('.comp-strat').forEach(el => el.style.outline = '');
+  }
+
+  function applyStrategy(key) {
+    if (!lastState) return;
+    const compPrice = parseFloat(document.getElementById('compPrice').value);
+    if (isNaN(compPrice) || compPrice <= 0) return;
+
+    compStrat = key; // update global strat
+
+    const prices = { under: compPrice * 0.95, match: compPrice, premium: compPrice * 1.10 };
+    const names  = { under: 'Unterbieten −5%', match: 'Angleichen', premium: 'Premium +10%' };
+    const simBrutto = prices[key];
+    const simTotalBrutto = simBrutto + lastState.shippingCharged;
+    const simTotalNetto  = simTotalBrutto / (1 + vatRate / 100);
+    const simNetto  = simBrutto / (1 + vatRate / 100);
+    const simVatAmt = simTotalBrutto - simTotalNetto;
+    const simPayFee = simTotalBrutto * (planFeePercent / 100) + planFeeFixed;
+    const simTxFee  = processor === 'third' ? simTotalBrutto * (planTxRate / 100) : 0;
+    const simTotalFees = simPayFee + simTxFee;
+    const simTotalCosts = simVatAmt + simPayFee + simTxFee + lastState.productCost + lastState.actualShipping + lastState.adCost + lastState.otherCost;
+    const simProfit = simTotalBrutto - simTotalCosts;
+    const simMargin = simTotalNetto > 0 ? (simProfit / simTotalNetto) * 100 : 0;
+
+    // Show banner
+    const banner = document.getElementById('simBanner');
+    banner.style.display = 'flex';
+    document.getElementById('simStratLabel').textContent = names[key];
+    document.getElementById('simPriceLabel').textContent = '€' + simBrutto.toFixed(2);
+
+    // Highlight active strat card + update winner class
+    document.querySelectorAll('.comp-strat').forEach(el => {
+      el.style.outline = '';
+      el.style.outlineOffset = '';
+      el.classList.remove('winner');
+    });
+    const keyToId = { under: 'cStrat1', match: 'cStrat2', premium: 'cStrat3' };
+    const activeCard = document.getElementById(keyToId[key]);
+    activeCard.style.outline = '2px solid var(--accent2)';
+    activeCard.style.outlineOffset = '2px';
+    activeCard.classList.add('winner');
+
+    // Update all panels with simulated values
+    updateResultPanels(simBrutto, simNetto, simVatAmt, simPayFee, simTxFee, simTotalFees,
+      lastState.shippingCharged, lastState.shipDiff, simProfit, simMargin,
+      lastState.productCost, lastState.actualShipping, lastState.adCost, lastState.otherCost,
+      lastState.ekVatAmt || 0);
+
+    // Update comp VS bar and verdict to reflect new "your price"
+    if (lastCompPrice > 0) {
+      refreshCompVsAndVerdict(simBrutto, lastCompPrice, lastBaseCosts, key);
+    }
+
+    // Scroll to ampel
+    document.getElementById('ampelWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetToOriginal() {
+    if (!lastState) return;
+    const s = lastState;
+    // Reset to original — go back to Angleichen (Mitte) as default
+    compStrat = 'match';
+    document.querySelectorAll('.comp-strat').forEach(el => {
+      el.style.outline = '';
+      el.style.outlineOffset = '';
+      el.classList.remove('winner');
+    });
+    document.getElementById('cStrat2').classList.add('winner'); // Angleichen = mitte
+
+    updateResultPanels(s.brutto, s.netto, s.vatAmt, s.payFee, s.txFee, s.totalShopifyFees,
+      s.shippingCharged, s.shipDiff, s.profit, s.margin,
+      s.productCost, s.actualShipping, s.adCost, s.otherCost, s.ekVatAmt || 0);
+
+    if (lastCompPrice > 0) {
+      refreshCompVsAndVerdict(s.brutto, lastCompPrice, lastBaseCosts, 'match');
+    }
+    document.getElementById('simBanner').style.display = 'none';
+  }
+
+  function updateResultPanels(brutto, netto, vatAmt, payFee, txFee, totalShopifyFees,
+      shippingCharged, shipDiff, profit, margin, productCost, actualShipping, adCost, otherCost, ekVatAmt) {
+
+    ekVatAmt = ekVatAmt || 0;
+    const payFeeBase = brutto + shippingCharged;
+
+    function setVal(id, text) {
+      const el = document.getElementById(id);
+      const trace = el.querySelector('.calc-trace');
+      el.childNodes[0].textContent = text;
+      // keep trace span intact
+    }
+    function setTrace(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    // Hero
+    document.getElementById('rProfit').textContent = fmt(profit);
+    document.getElementById('rMargin').textContent = margin.toFixed(1) + '%';
+    document.getElementById('profitHero').style.background = profit < 0
+      ? 'linear-gradient(135deg, rgba(255,68,102,0.12), rgba(255,107,53,0.08))'
+      : 'linear-gradient(135deg, rgba(0,229,160,0.1), rgba(124,77,255,0.1))';
+    document.getElementById('profitHero').style.borderColor = profit < 0 ? 'rgba(255,68,102,0.3)' : 'rgba(0,229,160,0.3)';
+    document.getElementById('rProfit').style.color = profit < 0 ? 'var(--red)' : 'var(--green)';
+
+    // Breakdown values
+    document.getElementById('rBrutto').childNodes[0].textContent = fmt(brutto);
+    document.getElementById('rNetto').childNodes[0].textContent = fmt(netto);
+    document.getElementById('rVatLabel').innerHTML = `MwSt (${vatRate}%)<small>abzuführen ans Finanzamt</small>`;
+    document.getElementById('rVat').childNodes[0].textContent = '−€' + vatAmt.toFixed(2);
+    document.getElementById('rFeeFormula').textContent = `${planFeePercent}% + €${planFeeFixed.toFixed(2)} vom Brutto`;
+    document.getElementById('rFee').childNodes[0].textContent = '−€' + payFee.toFixed(2);
+    document.getElementById('rTx').childNodes[0].textContent = processor === 'third' ? '−€' + txFee.toFixed(2) : '€0.00';
+    document.getElementById('rTxInfo').textContent = processor === 'third' ? `${planTxRate}% Transaktionsgebühr` : 'nur bei Drittanbieter';
+    document.getElementById('rProduct').childNodes[0].textContent = '−€' + productCost.toFixed(2);
+    document.getElementById('rProductLabel').textContent = ekVatAmt > 0 ? `nach ${getEkVatRate()}% Vorsteuerabzug` : 'Netto EK';
+    const ekVatRow = document.getElementById('rowEkVat');
+    if (ekVatAmt > 0) {
+      ekVatRow.style.display = 'flex';
+      document.getElementById('rEkVat').childNodes[0].textContent = '+€' + ekVatAmt.toFixed(2);
+      document.getElementById('rEkVatLabel').textContent = `${getEkVatRate()}% auf EK — erstattungsfähig`;
+    } else {
+      ekVatRow.style.display = 'none';
+    }
+    document.getElementById('rShip').childNodes[0].textContent = '−€' + actualShipping.toFixed(2);
+    document.getElementById('rShipDiff').childNodes[0].textContent = (shipDiff >= 0 ? '+' : '−') + '€' + Math.abs(shipDiff).toFixed(2);
+    document.getElementById('rShipDiff').className = 'result-value ' + (shipDiff >= 0 ? 'pos' : 'neg');
+    document.getElementById('rowAd').style.display = adCost > 0 ? 'flex' : 'none';
+    document.getElementById('rowOther').style.display = otherCost > 0 ? 'flex' : 'none';
+    document.getElementById('rAd').childNodes[0].textContent = '−€' + adCost.toFixed(2);
+    document.getElementById('rOther').childNodes[0].textContent = '−€' + otherCost.toFixed(2);
+    document.getElementById('rTotalFees').childNodes[0].textContent = '−€' + totalShopifyFees.toFixed(2);
+    const pf = document.getElementById('rProfitFinal');
+    pf.childNodes[0].textContent = fmt(profit);
+    pf.className = 'result-value ' + (profit < 0 ? 'neg' : 'pos');
+    pf.style.fontSize = '22px'; pf.style.fontWeight = '700';
+
+    // Traces (Zwischenrechnungen)
+    const divisor = (1 + vatRate / 100);
+    setTrace('trBrutto', priceType === 'netto'
+      ? `Netto €${netto.toFixed(2)} × ${divisor.toFixed(2)} = €${brutto.toFixed(2)}`
+      : `Eingabe: €${brutto.toFixed(2)} (Brutto)`);
+    setTrace('trNetto', `€${brutto.toFixed(2)} ÷ ${divisor.toFixed(2)} = €${netto.toFixed(2)}`);
+    setTrace('trVat', `(Produkt €${brutto.toFixed(2)} + Versand €${shippingCharged.toFixed(2)}) ÷ ${divisor.toFixed(2)} × ${vatRate}% = €${vatAmt.toFixed(2)}`);
+    setTrace('trFee', `(€${brutto.toFixed(2)} + €${shippingCharged.toFixed(2)}) × ${planFeePercent}% + €${planFeeFixed.toFixed(2)} = €${payFee.toFixed(2)}`);
+    if (processor === 'third') {
+      setTrace('trTx', `€${payFeeBase.toFixed(2)} × ${planTxRate}% = €${txFee.toFixed(2)}`);
+    } else {
+      setTrace('trTx', 'Nur bei Drittanbieter-Zahlungsanbieter');
+    }
+    setTrace('trProduct', `Netto-EK: €${productCost.toFixed(2)}`);
+    if (ekVatAmt > 0) {
+      setTrace('trEkVat', `€${productCost.toFixed(2)} × ${getEkVatRate()}% = €${ekVatAmt.toFixed(2)}`);
+    }
+    setTrace('trShip', `Tatsächlicher Versand: €${actualShipping.toFixed(2)}`);
+    setTrace('trShipDiff', `Vom Kunden: €${shippingCharged.toFixed(2)} − tatsächlich: €${actualShipping.toFixed(2)} = ${shipDiff >= 0 ? '+' : ''}€${shipDiff.toFixed(2)}`);
+    if (adCost > 0) setTrace('trAd', `Werbekosten pro Bestellung: €${adCost.toFixed(2)}`);
+    if (otherCost > 0) setTrace('trOther', `Sonstige Kosten: €${otherCost.toFixed(2)}`);
+    const allCosts = vatAmt + payFee + txFee + productCost + actualShipping + adCost + otherCost;
+    document.getElementById('rTotalCosts').childNodes[0].textContent = '−€' + allCosts.toFixed(2);
+
+    // Build trace string for total costs
+    const costParts = [
+      `MwSt €${vatAmt.toFixed(2)}`,
+      `EK €${productCost.toFixed(2)}`,
+      `Versand €${actualShipping.toFixed(2)}`,
+      `Shopify €${(payFee + txFee).toFixed(2)}`,
+    ];
+    if (adCost > 0) costParts.push(`Ads €${adCost.toFixed(2)}`);
+    if (otherCost > 0) costParts.push(`Sonst. €${otherCost.toFixed(2)}`);
+    setTrace('trTotalCosts', costParts.join(' + ') + ` = €${allCosts.toFixed(2)}`);
+
+    setTrace('trTotalFees', `Payment €${payFee.toFixed(2)}${processor === 'third' ? ` + Tx €${txFee.toFixed(2)}` : ''} = €${totalShopifyFees.toFixed(2)}`);
+    setTrace('trProfit', `€${(brutto + shippingCharged).toFixed(2)} (Einnahmen) − €${allCosts.toFixed(2)} (Kosten) = ${fmt(profit)}`);
+
+    // Ampel
+    updateAmpel(margin);
+    // Mobile bar
+    if (typeof updateMobBar === 'function') updateMobBar(profit, margin);
+  }
+
+  function calcMarginForPrice(bruttoP, baseCosts, shipCharged) {
+    shipCharged = shipCharged || 0;
+    const totalBrutto = bruttoP + shipCharged;
+    const totalNetto  = totalBrutto / (1 + vatRate / 100);
+    const vatA   = totalBrutto - totalNetto;
+    const payFee = totalBrutto * (planFeePercent / 100) + planFeeFixed;
+    const txFee  = processor === 'third' ? totalBrutto * (planTxRate / 100) : 0;
+    const profit = totalBrutto - vatA - payFee - txFee - baseCosts;
+    return totalNetto > 0 ? (profit / totalNetto) * 100 : 0;
+  }
+
+  function updateCompAnalysis(compPrice, yourBrutto, baseCosts, shipCharged) {
+    shipCharged = shipCharged || 0;
+    document.getElementById('compAnalysis').style.display = 'block';
+
+    refreshCompVsAndVerdict(yourBrutto, compPrice, baseCosts, compStrat, shipCharged);
+
+    const strategies = [
+      { id: 1, price: compPrice * 0.95, key: 'under' },
+      { id: 2, price: compPrice,        key: 'match' },
+      { id: 3, price: compPrice * 1.10, key: 'premium' },
+    ];
+
+    strategies.forEach(s => {
+      const m = calcMarginForPrice(s.price, baseCosts, shipCharged);
+      const diff = ((s.price - yourBrutto) / yourBrutto * 100);
+      document.getElementById(`cs${s.id}Price`).textContent = '€' + s.price.toFixed(2);
+      document.getElementById(`cs${s.id}Diff`).textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% vs. dein Preis';
+      document.getElementById(`cs${s.id}Margin`).textContent = m.toFixed(1) + '% Marge';
+      document.getElementById(`cStrat${s.id}`).classList.toggle('winner', s.key === compStrat);
+    });
+  }
+
+  function refreshCompVsAndVerdict(yourBrutto, compPrice, baseCosts, activeKey, shipCharged) {
+    shipCharged = shipCharged || (lastState ? lastState.shippingCharged : 0);
+    // Update VS bar
+    document.getElementById('cvYours').textContent = '€' + yourBrutto.toFixed(2);
+    document.getElementById('cvComp').textContent = '€' + compPrice.toFixed(2);
+    const diffPct = ((yourBrutto - compPrice) / compPrice * 100);
+    const badge = document.getElementById('cvDiffBadge');
+    badge.textContent = (diffPct >= 0 ? '+' : '') + diffPct.toFixed(1) + '% vs. Konkurrenz';
+    badge.classList.remove('badge-red', 'badge-green', 'badge-yellow');
+    if (diffPct > 10) {
+      badge.classList.add('badge-red');
+    } else if (diffPct < -10) {
+      badge.classList.add('badge-green');
+    } else {
+      badge.classList.add('badge-yellow');
+    }
+
+    // Verdict for the active strategy
+    const stratPrices = { under: compPrice * 0.95, match: compPrice, premium: compPrice * 1.10 };
+    const stratNames  = { under: 'Unterbieten', match: 'Angleichen', premium: 'Premium' };
+    const chosenPrice  = stratPrices[activeKey];
+    const chosenMargin = calcMarginForPrice(chosenPrice, baseCosts, shipCharged);
+    const verdict = document.getElementById('compVerdict');
+
+    let txt = '';
+    if (chosenMargin < 0) {
+      txt = `⛔ <strong>${stratNames[activeKey]} bei €${chosenPrice.toFixed(2)}</strong> → <strong>${chosenMargin.toFixed(1)}% Marge</strong> — Verlustgeschäft! Kosten drastisch senken oder anderen Preis wählen.`;
+    } else if (chosenMargin < 20) {
+      txt = `⚠️ <strong>${stratNames[activeKey]} bei €${chosenPrice.toFixed(2)}</strong> → <strong>${chosenMargin.toFixed(1)}% Marge</strong> — zu wenig zum Skalieren. Erwäge Kosten zu senken oder wechsle zur Premium-Strategie.`;
+    } else if (activeKey === 'under') {
+      txt = `✅ <strong>Unterbieten bei €${chosenPrice.toFixed(2)}</strong> → ${chosenMargin.toFixed(1)}% Marge — solide. Du wärst günstigster Anbieter, aber achte darauf dass die Konkurrenz nicht weiter runtergeht.`;
+    } else if (activeKey === 'match') {
+      txt = `✅ <strong>Angleichen bei €${chosenPrice.toFixed(2)}</strong> → ${chosenMargin.toFixed(1)}% Marge. Auf Augenhöhe mit der Konkurrenz — der Unterschied muss über Bewertungen, Bilder oder Lieferzeit kommen.`;
+    } else {
+      txt = `✅ <strong>Premium bei €${chosenPrice.toFixed(2)}</strong> → ${chosenMargin.toFixed(1)}% Marge. Funktioniert nur wenn du echten Mehrwert kommunizierst — bessere Fotos, Trust-Signale, schnellere Lieferung.`;
+    }
+    verdict.innerHTML = txt;
+  }
+
+  function updateAmpel(margin) {
+    document.getElementById('ampelWrap').style.display = 'block';
+
+    // Reset lights
+    document.getElementById('aRed').className = 'ampel-light';
+    document.getElementById('aYellow').className = 'ampel-light';
+    document.getElementById('aGreen').className = 'ampel-light';
+
+    const status = document.getElementById('ampelStatus');
+    const desc = document.getElementById('ampelDesc');
+    const bar = document.getElementById('ampelBar');
+    const card = document.getElementById('ampelCard');
+
+    const barWidth = Math.min(Math.max(margin, 0), 100);
+
+    setTimeout(() => { bar.style.width = barWidth + '%'; }, 50);
+
+    if (margin < 0) {
+      document.getElementById('aRed').className = 'ampel-light on-red';
+      status.className = 'ampel-status red';
+      status.textContent = '🔴 Verlustgeschäft';
+      desc.textContent = 'Du verlierst Geld pro Verkauf. Produktkosten senken oder Preis erhöhen — sofort.';
+      bar.style.background = '#ff4466';
+      card.style.borderColor = 'rgba(255,68,102,0.3)';
+    } else if (margin < 20) {
+      document.getElementById('aRed').className = 'ampel-light on-red';
+      status.className = 'ampel-status red';
+      status.textContent = '🔴 Kritisch — zu niedrig';
+      desc.textContent = `${margin.toFixed(1)}% Marge reicht nach Retouren & Ads kaum aus. Ziel: mind. 30%. Preis anheben oder Kosten drücken.`;
+      bar.style.background = '#ff4466';
+      card.style.borderColor = 'rgba(255,68,102,0.3)';
+    } else if (margin < 30) {
+      document.getElementById('aYellow').className = 'ampel-light on-yellow';
+      status.className = 'ampel-status yellow';
+      status.textContent = '🟡 Grenzwertig';
+      desc.textContent = `${margin.toFixed(1)}% — okay für skalierte Volumen-Produkte, aber wenig Puffer. Für Einsteiger riskant. Ads-Budget limitiert.`;
+      bar.style.background = '#ffc107';
+      card.style.borderColor = 'rgba(255,193,7,0.3)';
+    } else if (margin < 50) {
+      document.getElementById('aYellow').className = 'ampel-light on-yellow';
+      status.className = 'ampel-status yellow';
+      status.textContent = '🟡 Solide';
+      desc.textContent = `${margin.toFixed(1)}% ist ein guter Start. Reicht für moderates Ad-Budget. Noch Luft nach oben — Upsells oder Bundles könnten helfen.`;
+      bar.style.background = '#ffc107';
+      card.style.borderColor = 'rgba(255,193,7,0.3)';
+    } else if (margin < 70) {
+      document.getElementById('aGreen').className = 'ampel-light on-green';
+      status.className = 'ampel-status green';
+      status.textContent = '🟢 Stark';
+      desc.textContent = `${margin.toFixed(1)}% — sehr gut! Genug Puffer für Retouren, Ads und Skalierung. Produkt hat echtes Potenzial.`;
+      bar.style.background = 'var(--green)';
+      card.style.borderColor = 'rgba(0,229,160,0.3)';
+    } else {
+      document.getElementById('aGreen').className = 'ampel-light on-green';
+      status.className = 'ampel-status green';
+      status.textContent = '🟢 Ausgezeichnet';
+      desc.textContent = `${margin.toFixed(1)}% — Top-Marge! Perfekt für aggressive Skalierung. Prüfe ob Preis noch marktgerecht ist.`;
+      bar.style.background = 'var(--green)';
+      card.style.borderColor = 'rgba(0,229,160,0.3)';
+    }
+  }
+
+  // Mobile tab switching
+  function switchTab(tab) {
+    const inputsCol = document.getElementById('inputsCol');
+    const resultsCol = document.getElementById('resultsCol');
+    document.getElementById('tabInputs').classList.toggle('active', tab === 'inputs');
+    document.getElementById('tabResults').classList.toggle('active', tab === 'results');
+    if (tab === 'results') {
+      inputsCol.classList.add('mob-hidden');
+      resultsCol.classList.add('mob-active');
+    } else {
+      inputsCol.classList.remove('mob-hidden');
+      resultsCol.classList.remove('mob-active');
+    }
+  }
+
+  // Update mobile mini profit bar
+  function updateMobBar(profit, margin) {
+    const fmt2 = n => (n < 0 ? '−' : '') + '€' + Math.abs(n).toFixed(2);
+    const el2 = document.getElementById('mobProfit2');
+    if (el2) { el2.textContent = fmt2(profit); el2.style.color = profit < 0 ? 'var(--red)' : 'var(--accent)'; }
+    const el3 = document.getElementById('mobMargin2');
+    if (el3) { el3.textContent = margin.toFixed(1) + '%'; el3.style.color = profit < 0 ? 'var(--red)' : profit < 20 ? '#ffc107' : 'var(--accent)'; }
+    const bar = document.getElementById('mobProfitBarTop');
+    if (bar) bar.style.display = 'flex';
+  }
+
+  // Init
+  updateTx();
+</script>
+</script>
+</body>
+</html>
