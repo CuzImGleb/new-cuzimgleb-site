@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IHK Prüfungssimulation – Kaufmann/Kauffrau im Einzelhandel</title>
+<style>
+  :root {
+    --t1: #1F4E79; --t1l: #D6E4F7; --t1m: #2E75B6;
+    --t2: #1F4E79; --t2l: #D6E4F7;
+    --t3: #375623; --t3l: #E2EFDA; --t3m: #70AD47;
+    --correct: #375623; --correct-bg: #E2EFDA;
+    --wrong: #C00000; --wrong-bg: #FCE4D6;
+    --neutral: #404040;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #F0F4F8; min-height: 100vh; }
+
+  #app { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* START SCREEN */
+  .start-card {
+    background: white; border-radius: 12px; padding: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center;
+  }
+  .start-card h1 { color: var(--t1); font-size: 2rem; margin-bottom: 8px; }
+  .start-card .subtitle { color: #666; font-size: 1.1rem; margin-bottom: 32px; }
+
+  .part-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 32px 0; }
+  .part-btn {
+    padding: 20px 12px; border: 3px solid #ddd; border-radius: 10px;
+    cursor: pointer; background: white; transition: all 0.2s;
+  }
+  .part-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .part-btn.selected { border-color: var(--t1); background: var(--t1l); }
+  .part-btn .part-num { font-size: 1.5rem; font-weight: bold; margin-bottom: 6px; }
+  .part-btn .part-title { font-size: 0.85rem; color: #444; }
+  .part-btn .part-type { font-size: 0.75rem; color: #888; margin-top: 4px; }
+  .part-btn[data-part="1"] .part-num { color: var(--t1); }
+  .part-btn[data-part="1"].selected { border-color: var(--t1); background: var(--t1l); }
+  .part-btn[data-part="2"] .part-num { color: var(--t1m); }
+  .part-btn[data-part="2"].selected { border-color: var(--t1m); background: var(--t1l); }
+  .part-btn[data-part="3"] .part-num { color: var(--t3); }
+  .part-btn[data-part="3"].selected { border-color: var(--t3m); background: var(--t3l); }
+
+  .mode-selector { display: flex; gap: 12px; justify-content: center; margin: 16px 0 24px; flex-wrap: wrap; }
+  .mode-btn {
+    padding: 10px 22px; border: 2px solid #ddd; border-radius: 25px;
+    cursor: pointer; background: white; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .mode-btn:hover { border-color: var(--t1); color: var(--t1); }
+  .mode-btn.selected { background: var(--t1); color: white; border-color: var(--t1); }
+
+  .start-btn {
+    background: var(--t1); color: white; border: none;
+    padding: 14px 40px; font-size: 1.1rem; font-weight: bold;
+    border-radius: 8px; cursor: pointer; transition: background 0.2s;
+    margin-top: 8px;
+  }
+  .start-btn:hover { background: #163a5f; }
+  .start-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+  /* QUIZ SCREEN */
+  .quiz-header {
+    background: white; border-radius: 10px; padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .quiz-info { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .part-badge {
+    padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;
+    color: white;
+  }
+  .progress-text { color: #666; font-size: 0.9rem; }
+  .score-display { font-weight: bold; color: var(--t1); }
+
+  .timer {
+    font-size: 1.4rem; font-weight: bold; padding: 8px 16px;
+    border-radius: 8px; background: #F0F4F8; color: var(--t1);
+    min-width: 80px; text-align: center; transition: color 0.3s, background 0.3s;
+  }
+  .timer.warning { color: #E67E22; background: #FEF5E7; }
+  .timer.danger { color: var(--wrong); background: var(--wrong-bg); animation: pulse 1s infinite; }
+
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+
+  .progress-bar-wrap { background: #E0E0E0; border-radius: 4px; height: 6px; margin-bottom: 20px; }
+  .progress-bar { height: 100%; border-radius: 4px; background: var(--t1); transition: width 0.4s; }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: white; border-radius: 12px; padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px;
+  }
+  .q-meta {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .q-number {
+    background: var(--t1); color: white; width: 36px; height: 36px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 0.95rem; flex-shrink: 0;
+  }
+  .q-category { color: #888; font-size: 0.85rem; background: #F5F5F5; padding: 3px 10px; border-radius: 12px; }
+  .q-text { font-size: 1.05rem; color: #222; line-height: 1.6; margin-bottom: 24px; font-weight: 500; }
+
+  /* MC OPTIONS */
+  .options-list { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    padding: 14px 18px; border: 2px solid #E0E0E0; border-radius: 8px;
+    text-align: left; cursor: pointer; background: white;
+    font-size: 0.95rem; color: #333; transition: all 0.15s; line-height: 1.4;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--t1); background: var(--t1l); color: var(--t1); }
+  .option-btn.selected { border-color: var(--t1); background: var(--t1l); }
+  .option-btn.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); font-weight: bold; }
+  .option-btn.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }
+  .option-btn:disabled { cursor: default; }
+  .option-letter { font-weight: bold; margin-right: 8px; color: #999; }
+  .option-btn.correct .option-letter { color: var(--correct); }
+  .option-btn.wrong .option-letter { color: var(--wrong); }
+
+  /* OPEN QUESTION */
+  .open-answer-wrap { position: relative; }
+  .open-answer {
+    width: 100%; min-height: 120px; padding: 14px; border: 2px solid #E0E0E0;
+    border-radius: 8px; font-family: Arial, sans-serif; font-size: 0.95rem;
+    resize: vertical; line-height: 1.5; transition: border-color 0.2s;
+  }
+  .open-answer:focus { outline: none; border-color: var(--t1); }
+
+  /* FEEDBACK */
+  .feedback-box {
+    margin-top: 16px; padding: 16px 20px; border-radius: 8px;
+    border-left: 5px solid; display: none;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct-fb { border-color: var(--correct); background: var(--correct-bg); }
+  .feedback-box.wrong-fb { border-color: var(--wrong); background: var(--wrong-bg); }
+  .feedback-box.open-fb { border-color: var(--t1); background: var(--t1l); }
+  .feedback-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; }
+  .feedback-text { font-size: 0.9rem; white-space: pre-line; line-height: 1.6; }
+
+  /* ACTION BUTTONS */
+  .action-row {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .btn {
+    padding: 12px 24px; border: none; border-radius: 8px;
+    cursor: pointer; font-size: 0.95rem; font-weight: bold; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--t1); color: white; }
+  .btn-primary:hover { background: #163a5f; }
+  .btn-secondary { background: #F0F4F8; color: var(--t1); border: 2px solid var(--t1); }
+  .btn-secondary:hover { background: var(--t1l); }
+  .btn-danger { background: var(--wrong-bg); color: var(--wrong); border: 2px solid var(--wrong); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* RESULTS SCREEN */
+  .results-card {
+    background: white; border-radius: 12px; padding: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .results-card h2 { color: var(--t1); font-size: 1.8rem; margin-bottom: 8px; text-align: center; }
+  .score-big {
+    font-size: 4rem; font-weight: bold; text-align: center;
+    margin: 24px 0 8px; line-height: 1;
+  }
+  .grade-label { text-align: center; font-size: 1.2rem; color: #666; margin-bottom: 32px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+  .stat-box { background: #F5F7FA; border-radius: 8px; padding: 16px; text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: bold; color: var(--t1); }
+  .stat-label { font-size: 0.8rem; color: #888; margin-top: 4px; }
+  .results-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+
+  /* REVIEW */
+  .review-item { background: white; border-radius: 8px; padding: 20px; margin-bottom: 12px; border-left: 4px solid #ddd; }
+  .review-item.r-correct { border-color: var(--correct); }
+  .review-item.r-wrong { border-color: var(--wrong); }
+  .review-item.r-open { border-color: var(--t1); }
+  .review-q { font-weight: bold; margin-bottom: 8px; font-size: 0.95rem; }
+  .review-given { font-size: 0.9rem; margin-bottom: 6px; }
+  .review-correct { font-size: 0.9rem; color: var(--correct); }
+
+  @media (max-width: 600px) {
+    .part-selector { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .quiz-header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- START SCREEN -->
+<div id="screen-start" class="screen active">
+  <div class="start-card">
+    <h1>📚 IHK Prüfungssimulation</h1>
+    <div class="subtitle">Kaufmann / Kauffrau im Einzelhandel</div>
+
+    <p style="margin-bottom:16px; color:#444;">Wähle einen oder mehrere Prüfungsteile:</p>
+    <div class="part-selector">
+      <div class="part-btn" data-part="1" onclick="togglePart(1)">
+        <div class="part-num">Teil 1</div>
+        <div class="part-title">Verkauf & Werbung</div>
+        <div class="part-type">30 Fragen · Offen & MC · 90 Min</div>
+      </div>
+      <div class="part-btn" data-part="2" onclick="togglePart(2)">
+        <div class="part-num">Teil 2</div>
+        <div class="part-title">Warenwirtschaft</div>
+        <div class="part-type">17 Fragen · Multiple Choice · 60 Min</div>
+      </div>
+      <div class="part-btn" data-part="3" onclick="togglePart(3)">
+        <div class="part-num">Teil 3</div>
+        <div class="part-title">Wirtschaft & Recht</div>
+        <div class="part-type">23 Fragen · Multiple Choice · 60 Min</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom:10px; color:#444; font-weight:bold;">Modus:</p>
+    <div class="mode-selector">
+      <div class="mode-btn selected" data-mode="exam" onclick="setMode('exam')">⏱ Prüfungsmodus (mit Timer)</div>
+      <div class="mode-btn" data-mode="learn" onclick="setMode('learn')">📖 Lernmodus (ohne Timer)</div>
+      <div class="mode-btn" data-mode="quick" onclick="setMode('quick')">⚡ Schnelltest (15 Fragen)</div>
+    </div>
+
+    <button class="start-btn" id="start-btn" onclick="startQuiz()" disabled>Prüfung starten →</button>
+    <p id="q-count" style="margin-top:12px; color:#888; font-size:0.85rem;"></p>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-info">
+      <span class="part-badge" id="quiz-part-badge">Teil 1</span>
+      <span class="progress-text" id="progress-text">Frage 1 von 20</span>
+      <span class="score-display" id="score-display">0 / 0 richtig</span>
+    </div>
+    <div class="timer" id="timer">--:--</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-meta">
+      <div class="q-number" id="q-number">1</div>
+      <div class="q-category" id="q-category">Teamarbeit</div>
+    </div>
+    <div class="q-text" id="q-text">Frage wird geladen...</div>
+    <div id="q-content"><!-- options or textarea --></div>
+    <div class="feedback-box" id="feedback-box">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-text" id="feedback-text"></div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-secondary" id="btn-show-answer" onclick="showAnswer()" style="display:none">Lösung anzeigen</button>
+    <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>Weiter →</button>
+    <button class="btn btn-danger" onclick="endQuiz()" style="margin-left:auto;">Prüfung beenden</button>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="screen-results" class="screen">
+  <div class="results-card">
+    <h2>Ergebnis</h2>
+    <div class="score-big" id="result-pct">--</div>
+    <div class="grade-label" id="result-grade">--</div>
+    <div class="stats-grid" style="grid-template-columns: repeat(4,1fr);">
+      <div class="stat-box">
+        <div class="stat-num" id="stat-pct">–</div>
+        <div class="stat-label">Punkte (IHK)</div>
+      </div>
+      <div class="stat-box" style="background:#E2EFDA;">
+        <div class="stat-num" id="stat-correct" style="color:var(--correct);">0</div>
+        <div class="stat-label">Richtig</div>
+      </div>
+      <div class="stat-box" style="background:#FCE4D6;">
+        <div class="stat-num" id="stat-wrong" style="color:var(--wrong);">0</div>
+        <div class="stat-label">Falsch</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-open">0</div>
+        <div class="stat-label">Offen</div>
+      </div>
+    </div>
+    <div id="result-time" style="text-align:center; color:#888; font-size:0.9rem; margin-bottom:24px;"></div>
+
+    <div class="results-actions">
+      <button class="btn btn-primary" onclick="showReview()">📋 Antworten ansehen</button>
+      <button class="btn btn-secondary" onclick="restartQuiz()">🔄 Nochmal versuchen</button>
+      <button class="btn btn-secondary" onclick="goHome()">🏠 Startseite</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW SCREEN -->
+<div id="screen-review" class="screen">
+  <div style="margin-bottom:16px; display:flex; gap:12px; align-items:center;">
+    <button class="btn btn-secondary" onclick="showResults()">← Zurück zum Ergebnis</button>
+    <h3 style="color:var(--t1);">Alle Antworten im Überblick</h3>
+  </div>
+  <div id="review-list"></div>
+</div>
+
+</div>
+
+<script>
+// ==================== DATA ====================
+const QUESTIONS = {
+  t1: [
+    { id:1, cat:"Teamarbeit", type:"mc",
+      q:"Welche Aussage beschreibt ein Merkmal der Teamarbeit NICHT?",
+      opts:["Angemessene Gruppengröße / Teilnehmerzahl","Eine Teamleitung","Jeder arbeitet eigenständig ohne Absprache mit anderen","Fest vereinbarte Rahmenbedingungen"],
+      correct:2, explain:"Teamarbeit setzt gerade die enge Absprache und Zusammenarbeit voraus – eigenständiges Arbeiten ohne Koordination widerspricht dem Teamprinzip." },
+    { id:2, cat:"Teamarbeit", type:"open",
+      q:"Nennen Sie 4 Vorteile der Teamarbeit.",
+      answer:"1. Stärken und Schwächen der Teammitglieder werden ausgeglichen\n2. Entscheidungen werden gemeinsam getroffen und von allen getragen\n3. Wir-Gefühl wird gestärkt\n4. Das Wissen der Teammitglieder wird besser genutzt" },
+    { id:3, cat:"Teamarbeit", type:"mc",
+      q:"Was beschreibt das 'Trittbrettfahrer'-Phänomen in großen Teams?",
+      opts:["Mitarbeiter arbeiten besonders hart, wenn das Team groß ist","Zurückhaltende Mitarbeiter verstecken sich leicht und tragen weniger bei","Der Informationsfluss verbessert sich mit der Teamgröße","Große Teams treffen bessere Entscheidungen"],
+      correct:1, explain:"Bei zu vielen Teammitgliedern können zurückhaltende Personen weniger beitragen, ohne dass es auffällt – man nennt das den 'Trittbrettfahrer-Effekt'." },
+    { id:4, cat:"Feedback", type:"mc",
+      q:"Welche Aussage zur Sandwich-Methode (Feedbackgespräch) ist RICHTIG?",
+      opts:["Kritik wird direkt und scharf formuliert, ohne Beschönigung","Die Methode besteht aus: Lob → Kritik → Ermutigung","Zuerst kommt die Kritik, dann das Lob","Die Sandwich-Methode ist für Kritik an Kunden gedacht"],
+      correct:1, explain:"Sandwich = Lob + Kritik + Lob (Ermutigung). Ziel: Kritik annehmbar machen, ohne das Selbstwertgefühl zu verletzen." },
+    { id:5, cat:"Feedback", type:"open",
+      q:"Erklären Sie die Sandwich-Methode als Feedbacktechnik und nennen Sie ihre drei Schichten.",
+      answer:"Schicht 1 (LOB): Mit einer positiven Aussage beginnen\nSchicht 2 (KRITIK): Konkrete, sachliche Kritik in Ich-Form formulieren\nSchicht 3 (ERMUTIGUNG): Mit einer motivierenden Aussage abschließen\nZiel: Kritik annehmbar machen, ohne das Selbstwertgefühl zu verletzen." },
+    { id:6, cat:"Feedback", type:"mc",
+      q:"Welche Formulierung entspricht einer korrekten Feedback-Regel?",
+      opts:["'Du machst das immer falsch!'","'Ich habe den Eindruck, dass die Präsentation noch klarer strukturiert werden könnte.'","'Das war wirklich nicht gut von dir.'","'Alle fanden, dass du dich verbessern musst.'"],
+      correct:1, explain:"Feedback soll in der Ich-Form formuliert werden, sachlich und konkret sein und das Selbstwertgefühl nicht verletzen." },
+    { id:7, cat:"Feedback", type:"mc",
+      q:"Nennen Sie einen Vorteil der Sandwich-Methode beim Mitarbeitergespräch.",
+      opts:["Kritik wirkt stärker, weil sie doppelt betont wird","Das Selbstwertgefühl des Mitarbeiters bleibt erhalten und Kritik wird besser angenommen","Der Vorgesetzte muss sich nicht entschuldigen","Die Methode verkürzt das Gespräch auf ein Minimum"],
+      correct:1, explain:"Die Sandwich-Methode bettet Kritik zwischen zwei positive Aussagen – so bleibt das Selbstwertgefühl erhalten und der Mitarbeiter ist offener für Verbesserungsvorschläge." },
+    { id:8, cat:"Werbung", type:"mc",
+      q:"Was ist der UNTERSCHIED zwischen Werbemittel und Werbeträger?",
+      opts:["Beide Begriffe bedeuten dasselbe","Werbemittel = das Werbeobjekt selbst; Werbeträger = Medium, das es transportiert","Werbeträger = Flyer, Werbemittel = Zeitung","Werbemittel ist das Budget, Werbeträger die Zielgruppe"],
+      correct:1, explain:"Werbemittel = das Werbeobjekt selbst (Flyer, Anzeige, Plakat).\nWerbeträger = das Medium, das es transportiert (Zeitung, Radio, Internet)." },
+    { id:9, cat:"Werbung", type:"open",
+      q:"Nennen Sie 5 Inhalte eines vollständigen Werbeplans.",
+      answer:"1. Werbeziele\n2. Zielgruppe (Streukreis)\n3. Werbebotschaft\n4. Werbemittel\n5. Werbebudget\n(+ Werbeträger, Zeitraum)" },
+    { id:10, cat:"Werbung", type:"mc",
+      q:"Warum eignet sich Social Media besonders gut als Werbemittel?",
+      opts:["Es ist das teuerste, aber effektivste Werbemittel","Kunden können nicht erreicht werden","Günstig, hohe Reichweite und Kunden erwarten eine Internetpräsenz","Nur für junge Zielgruppen geeignet"],
+      correct:2, explain:"Social Media ist das günstigste Werbemittel, erreicht viele Kunden direkt, und moderne Kunden erwarten eine Internetpräsenz von Unternehmen." },
+    { id:11, cat:"Werbung", type:"mc",
+      q:"Welcher der folgenden ist KEIN Grundsatz der Werbung?",
+      opts:["Werbewahrheit (keine falschen Versprechen)","Werbeoriginalität (Aufmerksamkeit erregen)","Werbeexklusivität (nur für Stammkunden)","Werbeklarheit (verständlich und eindeutig)"],
+      correct:2, explain:"Die 5 Grundsätze der Werbung sind: Werbewirksamkeit, Werbewahrheit, Werbeklarheit, Werbeoriginalität, Werbe-Wirtschaftlichkeit.\n'Werbeexklusivität' gibt es nicht." },
+    { id:12, cat:"Werbung", type:"mc",
+      q:"Was ist Verkaufsförderung (Sales Promotion)?",
+      opts:["Maßnahmen zur Schulung des Verkaufspersonals","Summe aller absatzfördernden Maßnahmen am Ort des Verkaufs","Werbung in Zeitungen und Magazinen","Rabattaktionen nur für Stammkunden"],
+      correct:1, explain:"Sales Promotion = Summe aller absatzfördernden Maßnahmen am Point of Sale (POS), um aufgebautes Kaufinteresse in einen konkreten Kauf umzuwandeln." },
+    { id:13, cat:"Verkaufsgespräch", type:"mc",
+      q:"Welche Fragetechnik ist bei der Bedarfsermittlung am Anfang des Verkaufsgesprächs am besten geeignet?",
+      opts:["Geschlossene Frage (Ja/Nein)","Suggestivfrage","Offene W-Frage","Alternativfrage"],
+      correct:2, explain:"Offene W-Fragen ('Was suchen Sie?', 'Wie kann ich helfen?') ermöglichen breite Antworten und helfen, den Bedarf des Kunden zu ermitteln." },
+    { id:14, cat:"Verkaufsgespräch", type:"open",
+      q:"Erklären Sie den Unterschied zwischen offener Frage und Alternativfrage. Geben Sie je ein Beispiel.",
+      answer:"Offene Frage (W-Frage): Lässt viele Antwortmöglichkeiten zu\nBeispiel: 'Welche Funktion soll das Gerät haben?'\n\nAlternativfrage: Lässt den Kunden zwischen zwei Optionen wählen\nBeispiel: 'Möchten Sie einen trockenen oder einen lieblichen Wein?'" },
+    { id:15, cat:"Verkaufsgespräch", type:"mc",
+      q:"Bei der Warenvorlage sollte man mit welcher Preislage beginnen?",
+      opts:["Mit dem günstigsten Artikel","Mit dem teuersten Artikel","Mit der mittleren Preislage","Mit der neuesten Ware"],
+      correct:2, explain:"Mit mittlerer Preislage beginnen – so hat man Handlungsspielraum nach oben (höherwertige Artikel zeigen) und nach unten (günstigere Alternativen)." },
+    { id:16, cat:"Verkaufsgespräch", type:"mc",
+      q:"Wie funktioniert die Sandwich-Methode bei der Preisnennung?",
+      opts:["Preis zuerst nennen, dann Vorteile","Nutzen nennen → Preis nennen → Vorteil nennen","Preis verschweigen und nur Vorteile nennen","Preis zwischen zwei Rabatten einbetten"],
+      correct:1, explain:"Sandwich-Preisnennung: Nutzen → Preis → Vorteil.\nDer Preis wird zwischen zwei positive Aussagen eingebettet und wirkt so weniger abschreckend." },
+    { id:17, cat:"Reklamation", type:"mc",
+      q:"Was ist der Unterschied zwischen Umtausch und Reklamation?",
+      opts:["Umtausch = gesetzlicher Anspruch; Reklamation = freiwillige Leistung","Umtausch = freiwillige Leistung des Händlers; Reklamation = gesetzlicher Anspruch bei Mangel","Beide sind gesetzliche Ansprüche","Beide sind freiwillige Leistungen"],
+      correct:1, explain:"Umtausch: Freiwillige Leistung des Händlers – kein Mangel vorhanden.\nReklamation: Gesetzlicher Anspruch des Kunden auf Nacherfüllung bei einem Mangel." },
+    { id:18, cat:"Reklamation", type:"open",
+      q:"Beschreiben Sie, wie Sie sich kundenorientiert bei einer Reklamation verhalten. (4 Schritte)",
+      answer:"1. Kunden höflich in eine ruhige Ecke bitten (Geschäftsablauf nicht stören)\n2. Kunden ruhig aussprechen lassen\n3. Aufmerksam zuhören, Verständnis und Entschuldigung zeigen\n4. Lösungsangebot machen (Reparatur, Ersatz, Erstattung)" },
+    { id:19, cat:"Kassenbereich", type:"mc",
+      q:"Was gehört zu den vorbereitenden Tätigkeiten vor dem Kassieren?",
+      opts:["Waren neu einräumen","Wechselgeld abzählen und in die Kasse einzählen","Inventur durchführen","Lieferanten anrufen"],
+      correct:1, explain:"Vor dem Kassieren muss u.a. das Wechselgeld bereitgestellt, die Kasse auf Funktionsfähigkeit geprüft, der Kassierer angemeldet und die Bonrolle kontrolliert werden." },
+    { id:20, cat:"Kassenbereich", type:"open",
+      q:"Nennen Sie 4 Ursachen für Kassendifferenzen und je eine Gegenmassnahme.",
+      answer:"1. Kassierfehler → Betrag laut nennen\n2. Falschgeld nicht erkannt → Geldscheine mit Prüfstift / UV-Lampe prüfen\n3. Fehler bei Preiseingabe → Barcode erneut scannen / WWS nutzen\n4. Unehrlichkeit des Kassenpersonals → Videoüberwachung, 4-Augen-Prinzip" },
+    { id:21, cat:"Kassenbereich", type:"mc",
+      q:"Welchen Vorteil hat die Kartenzahlung für das Unternehmen?",
+      opts:["Höhere Kassenbestände","Zahlungsgarantie durch Online-Prüfung und weniger Kassendifferenzen","Kunden kaufen weniger spontan","Kein Wechselgeld nötig – aber dafür längere Wartezeiten"],
+      correct:1, explain:"Kartenzahlung: Zahlungsgarantie, weniger Kassendifferenzen, Erhöhung der Kundenbindung.\nFür den Kunden: Bequemlichkeit, Unabhängigkeit von Bargeld, spontane Käufe möglich." },
+    { id:22, cat:"Warenpräsentation", type:"mc",
+      q:"Welche Regalzone wird als 'Greifzone' bezeichnet?",
+      opts:["0–80 cm (Bückzone)","80–120 cm","120–160 cm (Sichtzone)","160–220 cm (Reckzone)"],
+      correct:1, explain:"Greifzone (80–120 cm): Leichter Zugriff, hochwertige margenstarke Ware.\nSichtzone (120–160 cm): Attraktive Ware, Impulskäufe.\nBeide gelten als verkaufsstark." },
+    { id:23, cat:"Warenpräsentation", type:"mc",
+      q:"Wo sollte ein Händler seine teuerste, margenstarke Ware platzieren?",
+      opts:["Bückzone (0–80 cm) – damit Kunden sie suchen müssen","Reckzone (160–220 cm) – damit sie auffällt","Greifzone (80–120 cm) – leichter Zugriff und gute Sichtbarkeit","Immer am Eingang"],
+      correct:2, explain:"Greifzone (80–120 cm): Leichter Zugriff = hohe Kaufbereitschaft → ideal für hochwertige, margenstarke Ware." },
+    { id:24, cat:"Warenpräsentation", type:"mc",
+      q:"Was ist eine Verbundplatzierung?",
+      opts:["Ware wird an ihrem normalen Regalplatz aufgestellt","Ergänzende Artikel werden gemeinsam platziert (z.B. Kaffee + Kaffeemaschine)","Ware wird zweimal aufgestellt","Ware wird im Schaufenster präsentiert"],
+      correct:1, explain:"Verbundplatzierung = zusammengehörende Produkte gemeinsam präsentieren → fördert Zusatzkäufe und logische Kundenlenkung." },
+    { id:25, cat:"Warenpräsentation", type:"mc",
+      q:"Was beschreibt das Zwangsablauf-Prinzip der Regalanordnung?",
+      opts:["Kunden können den Weg durch das Geschäft frei wählen","Ein fester Einkaufsweg ist vorgegeben – der Kunde wird durch alle Bereiche geführt","Warenträger werden sternförmig in der Mitte aufgestellt","Kurze Warenträger werden quer im Raum verteilt"],
+      correct:1, explain:"Zwangsablauf (Beispiel: IKEA): Ein fest vorgegebener Weg führt den Kunden durch alle Bereiche → maximale Exposition gegenüber dem Sortiment." },
+    { id:26, cat:"Warenpräsentation", type:"mc",
+      q:"Was ist der Unterschied zwischen Kern- und Randsortiment?",
+      opts:["Kernsortiment = teure Ware; Randsortiment = günstige Ware","Kernsortiment = Haupttätigkeit des Unternehmens; Randsortiment = Ergänzungsartikel","Kernsortiment = Neuzugänge; Randsortiment = alte Ware","Kernsortiment = Markenware; Randsortiment = Eigenmarken"],
+      correct:1, explain:"Kernsortiment: Haupttätigkeit (z.B. Möbelhaus → Sofas, Schlafzimmer).\nRandsortiment: Ergänzungsartikel für zusätzlichen Kundenservice (z.B. Möbelhaus → Heimtextilien, Dekoration)." },
+    { id:27, cat:"Warenpräsentation", type:"mc",
+      q:"Welche Regalanordnung beschreibt das Kojenprinzip?",
+      opts:["Warenträger stehen sternförmig in der Mitte","Der Innenraum wird durch Warenträger in kleinere abgeschlossene Bereiche eingeteilt (Wohnlichkeit)","Warenträger werden von innen nach außen immer höher","Warenträger sind schräg versetzt angeordnet"],
+      correct:1, explain:"Kojenprinzip (Beispiel: Möbel Martin): Warenträger teilen den Raum in kleinere Bereiche auf – wirkt wohnlich und einladend." },
+    { id:28, cat:"Warenpräsentation", type:"open",
+      q:"Nennen Sie 4 der 6 Regalanordnungsprinzipien und je ein Beispielunternehmen.",
+      answer:"1. Diagonalprinzip – dm (Warenträger schräg versetzt)\n2. Zwangsablauf – IKEA (fester Einkaufsweg)\n3. Arenaprinzip – Warenträger von Mitte nach außen immer höher\n4. Sternprinzip – Thalia (sternförmige Aufstellung in der Mitte)\n5. Kojenprinzip – Möbel Martin (abgeschlossene Bereiche)\n6. Individualablauf – Aldi (Kunde wählt Weg frei)" },
+    { id:29, cat:"Warenpräsentation", type:"mc",
+      q:"Was versteht man unter verkaufsstarken Zonen im Verkaufsraum?",
+      opts:["Eingangsbereich, Eckzone und Mittelzone","Kassenzone, Bedienungszone und Randzone","Bückzone, Reckzone und Lagerfläche","Immer die Flächen direkt am Schaufenster"],
+      correct:1, explain:"Verkaufsstarke Zonen: Kassenzone, Bedienungszone, Randzone.\nVerkaufsschwache Zonen: Eingangsbereich, Eckzone, Mittelzone.\nTipp: Margenstarke Ware in starke Zonen – Pflichtartikel (Salz, Mehl) in schwache." },
+    { id:30, cat:"Visual Merchandising", type:"mc",
+      q:"Welche Wirkung hat warme Beleuchtung im Verkaufsraum laut Visual Merchandising?",
+      opts:["Sie lässt den Raum kleiner wirken","Sie wirkt sich positiv auf die Verweildauer der Kunden aus","Sie schreckt Kunden ab","Sie erhöht die Diebstahlsicherheit"],
+      correct:1, explain:"Visual Merchandising: Warme Beleuchtung → angenehme Atmosphäre → längere Verweildauer → mehr Impulskäufe.\nGroßflächige Beleuchtung lässt den Raum hochwertiger erscheinen." },
+  ],
+  t2: [
+    { id:31, cat:"Lagerbestand", type:"mc",
+      q:"Wie berechnet man den Meldebestand?",
+      opts:["Meldebestand = Höchstbestand – Mindestbestand","Meldebestand = Tagesabsatz × Lieferzeit + Mindestbestand","Meldebestand = Jahresabsatz / 360","Meldebestand = Lagerbestand / 2"],
+      correct:1, explain:"Meldebestand = Tagesabsatz × Lieferzeit (in Tagen) + Mindestbestand\nBei Erreichen des Meldebestands muss sofort bestellt werden!" },
+    { id:32, cat:"Lagerbestand", type:"mc",
+      q:"Was passiert mit dem Meldebestand, wenn sich die Lieferzeit verlängert?",
+      opts:["Der Meldebestand sinkt","Der Meldebestand bleibt gleich","Der Meldebestand muss erhöht werden","Der Meldebestand ist dann irrelevant"],
+      correct:2, explain:"Längere Lieferzeit = mehr Puffer nötig → Meldebestand muss erhöht werden." },
+    { id:33, cat:"Lagerbestand", type:"mc",
+      q:"Wie berechnet man die Umschlagshäufigkeit?",
+      opts:["Umschlagshäufigkeit = Ø Lagerbestand × 360","Umschlagshäufigkeit = Jahresabsatz / Ø Lagerbestand","Umschlagshäufigkeit = Ø Lagerbestand / Jahresabsatz","Umschlagshäufigkeit = Lagerdauer × Jahresabsatz"],
+      correct:1, explain:"Umschlagshäufigkeit = Jahresabsatz / Ø Lagerbestand\nHohe Umschlagshäufigkeit = Ware dreht sich schnell = gut!" },
+    { id:34, cat:"Lagerbestand", type:"mc",
+      q:"Wie berechnet man die Lagerdauer in Tagen?",
+      opts:["Lagerdauer = Jahresabsatz × Ø Lagerbestand","Lagerdauer = Ø Lagerbestand × 360 / Jahresabsatz","Lagerdauer = Umschlagshäufigkeit / 360","Lagerdauer = Mindestbestand / Tagesabsatz"],
+      correct:1, explain:"Lagerdauer = Ø Lagerbestand × 360 / Jahresabsatz (Ergebnis in Tagen)\nKurze Lagerdauer = gut (geringere Lagerkosten, Kapitalbindung)." },
+    { id:35, cat:"Lagerbestand", type:"mc",
+      q:"Ein Artikel hat einen Tagesabsatz von 5 Stück, eine Lieferzeit von 8 Tagen und einen Mindestbestand von 10 Stück. Wie hoch ist der Meldebestand?",
+      opts:["50 Stück","30 Stück","40 Stück","45 Stück"],
+      correct:0, explain:"Meldebestand = 5 × 8 + 10 = 40 + 10 = 50 Stück" },
+    { id:36, cat:"Kalkulation", type:"mc",
+      q:"Was ist der Bezugspreis (Einstandspreis)?",
+      opts:["Der Preis auf dem Preisschild","Der tatsächliche Einkaufspreis nach allen Abzügen und zzgl. Bezugskosten","Der Preis vor Abzug von Rabatten","Der Nettoverkaufspreis"],
+      correct:1, explain:"Bezugspreis = Listeneinkaufspreis – Rabatt – Skonto + Bezugskosten\nDas ist der tatsächliche Einstandspreis pro Stück – Grundlage für die Verkaufskalkulation." },
+    { id:37, cat:"Kalkulation", type:"mc",
+      q:"Listeneinkaufspreis 200 €, Rabatt 10%, Skonto 2%, Frachtkosten 5 €. Wie hoch ist der Bezugspreis?",
+      opts:["181,40 €","176,40 €","180 €","185 €"],
+      correct:0, explain:"200 – 20 (10% Rabatt) = 180 € (Zieleinkaufspreis)\n180 – 3,60 (2% Skonto) = 176,40 € (Bareinkaufspreis)\n176,40 + 5 € (Fracht) = 181,40 € Bezugspreis" },
+    { id:38, cat:"Kalkulation", type:"mc",
+      q:"Wie berechnet man den Kalkulationsfaktor?",
+      opts:["Kalkulationsfaktor = Bezugspreis × Bruttoverkaufspreis","Kalkulationsfaktor = Bruttoverkaufspreis / Bezugspreis","Kalkulationsfaktor = Nettoverkaufspreis / Umsatzsteuer","Kalkulationsfaktor = Bezugspreis / Nettoverkaufspreis"],
+      correct:1, explain:"Kalkulationsfaktor = Bruttoverkaufspreis / Bezugspreis\nUmgekehrt: Bruttoverkaufspreis = Bezugspreis × Kalkulationsfaktor" },
+    { id:39, cat:"Kalkulation", type:"mc",
+      q:"Bezugspreis = 20 €, Kalkulationsfaktor = 2,5. Wie hoch ist der Bruttoverkaufspreis?",
+      opts:["40 €","45 €","50 €","55 €"],
+      correct:2, explain:"Bruttoverkaufspreis = 20 € × 2,5 = 50 €" },
+    { id:40, cat:"Kalkulation", type:"mc",
+      q:"Ein Artikel kostet den Kunden (Brutto) 59,50 € bei einem Kalkulationsfaktor von 1,70. Wie hoch ist der Bezugspreis?",
+      opts:["35 €","25 €","40 €","45 €"],
+      correct:0, explain:"Bezugspreis = Bruttoverkaufspreis / Kalkulationsfaktor = 59,50 / 1,70 = 35 €" },
+    { id:41, cat:"Kalkulation", type:"mc",
+      q:"Was ist der Unterschied zwischen Rabatt und Skonto?",
+      opts:["Rabatt = bei Zahlung, Skonto = bei Bestellung","Rabatt = Nachlass bei Bestellung / Menge; Skonto = Nachlass bei schneller Zahlung","Beide sind das Gleiche","Rabatt gibt der Händler, Skonto gibt der Kunde"],
+      correct:1, explain:"Rabatt: Preisnachlass bei Bestellung (z.B. Mengenrabatt, Treuerabatt)\nSkonto: Nachlass bei schneller Zahlung innerhalb der Skontofrist (z.B. 2% bei Zahlung binnen 10 Tagen)" },
+    { id:42, cat:"Kalkulation", type:"mc",
+      q:"Was ist ein Bonus im Unterschied zu Rabatt und Skonto?",
+      opts:["Ein Bonus ist dasselbe wie ein Rabatt","Ein Bonus ist ein nachträglicher Nachlass bei Erreichen einer vereinbarten Umsatzhöhe (am Jahresende)","Ein Bonus ist ein Nachlass bei schneller Zahlung","Ein Bonus ist ein Nachlass für Neukunden"],
+      correct:1, explain:"Bonus: Nachträglicher Nachlass bei Erreichen einer bestimmten Umsatzhöhe – wird in der Regel am Jahresende gewährt.\nRabatt: Bei Bestellung. Skonto: Bei schneller Zahlung." },
+    { id:43, cat:"WWS", type:"mc",
+      q:"Welche Aussage zum Warenwirtschaftssystem (WWS) ist RICHTIG?",
+      opts:["Das WWS wird nur für die Buchhaltung verwendet","Das WWS erfasst automatisch Warenabgänge beim Kassiervorgang und löst Bestellvorschläge aus","Das WWS kann nur Lagerbestände speichern","Das WWS ersetzt den Kassierer"],
+      correct:1, explain:"WWS: Automatische Erfassung von Warenabgängen beim Kassieren, automatische Bestellvorschläge bei Meldebestand, Überblick über Einkauf, Lager und Verkauf." },
+    { id:44, cat:"Wareneingang", type:"mc",
+      q:"Was ist die korrekte Reihenfolge bei der Warenannahme? (1. Schritt)",
+      opts:["Ware einlagern","Wareneingang im WWS erfassen","Empfängeranschrift prüfen","Begleitpapiere unterschreiben"],
+      correct:2, explain:"Reihenfolge: 1. Empfängeranschrift prüfen → 2. Anzahl und Zustand prüfen → 3. Papiere unterschreiben → 4. WWS erfassen → 5. Einlagern" },
+    { id:45, cat:"Wareneingang", type:"mc",
+      q:"Welcher Mangel liegt vor, wenn 10 Hosen bestellt wurden, aber nur 7 geliefert wurden?",
+      opts:["Sachmangel","Rechtsmangel","Mengenmangel","Qualitätsmangel"],
+      correct:2, explain:"Mengenmangel = die gelieferte Menge entspricht nicht der bestellten Menge.\nSachmangel = falsche Qualität/Ausführung. Rechtsmangel = Dritter hat Rechte an der Ware." },
+    { id:46, cat:"Bilanz", type:"mc",
+      q:"Was gehört zu den Aktiva (Vermögenswerte) in der Bilanz?",
+      opts:["Eigenkapital und Fremdkapital","Anlage- und Umlaufvermögen","Darlehen und Verbindlichkeiten","Nur Bargeld und Bankguthaben"],
+      correct:1, explain:"Aktiva = was das Unternehmen hat: Anlagevermögen (Gebäude, Ausstattung) + Umlaufvermögen (Waren, Forderungen, Kasse).\nPassiva = woher das Geld kommt (Eigenkapital + Fremdkapital)." },
+    { id:47, cat:"Bilanz", type:"mc",
+      q:"Eigenkapital = 80.000 €, Fremdkapital = 120.000 €. Wie hoch ist die Eigenkapitalquote?",
+      opts:["40 %","80 %","66,7 %","50 %"],
+      correct:0, explain:"Gesamtkapital = 80.000 + 120.000 = 200.000 €\nEigenkapitalquote = (80.000 / 200.000) × 100 = 40 %" },
+  ],
+  t3: [
+    { id:48, cat:"Wirtschaft", type:"mc",
+      q:"Was beschreibt das Maximalprinzip?",
+      opts:["Mit möglichst geringen Mitteln ein Ziel erreichen","Mit gegebenen Mitteln den größtmöglichen Erfolg erzielen","Gewinne maximieren durch Preiserhöhung","Kosten minimieren durch Personalabbau"],
+      correct:1, explain:"Maximalprinzip: Mit gegebenen (fixen) Mitteln den größtmöglichen Erfolg erzielen.\nGegenteil → Minimalprinzip: Festgelegtes Ziel mit minimalen Mitteln erreichen." },
+    { id:49, cat:"Wirtschaft", type:"mc",
+      q:"Zu welchem Wirtschaftssektor gehört der Einzelhandel?",
+      opts:["Primärsektor (Urproduktion)","Sekundärsektor (Verarbeitung)","Tertiärsektor (Dienstleistungen)","Quartärsektor"],
+      correct:2, explain:"Tertiärsektor = Dienstleistungen: Einzelhandel, Banken, Versicherungen, Transport, Logistik.\nPrimär = Urproduktion. Sekundär = Verarbeitung (Industrie)." },
+    { id:50, cat:"Wirtschaft", type:"mc",
+      q:"Was entsteht am Schnittpunkt von Angebots- und Nachfragekurve?",
+      opts:["Monopolpreis","Gleichgewichtspreis / Marktpreis","Mindestpreis","Höchstpreis"],
+      correct:1, explain:"Am Schnittpunkt beider Kurven gleicht sich Angebot und Nachfrage aus – das ist der Gleichgewichtspreis (Marktpreis)." },
+    { id:51, cat:"Kaufvertrag", type:"mc",
+      q:"Was ist ein einseitiger Handelskauf?",
+      opts:["Beide Parteien sind Kaufleute","Nur eine Seite ist Kaufmann (z.B. Privatperson kauft im Supermarkt)","Nur Privatpersonen sind beteiligt","Ein Vertrag mit nur einem Artikel"],
+      correct:1, explain:"Einseitiger Handelskauf (HGB): Nur eine Partei ist Kaufmann (z.B. Privatperson kauft in einem Warenhaus).\nZweiseitiger Handelskauf: Beide Parteien sind Kaufleute (B2B)." },
+    { id:52, cat:"Geschäftsfähigkeit", type:"mc",
+      q:"Ein 5-jähriges Kind kauft eigenständig Süßigkeiten. Welche rechtliche Folge hat das?",
+      opts:["Der Kauf ist gültig wegen Taschengeldparagraph","Der Kauf ist schwebend unwirksam","Der Kauf ist NICHTIG (Geschäftsunfähigkeit)","Der Kauf ist gültig, da er vorteilhaft ist"],
+      correct:2, explain:"0–6 Jahre = Geschäftsunfähig → Rechtsgeschäfte sind NICHTIG.\n(Nicht 'schwebend unwirksam' – das gilt erst ab 7 Jahren!)" },
+    { id:53, cat:"Geschäftsfähigkeit", type:"mc",
+      q:"Wann gilt ein Rechtsgeschäft eines 15-Jährigen nach dem Taschengeldparagraph (§ 110 BGB)?",
+      opts:["Wenn die Eltern im Nachhinein zustimmen","Wenn der Jugendliche vollständig mit eigenem Taschengeld bezahlt","Wenn der Artikel weniger als 20 € kostet","Wenn der Kauf einen Vorteil bringt"],
+      correct:1, explain:"§ 110 BGB: Das Rechtsgeschäft ist gültig, wenn der Minderjährige es vollständig mit Mitteln erfüllt, die ihm die Eltern zu diesem Zweck überlassen haben." },
+    { id:54, cat:"Eigentum", type:"mc",
+      q:"Was ist der Unterschied zwischen Eigentum und Besitz?",
+      opts:["Beide Begriffe sind identisch","Eigentum = rechtliche Herrschaft; Besitz = tatsächliche Herrschaft","Eigentum = Besitz an Immobilien; Besitz = an beweglichen Sachen","Eigentumsrecht gilt nur für Kaufleute"],
+      correct:1, explain:"Eigentum = Rechtliche Herrschaft (z.B. Bank ist Eigentümer des finanzierten Autos)\nBesitz = Tatsächliche Herrschaft (Käufer hat das Auto in der Hand)\nBeides kann getrennt sein!" },
+    { id:55, cat:"Gewährleistung", type:"mc",
+      q:"Wie lange gilt die gesetzliche Gewährleistung bei neuen Produkten?",
+      opts:["1 Jahr","2 Jahre","3 Jahre","6 Monate"],
+      correct:1, explain:"Gesetzliche Gewährleistung = 2 Jahre ab Kauf.\nErste 6 Monate: Beweislast beim Händler.\n(Bei gebrauchten Sachen kann auf 1 Jahr verkürzt werden.)" },
+    { id:56, cat:"Gewährleistung", type:"mc",
+      q:"Was ist der Unterschied zwischen Gewährleistung und Garantie?",
+      opts:["Garantie ist gesetzlich; Gewährleistung ist freiwillig","Gewährleistung ist gesetzlich (2 Jahre, gegen Händler); Garantie ist freiwillig (Hersteller bestimmt Dauer)","Beide sind freiwillige Leistungen","Beide sind 2 Jahre gültig"],
+      correct:1, explain:"Gewährleistung: Gesetzlich, 2 Jahre, gegen den Händler.\nGarantie: Freiwillig, Hersteller legt Dauer fest – kann länger als 2 Jahre sein.\nGarantie hebt Gewährleistung NICHT auf!" },
+    { id:57, cat:"Verbraucherrecht", type:"mc",
+      q:"Was gilt beim Fernabsatz (Online-Kauf)?",
+      opts:["Kein Widerrufsrecht, da der Kunde die Ware nicht sehen konnte","14-tägiges Widerrufsrecht; Kunde muss schriftlich informiert werden","Nur 7 Tage Rückgaberecht","Widerrufsrecht nur bei defekter Ware"],
+      correct:1, explain:"Beim Fernabsatz hat der Verbraucher ein 14-tägiges Widerrufsrecht. Der Händler muss ihn schriftlich darüber informieren." },
+    { id:58, cat:"Ausbildung", type:"mc",
+      q:"Was ist KEIN Pflichtinhalt des Ausbildungsvertrags nach BBiG?",
+      opts:["Ausbildungsberuf","Ausbildungsvergütung","Berufsschulmodell (Block- oder Teilzeitschule)","Probezeit"],
+      correct:2, explain:"Das Berufsschulmodell (Block- oder Teilzeitunterricht) ist keine Pflichtangabe im Ausbildungsvertrag – das bestimmt die Schule.\nPflicht: Beruf, Dauer, Vergütung, Probezeit, Urlaub." },
+    { id:59, cat:"Ausbildung", type:"mc",
+      q:"Wie lange darf die Probezeit im Ausbildungsverhältnis maximal dauern?",
+      opts:["1 Monat","3 Monate","4 Monate","6 Monate"],
+      correct:2, explain:"Probezeit: Mindestens 1 Monat, maximal 4 Monate.\nWährend der Probezeit: fristlose Kündigung ohne Angabe von Gründen jederzeit möglich." },
+    { id:60, cat:"Jugendarbeitsschutz", type:"mc",
+      q:"Wie lange muss die Ruhepause bei einer täglichen Arbeitszeit von mehr als 6 Stunden für Jugendliche betragen?",
+      opts:["15 Minuten","30 Minuten","60 Minuten","45 Minuten"],
+      correct:2, explain:"JArbSchG: Ab 4,5 h → mind. 30 Min. Pause; ab 6 h → mind. 60 Min. Pause.\nFrühestens 1 h nach Arbeitsbeginn, spätestens 1 h vor Arbeitsende." },
+    { id:61, cat:"Jugendarbeitsschutz", type:"mc",
+      q:"Ein Jugendlicher arbeitet von 09:00 bis 18:00 Uhr. Wann muss die Pause spätestens beginnen?",
+      opts:["Bis 13:00 Uhr","Bis 17:00 Uhr","Bis 15:00 Uhr","Bis 12:00 Uhr"],
+      correct:1, explain:"9 Stunden Arbeit → 60 Min. Pause nötig.\nSpätestens 1 Stunde vor Ende (18:00) → bis 17:00 Uhr.\nFrühestens ab 10:00 Uhr (1 h nach Beginn)." },
+    { id:62, cat:"Tarifrecht", type:"mc",
+      q:"Was versteht man unter Tarifautonomie?",
+      opts:["Das Recht des Staates, Tariflöhne festzulegen","Das Recht der Tarifvertragsparteien, ohne staatliche Einflussnahme Tarifverträge abzuschließen","Die Pflicht, einem Tarifvertrag beizutreten","Das automatische Einhalten von Mindestlöhnen"],
+      correct:1, explain:"Tarifautonomie = Art. 9 GG: Gewerkschaften und Arbeitgeberverbände verhandeln selbst, ohne staatlichen Eingriff." },
+    { id:63, cat:"Tarifrecht", type:"mc",
+      q:"Was regelt ein Manteltarifvertrag?",
+      opts:["Die genaue Höhe der Löhne und Gehälter","Allgemeine Arbeitsbedingungen: Urlaub, Kündigungsfristen, Arbeitszeit","Nur die Arbeitszeiten","Die Sozialversicherungsbeiträge"],
+      correct:1, explain:"Manteltarifvertrag: Allgemeine Arbeitsbedingungen (Urlaub, Arbeitszeit, Kündigungsfristen, Überstunden).\nEntgelttarifvertrag: Höhe der Vergütung (Löhne und Gehälter)." },
+    { id:64, cat:"Tarifrecht", type:"mc",
+      q:"Was regelt ein Entgelttarifvertrag?",
+      opts:["Allgemeine Arbeitsbedingungen wie Urlaub und Kündigung","Die Höhe der Löhne und Gehälter","Die Sozialversicherungspflicht","Die Kündigungsfristen"],
+      correct:1, explain:"Entgelttarifvertrag: Regelt die Höhe der Vergütung (Löhne und Gehälter).\nManteltarifvertrag: Regelt allgemeine Arbeitsbedingungen (Urlaub, Arbeitszeit, Kündigung)." },
+    { id:65, cat:"Sozialversicherung", type:"mc",
+      q:"Welcher Sozialversicherungszweig wird VOLLSTÄNDIG vom Arbeitgeber finanziert?",
+      opts:["Rentenversicherung","Krankenversicherung","Unfallversicherung (Berufsgenossenschaft)","Pflegeversicherung"],
+      correct:2, explain:"Die Unfallversicherung (BG) wird vollständig vom Arbeitgeber bezahlt – kein Arbeitnehmeranteil.\nSie zahlt bei Arbeitsunfällen und Wegeunfällen." },
+    { id:66, cat:"Sozialversicherung", type:"mc",
+      q:"Zu welcher Versicherung werden gesetzlich Krankenversicherte automatisch aufgenommen?",
+      opts:["Rentenversicherung","Pflegeversicherung der gleichen Krankenkasse","Arbeitslosenversicherung","Unfallversicherung"],
+      correct:1, explain:"KV-Mitglieder werden automatisch Mitglied der Pflegeversicherung bei derselben Krankenkasse.\nPflegeversicherung: ca. 3,4% Beitrag, je zur Hälfte AN und AG." },
+    { id:67, cat:"Sozialversicherung", type:"mc",
+      q:"Wie hoch ist der Beitragssatz zur Rentenversicherung und wie wird er aufgeteilt?",
+      opts:["18,6 % – vollständig vom Arbeitnehmer","18,6 % – je zur Hälfte AN und AG","14,6 % – je zur Hälfte AN und AG","20 % – vollständig vom Arbeitgeber"],
+      correct:1, explain:"Rentenversicherung: 18,6 % Beitrag – je zur Hälfte von Arbeitnehmer und Arbeitgeber (je 9,3 %)." },
+    { id:68, cat:"Arbeitsschutz", type:"mc",
+      q:"Welche Verhaltensweise entspricht NICHT den Regeln der Arbeitssicherheit im Lager?",
+      opts:["Festes Schuhwerk tragen","Auf dem Boden liegendes Material sofort beseitigen","Notausgänge freihalten","Möglichst viele Kartons auf einmal tragen, um Zeit zu sparen"],
+      correct:3, explain:"Zu viele Kartons auf einmal zu tragen ist ein Sicherheitsrisiko (Stolpern, Überlastung).\nArbeitssicherheit geht vor Zeitersparnis!" },
+    { id:69, cat:"Eigentumsvorbehalt", type:"mc",
+      q:"Was bedeutet Eigentumsvorbehalt beim Ratenkauf?",
+      opts:["Der Käufer ist sofort Eigentümer","Der Verkäufer bleibt Eigentümer bis zur vollständigen Bezahlung","Der Händler kann die Ware jederzeit zurückholen","Es gibt kein Eigentum an der Ware"],
+      correct:1, explain:"Eigentumsvorbehalt: Der Verkäufer behält das Eigentum bis zur vollständigen Bezahlung der letzten Rate – Sicherheit für den Verkäufer." },
+    { id:70, cat:"Umweltschutz", type:"mc",
+      q:"Was sind Pflichten des Einzelhandels im Bereich Umweltschutz?",
+      opts:["Lieferanten vorschreiben, wie sie produzieren sollen","Kostenlose Rücknahme von Umverpackungen und Zuführung zum Entsorgungssystem","Eigene Energieerzeugung betreiben","Keine – Umweltschutz ist freiwillig"],
+      correct:1, explain:"Einzelhandel ist gesetzlich verpflichtet zur kostenlosen Rücknahme von Umverpackungen.\nLeihverpackungen gehen an den Hersteller zurück (Kreislaufwirtschaft)." },
+  ]
+};
+// ==================== STATE ====================
+let state = {
+  selectedParts: [],
+  mode: 'exam',
+  questions: [],
+  currentIdx: 0,
+  answered: 0,
+  correct: 0,
+  startTime: null,
+  elapsed: 0,
+  timerInterval: null,
+  totalTime: 0,
+  userAnswers: [],
+  finished: false,
+};
+
+const PART_TIMES = { 1: 5400, 2: 3600, 3: 3600 }; // seconds
+
+// ==================== UI HELPERS ====================
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function togglePart(p) {
+  const btn = document.querySelector(`.part-btn[data-part="${p}"]`);
+  const idx = state.selectedParts.indexOf(p);
+  if (idx === -1) { state.selectedParts.push(p); btn.classList.add('selected'); }
+  else { state.selectedParts.splice(idx, 1); btn.classList.remove('selected'); }
+  updateStartBtn();
+}
+
+function setMode(m) {
+  state.mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`.mode-btn[data-mode="${m}"]`).classList.add('selected');
+  updateStartBtn();
+}
+
+function updateStartBtn() {
+  const btn = document.getElementById('start-btn');
+  const countEl = document.getElementById('q-count');
+  if (state.selectedParts.length === 0) {
+    btn.disabled = true;
+    countEl.textContent = 'Bitte mindestens einen Prüfungsteil auswählen.';
+    return;
+  }
+  let total = 0;
+  state.selectedParts.forEach(p => total += QUESTIONS['t'+p].length);
+  if (state.mode === 'quick') total = Math.min(total, 15);
+  let time = 0;
+  state.selectedParts.forEach(p => time += PART_TIMES[p]);
+  btn.disabled = false;
+  countEl.textContent = `${total} Fragen${state.mode !== 'learn' ? ` · ${Math.round(time/60)} Minuten` : ''}`;
+}
+
+// ==================== QUIZ LOGIC ====================
+function startQuiz() {
+  // Build question list
+  let pool = [];
+  state.selectedParts.sort().forEach(p => {
+    pool = pool.concat(QUESTIONS['t'+p]);
+  });
+  // Shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  if (state.mode === 'quick') pool = pool.slice(0, 15);
+
+  state.questions = pool;
+  state.currentIdx = 0;
+  state.answered = 0;
+  state.correct = 0;
+  state.userAnswers = [];
+  state.finished = false;
+
+  // Timer
+  let totalTime = 0;
+  state.selectedParts.forEach(p => totalTime += PART_TIMES[p]);
+  if (state.mode === 'quick') totalTime = Math.min(totalTime, 15 * 90);
+  state.totalTime = state.mode === 'learn' ? 0 : totalTime;
+  state.elapsed = 0;
+  state.startTime = Date.now();
+
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  if (state.mode !== 'learn') {
+    state.timerInterval = setInterval(updateTimer, 1000);
+  }
+
+  show('quiz');
+  renderQuestion();
+}
+
+function updateTimer() {
+  state.elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  const remaining = Math.max(0, state.totalTime - state.elapsed);
+  const min = Math.floor(remaining / 60);
+  const sec = remaining % 60;
+  const el = document.getElementById('timer');
+  el.textContent = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  el.className = 'timer';
+  if (remaining <= 300) el.classList.add('warning');
+  if (remaining <= 60) el.classList.add('danger');
+  if (remaining === 0) {
+    clearInterval(state.timerInterval);
+    endQuiz();
+  }
+}
+
+function getPart(q) {
+  if (q.id <= 30) return 1;
+  if (q.id <= 47) return 2;
+  return 3;
+}
+
+function renderQuestion() {
+  const q = state.questions[state.currentIdx];
+  const total = state.questions.length;
+  const pct = (state.currentIdx / total) * 100;
+
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `Frage ${state.currentIdx + 1} von ${total}`;
+  document.getElementById('q-number').textContent = state.currentIdx + 1;
+  document.getElementById('q-category').textContent = q.cat;
+  document.getElementById('q-text').textContent = q.q;
+
+  const part = getPart(q);
+  const badge = document.getElementById('quiz-part-badge');
+  badge.textContent = `Teil ${part}`;
+  badge.style.background = part === 3 ? 'var(--t3)' : part === 2 ? 'var(--t1m)' : 'var(--t1)';
+
+  document.getElementById('score-display').textContent = `${state.correct} / ${state.answered} richtig`;
+
+  // Timer display
+  if (state.mode === 'learn') {
+    document.getElementById('timer').textContent = 'Lernmodus';
+    document.getElementById('timer').style.fontSize = '0.8rem';
+  }
+
+  // Reset feedback
+  const fb = document.getElementById('feedback-box');
+  fb.className = 'feedback-box';
+  document.getElementById('feedback-title').textContent = '';
+  document.getElementById('feedback-text').textContent = '';
+
+  // Next btn
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('btn-show-answer').style.display = 'none';
+
+  // Content
+  const content = document.getElementById('q-content');
+  if (q.type === 'mc') {
+    content.innerHTML = `<div class="options-list">${q.opts.map((o, i) =>
+      `<button class="option-btn" onclick="selectOption(${i})" data-idx="${i}">
+        <span class="option-letter">${String.fromCharCode(65+i)}.</span>${o}
+      </button>`
+    ).join('')}</div>`;
+  } else {
+    content.innerHTML = `<div class="open-answer-wrap">
+      <textarea class="open-answer" id="open-ans" placeholder="Schreibe deine Antwort hier..." oninput="checkOpenNotEmpty()"></textarea>
+    </div>`;
+    document.getElementById('btn-show-answer').style.display = 'inline-flex';
+    document.getElementById('btn-next').disabled = false;
+  }
+}
+
+function checkOpenNotEmpty() {
+  const val = document.getElementById('open-ans')?.value?.trim();
+  document.getElementById('btn-next').disabled = !val;
+}
+
+function selectOption(idx) {
+  const q = state.questions[state.currentIdx];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const isCorrect = idx === q.correct;
+  btns[idx].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) btns[q.correct].classList.add('correct');
+
+  state.answered++;
+  if (isCorrect) state.correct++;
+
+  state.userAnswers.push({
+    q: q.q, type: 'mc', cat: q.cat, part: getPart(q),
+    given: q.opts[idx], correct: q.opts[q.correct],
+    isCorrect, explain: q.explain
+  });
+
+  // Feedback
+  const fb = document.getElementById('feedback-box');
+  fb.className = 'feedback-box show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  document.getElementById('feedback-title').textContent = isCorrect ? '✓ Richtig!' : '✗ Leider falsch.';
+  document.getElementById('feedback-text').textContent = q.explain;
+
+  document.getElementById('btn-next').disabled = false;
+  document.getElementById('score-display').textContent = `${state.correct} / ${state.answered} richtig`;
+}
+
+function showAnswer() {
+  const q = state.questions[state.currentIdx];
+  const fb = document.getElementById('feedback-box');
+  fb.className = 'feedback-box show open-fb';
+  document.getElementById('feedback-title').textContent = '📋 Musterlösung:';
+  document.getElementById('feedback-text').textContent = q.answer;
+}
+
+function nextQuestion() {
+  const q = state.questions[state.currentIdx];
+  if (q.type === 'open') {
+    const val = document.getElementById('open-ans')?.value?.trim() || '(keine Antwort)';
+    state.userAnswers.push({
+      q: q.q, type: 'open', cat: q.cat, part: getPart(q),
+      given: val, correct: q.answer, isCorrect: null
+    });
+    state.answered++;
+  }
+
+  state.currentIdx++;
+  if (state.currentIdx >= state.questions.length) {
+    endQuiz();
+  } else {
+    renderQuestion();
+  }
+}
+
+function endQuiz() {
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  state.elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  showResults();
+}
+
+function showResults() {
+  const mcAnswered = state.userAnswers.filter(a => a.type === 'mc').length;
+  const openAnswered = state.userAnswers.filter(a => a.type === 'open').length;
+  const wrong = state.userAnswers.filter(a => a.type === 'mc' && !a.isCorrect).length;
+
+  // IHK Notenspiegel exakt
+  function getIHKGrade(pts) {
+    if (pts === 100) return { note: '1,0', cat: 'sehr gut' };
+    if (pts >= 98)   return { note: '1,1', cat: 'sehr gut' };
+    if (pts >= 96)   return { note: '1,2', cat: 'sehr gut' };
+    if (pts >= 94)   return { note: '1,3', cat: 'sehr gut' };
+    if (pts >= 92)   return { note: '1,4', cat: 'sehr gut' };
+    if (pts === 91)  return { note: '1,5', cat: 'gut' };
+    if (pts === 90)  return { note: '1,6', cat: 'gut' };
+    if (pts === 89)  return { note: '1,7', cat: 'gut' };
+    if (pts === 88)  return { note: '1,8', cat: 'gut' };
+    if (pts === 87)  return { note: '1,9', cat: 'gut' };
+    if (pts >= 85)   return { note: '2,0', cat: 'gut' };
+    if (pts === 84)  return { note: '2,1', cat: 'gut' };
+    if (pts === 83)  return { note: '2,2', cat: 'gut' };
+    if (pts === 82)  return { note: '2,3', cat: 'gut' };
+    if (pts === 81)  return { note: '2,4', cat: 'gut' };
+    if (pts === 80)  return { note: '2,5', cat: 'befriedigend' };
+    if (pts === 79)  return { note: '2,6', cat: 'befriedigend' };
+    if (pts >= 77)   return { note: '2,7', cat: 'befriedigend' };
+    if (pts === 76)  return { note: '2,8', cat: 'befriedigend' };
+    if (pts >= 74)   return { note: '2,9', cat: 'befriedigend' };
+    if (pts === 73)  return { note: '3,0', cat: 'befriedigend' };
+    if (pts >= 71)   return { note: '3,1', cat: 'befriedigend' };
+    if (pts === 70)  return { note: '3,2', cat: 'befriedigend' };
+    if (pts >= 68)   return { note: '3,3', cat: 'befriedigend' };
+    if (pts === 67)  return { note: '3,4', cat: 'befriedigend' };
+    if (pts === 66)  return { note: '3,5', cat: 'ausreichend' };
+    if (pts >= 64)   return { note: '3,6', cat: 'ausreichend' };
+    if (pts >= 62)   return { note: '3,7', cat: 'ausreichend' };
+    if (pts === 61)  return { note: '3,8', cat: 'ausreichend' };
+    if (pts >= 59)   return { note: '3,9', cat: 'ausreichend' };
+    if (pts >= 57)   return { note: '4,0', cat: 'ausreichend' };
+    if (pts >= 55)   return { note: '4,1', cat: 'ausreichend' };
+    if (pts === 54)  return { note: '4,2', cat: 'ausreichend' };
+    if (pts >= 52)   return { note: '4,3', cat: 'ausreichend' };
+    if (pts >= 50)   return { note: '4,4', cat: 'ausreichend' };
+    if (pts === 49)  return { note: '4,5', cat: 'mangelhaft' };
+    if (pts >= 47)   return { note: '4,6', cat: 'mangelhaft' };
+    if (pts >= 45)   return { note: '4,7', cat: 'mangelhaft' };
+    if (pts >= 43)   return { note: '4,8', cat: 'mangelhaft' };
+    if (pts >= 41)   return { note: '4,9', cat: 'mangelhaft' };
+    if (pts >= 38)   return { note: '5,0', cat: 'mangelhaft' };
+    if (pts >= 36)   return { note: '5,1', cat: 'mangelhaft' };
+    if (pts >= 34)   return { note: '5,2', cat: 'mangelhaft' };
+    if (pts >= 32)   return { note: '5,3', cat: 'mangelhaft' };
+    if (pts >= 30)   return { note: '5,4', cat: 'mangelhaft' };
+    if (pts === 29)  return { note: '5,5', cat: 'ungenügend' };
+    if (pts >= 23)   return { note: '5,6', cat: 'ungenügend' };
+    if (pts >= 17)   return { note: '5,7', cat: 'ungenügend' };
+    if (pts >= 12)   return { note: '5,8', cat: 'ungenügend' };
+    if (pts >= 6)    return { note: '5,9', cat: 'ungenügend' };
+    return           { note: '6,0', cat: 'ungenügend' };
+  }
+
+  let pct = mcAnswered > 0 ? Math.round((state.correct / mcAnswered) * 100) : null;
+  let ihk = pct !== null ? getIHKGrade(pct) : null;
+  let scoreText = pct !== null ? pct + ' Pkt.' : '–';
+  let grade = '';
+  let gradeColor = '#555';
+  if (ihk !== null) {
+    const catColors = { 'sehr gut':'#375623','gut':'#375623','befriedigend':'#7F6000','ausreichend':'#7F6000','mangelhaft':'#C00000','ungenügend':'#C00000' };
+    gradeColor = catColors[ihk.cat] || '#555';
+    grade = 'Note ' + ihk.note + ' · ' + ihk.cat;
+  } else {
+    grade = 'Offene Fragen – selbst bewerten';
+  }
+
+  const min = Math.floor(state.elapsed / 60);
+  const sec = state.elapsed % 60;
+
+  document.getElementById('result-pct').textContent = scoreText;
+  document.getElementById('result-pct').style.color = gradeColor;
+  // Show % and IHK note below
+  let gradeHTML = grade;
+  if (pct !== null) {
+    gradeHTML = pct + ' % &nbsp;|&nbsp; ' + grade;
+  }
+  document.getElementById('result-grade').innerHTML = gradeHTML;
+  document.getElementById('result-grade').style.color = gradeColor;
+  document.getElementById('stat-pct').textContent = pct !== null ? pct + ' Pkt.' : '–';
+  document.getElementById('stat-correct').textContent = state.correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-open').textContent = openAnswered;
+  document.getElementById('result-time').textContent = `Zeit: ${min}m ${sec}s`;
+
+  show('results');
+}
+
+function showReview() {
+  const list = document.getElementById('review-list');
+  list.innerHTML = state.userAnswers.map((a, i) => {
+    let cls = a.type === 'open' ? 'r-open' : (a.isCorrect ? 'r-correct' : 'r-wrong');
+    let icon = a.type === 'open' ? '📝' : (a.isCorrect ? '✓' : '✗');
+    return `<div class="review-item ${cls}">
+      <div class="review-q">${icon} Frage ${i+1} [${a.cat}]: ${a.q}</div>
+      <div class="review-given"><strong>Deine Antwort:</strong> ${a.given}</div>
+      ${a.type !== 'open' ? `<div class="review-correct"><strong>Richtige Antwort:</strong> ${a.correct}</div>` : ''}
+      ${a.type !== 'open' ? `<div style="font-size:0.85rem; color:#555; margin-top:6px;">${a.explain}</div>` : `<div style="font-size:0.85rem; color:#555; margin-top:6px;"><strong>Musterlösung:</strong> ${a.correct}</div>`}
+    </div>`;
+  }).join('');
+  show('review');
+}
+
+function restartQuiz() {
+  startQuiz();
+}
+
+function goHome() {
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  show('start');
+}
+</script>
+</body>
+</html>
