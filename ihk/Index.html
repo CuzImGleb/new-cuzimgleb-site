@@ -1398,15 +1398,41 @@ async function nextQuestion() {
     // Step 1: evaluate with AI
     const val = document.getElementById('open-ans')?.value?.trim() || '';
     const btn = document.getElementById('btn-next');
-    btn.disabled = true;
-    btn.textContent = '🤖 KI bewertet…';
 
     // Show musterlösung too (so user sees both)
     showAnswer();
 
+    // If answer is empty, skip AI and show 0 points immediately
+    if (!val) {
+      const totalLines = q.answer.split('\n').filter(l => l.trim()).length;
+      const aiResult = { got: 0, total: totalLines, ok: false, correct_points: [], missing: q.answer.split('\n').filter(l => l.trim()) };
+      const isCorrect = false;
+      state.userAnswers.push({
+        q: q.q, type: 'open', cat: q.cat, part: getPart(q),
+        given: '(keine Antwort)', correct: q.answer,
+        isCorrect, aiScore: aiResult
+      });
+      state.answered++;
+      document.getElementById('score-display').textContent = `${state.correct} / ${state.answered} richtig`;
+      document.getElementById('ai-feedback-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <span style="font-size:1.5rem;">❌</span>
+          <span style="font-weight:bold; color:#C00000; font-size:1.05rem;">Keine Antwort eingegeben – 0 / ${totalLines} Kernpunkte</span>
+        </div>`;
+      document.getElementById('ai-feedback-box').style.display = 'block';
+      document.getElementById('ai-feedback-box').style.borderColor = '#C00000';
+      state.openEvaluated = true;
+      btn.textContent = 'Nächste Frage →';
+      btn.disabled = false;
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '🤖 KI bewertet…';
+
     let aiResult = null;
     try {
-      aiResult = await evaluateWithAI(q.q, val || '(keine Antwort)', q.answer);
+      aiResult = await evaluateWithAI(q.q, val, q.answer);
     } catch(e) {
       aiResult = { got: 0, total: '?', ok: false, missing: 'Bewertung fehlgeschlagen – bitte selbst vergleichen.' };
     }
