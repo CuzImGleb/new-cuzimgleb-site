@@ -1300,7 +1300,7 @@ function checkOpenNotEmpty() {
 
 // ==================== KI BEWERTUNG ====================
 async function evaluateWithAI(question, userAnswer, musterloesung) {
-  const prompt = `Du bist ein wohlwollender IHK-Prüfer für Kaufleute im Einzelhandel. Bewerte die Schülerantwort inhaltlich – NICHT als Textvergleich mit der Musterlösung.
+  const prompt = `Du bist ein IHK-Prüfer für Kaufleute im Einzelhandel. Bewerte die Schülerantwort inhaltlich.
 
 FRAGE: ${question}
 
@@ -1310,20 +1310,23 @@ ${musterloesung}
 SCHÜLERANTWORT:
 ${userAnswer}
 
-Bewertungsregeln:
-- Bewertet wird der INHALT, nicht die Formulierung. Sinngemäß korrekte Antworten zählen als richtig.
-- Ein Kernpunkt gilt als erfüllt, wenn die Schülerantwort die gleiche BEDEUTUNG vermittelt – auch mit anderen Worten, vereinfacht oder aus einer anderen Perspektive erklärt.
-- Auch inhaltlich richtige Punkte, die NICHT in der Musterlösung stehen, aber zur Frage passen, zählen als korrekt.
-- Vage oder bedeutungslose Antworten zählen NICHT (z.B. "Es ist anders" ohne Erklärung).
-- WICHTIG: In "missing" dürfen NUR Punkte stehen, die der Schüler wirklich NICHT erwähnt hat – auch nicht sinngemäß. Wenn ein Punkt inhaltlich bereits in "correct_points" erfasst ist, darf er NICHT zusätzlich in "missing" auftauchen.
+Deine Aufgabe – Schritt für Schritt:
+1. Zähle die Kernpunkte der Musterlösung → das ist "total".
+2. Prüfe jeden Kernpunkt: Hat der Schüler ihn SINNGEMÄSS erfüllt? Formulierung ist egal, nur Bedeutung zählt.
+3. Zähle die erfüllten Kernpunkte → das ist "got".
+4. "correct_points" = alle Punkte die der Schüler richtig hatte (kurz in eigenen Worten).
+5. "missing" = nur Kernpunkte die wirklich fehlen.
 
-Antworte NUR als JSON in exakt diesem Format (kein Markdown, keine Erklärung drumherum):
+LOGISCHE PFLICHT: Wenn got == total, dann muss missing ein leeres Array [] sein.
+Ein Punkt kann NICHT gleichzeitig in correct_points UND in missing stehen.
+
+Antworte NUR als JSON, kein Markdown:
 {
-  "got": <Anzahl erfüllter Kernpunkte als Zahl>,
-  "total": <Gesamtanzahl geforderter Kernpunkte laut Frage als Zahl>,
-  "ok": <true wenn got >= total*0.5, sonst false>,
-  "correct_points": ["<korrekt erkannter Punkt 1 – in eigenen Worten>", "<korrekt erkannter Punkt 2>"],
-  "missing": ["<Kernpunkt den der Schüler wirklich nicht genannt hat>"]
+  "got": <Zahl>,
+  "total": <Zahl>,
+  "ok": <true wenn got >= total*0.5>,
+  "correct_points": ["<richtig erkannter Punkt>"],
+  "missing": ["<wirklich fehlender Punkt>"]
 }`;
 
   const response = await fetch("/.netlify/functions/anthropic-proxy", {
@@ -1438,11 +1441,14 @@ async function nextQuestion() {
     const correctList = Array.isArray(aiResult.correct_points) && aiResult.correct_points.length > 0
       ? aiResult.correct_points.map(p => `<li style="margin:3px 0;">✅ ${p}</li>`).join('')
       : (aiResult.got > 0 ? `<li style="margin:3px 0;">✅ ${aiResult.got} Punkt(e) erkannt</li>` : '');
-    const missingList = Array.isArray(aiResult.missing) && aiResult.missing.length > 0
-      ? aiResult.missing.map(p => `<li style="margin:3px 0;">❌ ${p}</li>`).join('')
-      : (typeof aiResult.missing === 'string' && aiResult.missing !== 'Alle Kernpunkte getroffen!'
-          ? `<li style="margin:3px 0;">❌ ${aiResult.missing}</li>` : '');
-    const allCorrect = missingList === '';
+
+    // Only show missing points if score is not perfect
+    const scorePerfect = (typeof aiResult.total === 'number') && (aiResult.got >= aiResult.total);
+    const rawMissing = Array.isArray(aiResult.missing) ? aiResult.missing : [];
+    const missingList = (!scorePerfect && rawMissing.length > 0)
+      ? rawMissing.map(p => `<li style="margin:3px 0;">❌ ${p}</li>`).join('')
+      : '';
+    const allCorrect = scorePerfect || missingList === '';
 
     document.getElementById('ai-feedback-content').innerHTML = `
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
@@ -1450,19 +1456,21 @@ async function nextQuestion() {
         <span style="font-weight:bold; color:${color}; font-size:1.05rem;">KI-Bewertung: ${scoreLabel}</span>
         ${pct !== null ? `<span style="background:${bgColor}; color:${color}; border-radius:20px; padding:3px 12px; font-size:0.85rem; font-weight:bold;">${pct}%</span>` : ''}
       </div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:0.88rem;">
+      <div style="display:grid; grid-template-columns: ${allCorrect ? '1fr' : '1fr 1fr'}; gap:12px; font-size:0.88rem;">
         <div style="background:#E2EFDA; border-radius:8px; padding:12px;">
           <div style="font-weight:bold; color:#375623; margin-bottom:6px;">✓ Richtige Punkte</div>
           <ul style="list-style:none; padding:0; margin:0; color:#2a4a1e; line-height:1.5;">
             ${correctList || '<li style="color:#888; font-style:italic;">Keine erkannt</li>'}
+            ${allCorrect ? '<li style="margin-top:6px; color:#375623; font-style:italic; font-weight:bold;">🎉 Alle Kernpunkte getroffen!</li>' : ''}
           </ul>
         </div>
+        ${!allCorrect ? `
         <div style="background:#FCE4D6; border-radius:8px; padding:12px;">
           <div style="font-weight:bold; color:#C00000; margin-bottom:6px;">✗ Fehlende Punkte</div>
           <ul style="list-style:none; padding:0; margin:0; color:#7a1a00; line-height:1.5;">
-            ${allCorrect ? '<li style="color:#375623; font-style:italic;">Alle Kernpunkte getroffen! 🎉</li>' : missingList}
+            ${missingList}
           </ul>
-        </div>
+        </div>` : ''}
       </div>`;
 
     document.getElementById('ai-feedback-box').style.display = 'block';
