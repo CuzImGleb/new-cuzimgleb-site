@@ -5,8 +5,9 @@ exports.handler = async function(event) {
 
   const body = JSON.parse(event.body);
 
+  // Convert Anthropic-style messages to OpenAI/Groq format
   const groqBody = {
-    model: 'llama-3.3-70b-versatile',
+    model: 'llama-3.1-8b-instant',
     max_tokens: body.max_tokens || 500,
     messages: body.messages
   };
@@ -22,6 +23,7 @@ exports.handler = async function(event) {
 
   const data = await response.json();
 
+  // Convert Groq response back to Anthropic-style so the HTML needs no changes
   const converted = {
     content: [{ type: 'text', text: data.choices?.[0]?.message?.content || '' }]
   };
