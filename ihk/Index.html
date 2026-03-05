@@ -257,7 +257,7 @@
       <div class="part-btn" data-part="4" onclick="togglePart(4)" style="grid-column: 1/-1; background: #FFF8E1; border-color: #F9A825;">
         <div class="part-num" style="color:#E65100;">📋 Fragenkatalog</div>
         <div class="part-title" style="color:#555;">Alle Themen – offene Fragen</div>
-        <div class="part-type" style="color:#E65100;">63 Fragen · Nur Lernmodus · Musterlösung</div>
+        <div class="part-type" style="color:#E65100;">83 Fragen · Nur Lernmodus · Musterlösung</div>
       </div>
     </div>
 
@@ -996,7 +996,105 @@ const QUESTIONS = {
     { id:163, cat:"Sozialversicherung", type:"open",
       q:"Was ist der Unterschied zwischen Lohn und Gehalt?",
       answer:"Lohn: zeitabhängige oder stückzahlabhängige Vergütung für Arbeiter (variable Höhe)\nGehalt: festes monatliches Entgelt für Angestellte (gleichbleibende Höhe)" },
-  ]
+  
+    // ── ERGÄNZUNG: Fehlende 20 Fragen aus dem 83er-Katalog ──────────────
+    { id:164, cat:"Werbung", type:"open",
+      q:"Nennen Sie 5 Grundsätze der Werbung.",
+      answer:"1. Werbewirksamkeit – Werbung muss Wirkung erzeugen\n2. Werbewahrheit – keine falschen Versprechen\n3. Werbeklarheit – verständlich und eindeutig\n4. Werbeoriginalität – Aufmerksamkeit erregen\n5. Werbe-Wirtschaftlichkeit – Kosten in angemessenem Verhältnis zum Erfolg" },
+    { id:165, cat:"Verkauf", type:"open",
+      q:"Erklären Sie die Sandwich-Methode bei der Preisnennung.",
+      answer:"Schritt 1 (LOB/Nutzen): Positive Eigenschaft des Produkts nennen\nSchritt 2 (PREIS): Den Preis nennen\nSchritt 3 (LOB/Vorteil): Weiteren Vorteil nennen\nZiel: Preis wirkt weniger abschreckend, wird in positive Aussagen eingebettet." },
+    { id:166, cat:"Warenpräsentation", type:"open",
+      q:"Was ist der Unterschied zwischen Normalplatzierung, Verbundplatzierung und Zweitplatzierung?",
+      answer:"Normalplatzierung: Ware steht an ihrem üblichen Regalplatz\nVerbundplatzierung: Ergänzende Artikel gemeinsam platziert (z.B. Kaffee + Kaffeemaschine)\nZweitplatzierung: Ware zusätzlich an einem anderen Ort aufgestellt (z.B. Aktionsaufsteller)" },
+    { id:167, cat:"Warenpräsentation", type:"open",
+      q:"Nennen Sie 6 Regalanordnungsprinzipien im Verkaufsraum und je ein Beispiel.",
+      answer:"1. Diagonalprinzip – dm (Warenträger schräg versetzt)\n2. Zwangsablauf – IKEA (fester Einkaufsweg)\n3. Arenaprinzip – Warenträger von Mitte nach außen höher\n4. Sternprinzip – Thalia (sternförmige Aufstellung)\n5. Kojenprinzip – Möbel Martin (abgeschlossene Bereiche)\n6. Individualablauf – Aldi (Kunde wählt Weg frei)" },
+    { id:168, cat:"Warenpräsentation", type:"open",
+      q:"Nennen Sie verkaufsstarke und verkaufsschwache Zonen im Verkaufsraum. (je 3)",
+      answer:"Verkaufsstarke Zonen: Kassenzone, Bedienungszone, Randzone\nVerkaufsschwache Zonen: Eingangsbereich, Eckzone, Mittelzone\nTipp: Margenstarke Ware in verkaufsstarke Zonen – Pflichtartikel (Salz, Mehl) in schwache Zonen." },
+    { id:169, cat:"Warenwirtschaft", type:"open",
+      q:"Was passiert, wenn die Lieferzeit sich verlängert? Wie verändert sich der Meldebestand?",
+      answer:"Der Meldebestand muss erhöht werden, da mehr Puffer benötigt wird, um Lieferverzögerungen zu überbrücken." },
+    { id:170, cat:"Kalkulation", type:"open",
+      q:"Wie berechnet man die Lagerdauer und die Umschlagshäufigkeit?",
+      answer:"Lagerdauer = Ø Lagerbestand × 360 / Jahresabsatz (in Tagen)\nUmschlagshäufigkeit = Jahresabsatz / Ø Lagerbestand\nMerke: Kurze Lagerdauer und hohe UH sind positiv!" },
+    { id:171, cat:"Kalkulation", type:"open",
+      q:"Tagesabsatz 5, Lieferzeit 8 Tage, Mindestbestand 10. Wie hoch ist der Meldebestand?",
+      answer:"Meldebestand = 5 × 8 + 10 = 40 + 10 = 50 Stück" },
+    { id:172, cat:"Kalkulation", type:"open",
+      q:"Was versteht man unter dem Bezugspreis (Einstandspreis)? Nennen Sie die Berechnungsformel.",
+      answer:"Bezugspreis = tatsächliche Kosten pro Stück nach Abzug aller Nachlässe zzgl. Bezugskosten.\nListeneinkaufspreis – Rabatt – Skonto + Bezugskosten = Bezugspreis" },
+    { id:173, cat:"Kalkulation", type:"open",
+      q:"Wie berechnet man den Kalkulationsfaktor?",
+      answer:"Kalkulationsfaktor = Bruttoverkaufspreis / Bezugspreis\nBzw. umgekehrt: Bruttoverkaufspreis = Bezugspreis × Kalkulationsfaktor" },
+    { id:174, cat:"Kalkulation", type:"open",
+      q:"Ein Artikel hat einen Bezugspreis von 20 € und einen Bruttoverkaufspreis von 47,60 €. Wie hoch ist der Kalkulationsfaktor?",
+      answer:"Kalkulationsfaktor = 47,60 € / 20 € = 2,38" },
+    { id:175, cat:"Kalkulation", type:"open",
+      q:"Ein Artikel hat einen Bezugspreis von 15 € und einen Kalkulationsfaktor von 2,5. Wie hoch ist der Bruttoverkaufspreis?",
+      answer:"Bruttoverkaufspreis = 15 € × 2,5 = 37,50 €" },
+    { id:176, cat:"Rechnungswesen", type:"open",
+      q:"Wie berechnet man die Eigenkapitalquote? EK = 80.000 €, FK = 120.000 €.",
+      answer:"Gesamtkapital = EK + FK = 200.000 €\nEigenkapitalquote = (80.000 / 200.000) × 100 = 40 %" },
+    { id:177, cat:"Rechnungswesen", type:"open",
+      q:"Was ist der Unterschied zwischen Umsatz und Gewinn?",
+      answer:"Umsatz = Erlöse aus Verkäufen (Menge × Preis)\nGewinn = Umsatz – Kosten\nMerke: Hoher Umsatz bedeutet nicht automatisch hohen Gewinn!" },
+    { id:178, cat:"Warenwirtschaft", type:"open",
+      q:"Was bedeutet FIFO beim Lager? Wann wird es angewendet?",
+      answer:"FIFO = First In, First Out: Die zuerst eingelagerten Waren werden zuerst entnommen.\nAnwendung: Bei verderblichen Waren (Lebensmittel), Ware mit Haltbarkeitsdatum" },
+    { id:179, cat:"Wirtschaft", type:"open",
+      q:"Beschreiben Sie den einfachen Wirtschaftskreislauf zwischen Haushalten und Unternehmen.",
+      answer:"Güter fließen von Unternehmen zu Haushalten. Geldströme fließen von Haushalten zu Unternehmen (Kaufpreise). Unternehmen zahlen Löhne/Gehälter an Haushalte. Haushalte stellen Arbeitskraft als Produktionsfaktor bereit." },
+    { id:180, cat:"Wirtschaft", type:"open",
+      q:"Zu welchem Wirtschaftssektor gehört der Einzelhandel? Nennen Sie 2 weitere Branchen.",
+      answer:"Tertiärsektor (Dienstleistungssektor). Weitere Branchen: Versicherungen, Banken, Transport und Logistik" },
+    { id:181, cat:"Wirtschaft", type:"open",
+      q:"Was ist ein Gleichgewichtspreis? Wie entsteht er?",
+      answer:"Der Gleichgewichtspreis entsteht am Schnittpunkt von Angebots- und Nachfragekurve. Dort entspricht die angebotene Menge genau der nachgefragten Menge – der Markt räumt sich." },
+    { id:182, cat:"Recht", type:"open",
+      q:"Was ist der Unterschied zwischen einem bürgerlichen Kauf, einseitigen und zweiseitigen Handelskauf?",
+      answer:"Bürgerlicher Kauf (BGB): Beide Parteien sind Privatpersonen\nEinseitiger Handelskauf (HGB): Nur eine Seite ist Kaufmann (z.B. Privatperson kauft im Warenhaus)\nZweiseitiger Handelskauf (HGB): Beide Seiten sind Kaufleute (B2B)" },
+    { id:183, cat:"Recht", type:"open",
+      q:"Was müssen Unternehmen beim Fernabsatz (Online-Handel) beachten?",
+      answer:"1. Kunden müssen schriftlich über das Widerrufsrecht informiert werden\n2. 14-tägiges Widerrufsrecht für Verbraucher\n3. Recht auf Nacherfüllung gilt auch online" },
+    { id:184, cat:"Recht", type:"open",
+      q:"Was ist Eigentumsvorbehalt beim Teilzahlungskauf?",
+      answer:"Der Käufer wird erst mit vollständiger Bezahlung der letzten Rate Eigentümer der Ware. Bis zur vollständigen Zahlung bleibt der Verkäufer Eigentümer – Sicherheit für den Verkäufer." },
+    { id:185, cat:"Arbeitsrecht", type:"open",
+      q:"Was ist Tarifautonomie?",
+      answer:"Das Recht der Tarifvertragsparteien (Gewerkschaft und Arbeitgeberverband), ohne staatliche Einflussnahme Tarifverträge abzuschließen." },
+    { id:186, cat:"Sozialversicherung", type:"open",
+      q:"Nennen Sie die 5 Zweige der Sozialversicherung.",
+      answer:"1. Krankenversicherung\n2. Pflegeversicherung\n3. Rentenversicherung\n4. Arbeitslosenversicherung\n5. Unfallversicherung (Berufsgenossenschaft)" },
+    { id:187, cat:"Sozialversicherung", type:"open",
+      q:"Was ist die Besonderheit der Unfallversicherung im Vergleich zu anderen Sozialversicherungszweigen?",
+      answer:"Die Unfallversicherung wird vollständig vom Arbeitgeber finanziert (kein Arbeitnehmeranteil). Sie zahlt bei Arbeitsunfällen und Wegeunfällen (auf dem Weg zur Arbeit)." },
+    { id:188, cat:"Sozialversicherung", type:"open",
+      q:"Wie hoch ist der Beitragssatz zur Pflegeversicherung und wer zahlt ihn?",
+      answer:"Ca. 3,4% Beitrag – je zur Hälfte von Arbeitnehmer und Arbeitgeber.\nMerke: KV-Mitglieder werden automatisch auch in die Pflegeversicherung aufgenommen." },
+    { id:189, cat:"Arbeitsrecht", type:"open",
+      q:"Was ist Tarifbindung?",
+      answer:"Tarifbindung bedeutet, dass die Tarifvertragsparteien (Gewerkschaft und Arbeitgeberverband) direkt an den abgeschlossenen Tarifvertrag gebunden sind." },
+    { id:190, cat:"Wirtschaft", type:"open",
+      q:"Was ist der Unterschied zwischen Primär-, Sekundär- und Tertiärsektor?",
+      answer:"Primärsektor: Urproduktion (Landwirtschaft, Bergbau)\nSekundärsektor: Verarbeitung (Industrie, Handwerk)\nTertiärsektor: Dienstleistungen (Handel, Banken, Versicherungen)" },
+    { id:191, cat:"Arbeitssicherheit", type:"open",
+      q:"Nennen Sie 3 Maßnahmen zur Arbeitssicherheit im Lager.",
+      answer:"1. Festes Schuhwerk bei gefährlichen Arbeiten tragen\n2. Auf dem Boden liegendes Verpackungsmaterial sofort entsorgen\n3. Notausgänge niemals blockieren" },
+    { id:192, cat:"Wirtschaft", type:"open",
+      q:"Was ist Angebot und Nachfrage? Was passiert bei steigendem Preis?",
+      answer:"Angebot: steigt bei höherem Preis (steigende Angebotskurve)\nNachfrage: sinkt bei höherem Preis (fallende Nachfragekurve)\nBei steigendem Preis: mehr Anbieter, aber weniger Käufer" },
+    { id:193, cat:"Ausbildung", type:"open",
+      q:"Welcher Beleg muss zu Beginn der Ausbildung vorgelegt werden?",
+      answer:"Der Nachweis über die ärztliche Erstuntersuchung nach dem Jugendarbeitsschutzgesetz." },
+    { id:194, cat:"Warenwirtschaft", type:"open",
+      q:"Was versteht man unter einer Leihverpackung?",
+      answer:"Eine Verpackung, die nach Gebrauch an den Hersteller zurückgegeben wird und erneut verwendet werden kann (Kreislaufwirtschaft)." },
+    { id:195, cat:"Recht", type:"open",
+      q:"Wann ist ein Rechtsgeschäft eines 7-Jährigen wirksam?",
+      answer:"Wenn es sich um ein ausschließlich rechtlich vorteilhaftes Geschäft handelt (z.B. Schenkungsannahme) ODER wenn es nach dem Taschengeldparagraph vollständig mit eigenem Taschengeld bezahlt wird." },
+]
 };
 // ==================== STATE ====================
 let state = {
@@ -1058,7 +1156,7 @@ function updateStartBtn() {
   }
   btn.disabled = false;
   if (hasPart4) {
-    countEl.textContent = total + ' Fragen · Lernmodus (Fragenkatalog enthält nur offene Fragen)';
+    countEl.textContent = total + ' Fragen · Lernmodus';
   } else if (state.mode === 'learn') {
     countEl.textContent = total + ' Fragen';
   } else {
@@ -2153,7 +2251,8 @@ const FRAGENKATALOG = {
       {n:"08", q:"Nennen Sie 5 Inhalte eines Werbeplans.", a:"1. Werbeziele\n2. Zielgruppe (Streukreis)\n3. Werbebotschaft\n4. Werbemittel\n5. Werbebudget (+ Werbeträger)"},
       {n:"09", q:"Was unterscheidet Werbemittel von Werbeträger? Geben Sie je ein Beispiel.", a:"Werbemittel = das Werbeobjekt selbst (z.B. Flyer, Anzeige, Plakat)\nWerbeträger = das Medium, das das Werbemittel transportiert (z.B. Zeitung, Radio, Internet)"},
       {n:"10", q:"Nennen Sie 3 Gründe, warum Social Media als Werbemittel geeignet ist.", a:"1. Günstigstes Werbemittel\n2. Kunden sind leicht erreichbar (hohe Reichweite)\n3. Kunden erwarten eine Internetpräsenz"},
-      {n:"11", q:"Nennen Sie 5 Grundsätze der Werbung.", a:"1. Werbewirksamkeit – Werbung muss Wirkung erzeugen\n2. Werbewahrheit – keine falschen Versprechen\n3. Werbeklarheit – verständlich und eindeutig\n4. Werbeoriginalität – Aufmerksamkeit erregen\n5. Werbe-Wirtschaftlichkeit – Kosten in angemessenem Verhältnis zum Erfolg"},
+      {n:"11", q:"Nennen Sie 5 Grundsätze der Werbung.", a:"1. Werbewirksamkeit – Werbung muss Wirkung erzeugen\n2. Werbewahrheit – keine falschen Versprechen\n3. Werbeklarheit – verständlich und eindeutig\n4. Werbeoriginalität – Aufmerksamkeit erregen\n5. Werbe-Wirtschaftlichkeit – Kosten in angemessenem Verhältnis zum Erfolg"}
+,
       {n:"12", q:"Wie kann ein Unternehmen den Werbeerfolg einer Kampagne messen? Nennen Sie 2 Möglichkeiten.", a:"1. Umsatzentwicklung vor und nach der Aktion vergleichen\n2. Kundenfrequenz messen / Absatzsteigerung der beworbenen Artikel auswerten"},
       {n:"13", q:"Was ist Verkaufsförderung (Sales Promotion)? Nennen Sie 3 Maßnahmen.", a:"Summe aller absatzfördernden Maßnahmen am Ort des Verkaufs.\nMaßnahmen:\n1. Verteilen von Gutscheinen / Werbegeschenken\n2. Preisreduzierungen / Rabatte (z.B. Take 2 Pay 1)\n3. Sonderaufstellung von Aktionsware"}
     ]},
@@ -2163,7 +2262,8 @@ const FRAGENKATALOG = {
       {n:"16", q:"Erklären Sie den Unterschied zwischen offener Frage, Alternativfrage und geschlossener Frage.", a:"Offene Frage (W-Frage): 'Welche Funktion soll das Gerät haben?' → breite Antwort möglich\nAlternativfrage: 'Möchten Sie Modell A oder Modell B?' → Entscheidung zwischen Optionen\nGeschlossene Frage: 'Möchten Sie das in Rot?' → nur Ja/Nein"},
       {n:"17", q:"Was versteht man unter der Warenvorlage? Nennen Sie 3 Grundsätze.", a:"Präsentation von Ware im Verkaufsgespräch.\n1. 3–5 Artikel auswählen (kein Überangebot)\n2. Nur einwandfreie Ware vorlegen\n3. Mit mittlerer Preislage beginnen"},
       {n:"18", q:"Wie gehen Sie mit einem Preiseinwand des Kunden um? (Ja-Aber-Methode)", a:"1. Verständnis zeigen: 'Ja, ich kann Ihren Einwand nachvollziehen …'\n2. Mehrwert / Nutzen herausstellen: '… aber bei uns erhalten Sie dazu …'\n3. Auf Service, Qualität oder Garantie hinweisen"},
-      {n:"19", q:"Erklären Sie die Sandwich-Methode bei der Preisnennung.", a:"Schritt 1 (LOB/Nutzen): Positive Eigenschaft des Produkts nennen\nSchritt 2 (PREIS): Den Preis nennen\nSchritt 3 (LOB/Vorteil): Weiteren Vorteil nennen\nZiel: Preis wirkt weniger abschreckend"},
+      {n:"19", q:"Erklären Sie die Sandwich-Methode bei der Preisnennung.", a:"Schritt 1 (LOB/Nutzen): Positive Eigenschaft des Produkts nennen\nSchritt 2 (PREIS): Den Preis nennen\nSchritt 3 (LOB/Vorteil): Weiteren Vorteil nennen\nZiel: Preis wirkt weniger abschreckend, wird in positive Aussagen eingebettet."}
+,
       {n:"20", q:"Nennen Sie 3 Entscheidungshilfen für unentschlossene Kunden.", a:"1. Wiederholung wesentlicher Verkaufsargumente\n2. Warenreservierung anbieten (mehr Zeit für Entscheidung)\n3. Einräumen einer Umtauschmöglichkeit"},
       {n:"21", q:"Was ist der Unterschied zwischen Umtausch und Reklamation?", a:"Umtausch: Freiwillige Leistung des Händlers, kein Mangel vorhanden\nReklamation: Gesetzlicher Anspruch des Kunden, Mangel in der Qualität vorhanden → Anspruch auf Nacherfüllung"},
       {n:"22", q:"Wie verhält man sich kundenorientiert bei einer Reklamation? Nennen Sie 4 Schritte.", a:"1. Kunden höflich in eine ruhige Ecke bitten\n2. Kunden ruhig aussprechen lassen\n3. Aufmerksam zuhören und Verständnis zeigen\n4. Lösung anbieten (Reparatur, Ersatz, Erstattung)"}
@@ -2176,30 +2276,39 @@ const FRAGENKATALOG = {
     { section: "Warenpräsentation & Sortiment", qs: [
       {n:"26", q:"Nennen Sie die 4 Regalzonen und ordnen Sie ihnen je eine typische Ware zu.", a:"Zone 1 (Reckzone 160–220 cm): Schwere Ware, geringer Gewinn\nZone 2 (Sichtzone 120–160 cm): Attraktive Ware, Impulskäufe\nZone 3 (Greifzone 80–120 cm): Hochwertige, margenstarke Ware\nZone 4 (Bückzone 0–80 cm): Schwere Ware, Sonderposten"},
       {n:"27", q:"Was ist der Unterschied zwischen Normalplatzierung, Verbundplatzierung und Zweitplatzierung?", a:"Normalplatzierung: Ware steht an ihrem üblichen Regalplatz\nVerbundplatzierung: Ergänzende Artikel gemeinsam platziert (z.B. Kaffee + Kaffeemaschine)\nZweitplatzierung: Ware zusätzlich an einem anderen Ort aufgestellt (z.B. Aktionsaufsteller)"},
-      {n:"28", q:"Nennen Sie 6 Regalanordnungsprinzipien im Verkaufsraum und je ein Beispiel.", a:"1. Diagonalprinzip – dm\n2. Zwangsablauf – IKEA\n3. Arenaprinzip – von Mitte nach außen höher\n4. Sternprinzip – Thalia\n5. Kojenprinzip – Möbel Martin\n6. Individualablauf – Aldi"},
+      {n:"28", q:"Nennen Sie 6 Regalanordnungsprinzipien im Verkaufsraum und je ein Beispiel.", a:"1. Diagonalprinzip – dm (Warenträger schräg versetzt)\n2. Zwangsablauf – IKEA (fester Einkaufsweg)\n3. Arenaprinzip – Warenträger von Mitte nach außen höher\n4. Sternprinzip – Thalia (sternförmige Aufstellung)\n5. Kojenprinzip – Möbel Martin (abgeschlossene Bereiche)\n6. Individualablauf – Aldi (Kunde wählt Weg frei)"}
+
+,
       {n:"29", q:"Was versteht man unter Kernsortiment und Randsortiment?", a:"Kernsortiment: Haupttätigkeit des Unternehmens (z.B. Möbelhaus → Sofas)\nRandsortiment: Ergänzungsartikel für zusätzlichen Kundenservice (z.B. Möbelhaus → Heimtextilien)"},
       {n:"30", q:"Nennen Sie die 4 Warenträgerplatzierungsarten und je einen Vorteil.", a:"1. Längsplatzierung → Übersichtlich, bessere Diebstahlkontrolle\n2. Querplatzierung → Fördert Impulskäufe\n3. Mischplatzierung → Maximale Flexibilität\n4. Verbundplatzierung → Fördert Zusatzkäufe"},
-      {n:"31", q:"Nennen Sie verkaufsstarke und verkaufsschwache Zonen im Verkaufsraum (je 3).", a:"Verkaufsstarke Zonen: Kassenzone, Bedienungszone, Randzone\nVerkaufsschwache Zonen: Eingangsbereich, Eckzone, Mittelzone"},
+      {n:"31", q:"Nennen Sie verkaufsstarke und verkaufsschwache Zonen im Verkaufsraum. (je 3)", a:"Verkaufsstarke Zonen: Kassenzone, Bedienungszone, Randzone\nVerkaufsschwache Zonen: Eingangsbereich, Eckzone, Mittelzone\nTipp: Margenstarke Ware in verkaufsstarke Zonen – Pflichtartikel (Salz, Mehl) in schwache Zonen."}
+,
       {n:"32", q:"Nennen Sie 5 Gestaltungselemente des Visual Merchandising und deren Wirkung.", a:"1. Großflächige Beleuchtung → lässt Verkaufsraum hochwertiger erscheinen\n2. Warme Beleuchtung → wirkt positiv auf Verweildauer\n3. Niedrige Warenträger → Kunden behalten Überblick\n4. Glasvitrinen → dekorative Warenpräsentation\n5. Farbliche Laufwege → Orientierungshilfe"}
     ]}
   ],
   2: [
     { section: "Lagerbestand & Kennzahlen", qs: [
       {n:"33", q:"Was versteht man unter dem Meldebestand? Wie wird er berechnet?", a:"Der Meldebestand ist der Lagerbestand, bei dem eine Nachbestellung ausgelöst werden muss.\nFormel: Meldebestand = Tagesabsatz × Lieferzeit (Tage) + Mindestbestand"},
-      {n:"34", q:"Was passiert, wenn die Lieferzeit sich verlängert? Wie verändert sich der Meldebestand?", a:"Der Meldebestand muss erhöht werden, da mehr Puffer benötigt wird, um Lieferverzögerungen zu überbrücken."},
+      {n:"34", q:"Was passiert, wenn die Lieferzeit sich verlängert? Wie verändert sich der Meldebestand?", a:"Der Meldebestand muss erhöht werden, da mehr Puffer benötigt wird, um Lieferverzögerungen zu überbrücken."}
+,
       {n:"35", q:"Was ist der Unterschied zwischen Mindestbestand und Höchstbestand?", a:"Mindestbestand (eiserner Bestand): Untere Grenze – darf nicht unterschritten werden (Puffer für Lieferverzögerungen)\nHöchstbestand: Obere Lagermenge – begrenzt durch Lagerplatz und Kapitalbindung"},
       {n:"36", q:"Wie berechnet man den durchschnittlichen Lagerbestand?", a:"Einfach: Ø Lagerbestand = (Anfangsbestand + Endbestand) / 2\nMit Zwischenwerten: (AB/2 + Wert1 + Wert2 + … + EB/2) / Anzahl Perioden"},
       {n:"37", q:"Wie berechnet man die Lagerdauer und die Umschlagshäufigkeit?", a:"Lagerdauer = Ø Lagerbestand × 360 / Jahresabsatz (in Tagen)\nUmschlagshäufigkeit = Jahresabsatz / Ø Lagerbestand\nMerke: Kurze Lagerdauer und hohe UH sind positiv!"},
-      {n:"38", q:"Tagesabsatz 5, Lieferzeit 8 Tage, Mindestbestand 10. Wie hoch ist der Meldebestand?", a:"Meldebestand = 5 × 8 + 10 = 40 + 10 = 50 Stück"},
+      {n:"38", q:"Tagesabsatz 5, Lieferzeit 8 Tage, Mindestbestand 10. Wie hoch ist der Meldebestand?", a:"Meldebestand = 5 × 8 + 10 = 40 + 10 = 50 Stück"}
+
+,
       {n:"39", q:"Nennen Sie 4 Vorteile eines Warenwirtschaftssystems (WWS).", a:"1. Automatische Erfassung von Warenabgängen beim Kassiervorgang\n2. Automatischer Bestellvorschlag bei Erreichen des Meldebestands\n3. Schneller Zugriff auf Informationen aus Einkauf, Lager und Verkauf\n4. Fehlmengen und Überbestände werden schnell erkannt"}
     ]},
     { section: "Kalkulation", qs: [
       {n:"40", q:"Was versteht man unter dem Bezugspreis (Einstandspreis)? Nennen Sie die Berechnungsformel.", a:"Bezugspreis = tatsächliche Kosten pro Stück nach Abzug aller Nachlässe zzgl. Bezugskosten.\nListeneinkaufspreis − Rabatt − Skonto + Bezugskosten = Bezugspreis"},
       {n:"41", q:"Erklären Sie den Unterschied zwischen Rabatt, Skonto und Bonus.", a:"Rabatt: Preisnachlass bei Bestellung (z.B. Mengenrabatt, Treuerabatt)\nSkonto: Nachlass bei schneller Zahlung innerhalb der Skontofrist (z.B. 2% bei Zahlung binnen 10 Tagen)\nBonus: Nachträglicher Nachlass bei Erreichen einer vereinbarten Umsatzhöhe (am Jahresende)"},
       {n:"42", q:"Wie berechnet man den Bruttoverkaufspreis? Nennen Sie die vollständige Formel.", a:"Bezugspreis + Handlungskostenzuschlag = Selbstkostenpreis\n+ Gewinnzuschlag = Nettoverkaufspreis\n+ Umsatzsteuer (19% oder 7% Lebensmittel) = Bruttoverkaufspreis"},
-      {n:"43", q:"Wie berechnet man den Kalkulationsfaktor?", a:"Kalkulationsfaktor = Bruttoverkaufspreis / Bezugspreis\nbzw.: Bruttoverkaufspreis = Bezugspreis × Kalkulationsfaktor"},
-      {n:"44", q:"Bezugspreis 20 €, Bruttoverkaufspreis 47,60 €. Wie hoch ist der Kalkulationsfaktor?", a:"Kalkulationsfaktor = 47,60 € / 20 € = 2,38"},
-      {n:"45", q:"Bezugspreis 15 €, Kalkulationsfaktor 2,5. Wie hoch ist der Bruttoverkaufspreis?", a:"Bruttoverkaufspreis = 15 € × 2,5 = 37,50 €"},
+      {n:"43", q:"Wie berechnet man den Kalkulationsfaktor?", a:"Kalkulationsfaktor = Bruttoverkaufspreis / Bezugspreis\nBzw. umgekehrt: Bruttoverkaufspreis = Bezugspreis × Kalkulationsfaktor"},
+      {n:"44", q:"Ein Artikel hat einen Bezugspreis von 20 € und einen Bruttoverkaufspreis von 47,60 €. Wie hoch ist der Kalkulationsfaktor?", a:"Kalkulationsfaktor = 47,60 € / 20 € = 2,38"},
+      {n:"45", q:"Ein Artikel hat einen Bezugspreis von 15 € und einen Kalkulationsfaktor von 2,5. Wie hoch ist der Bruttoverkaufspreis?", a:"Bruttoverkaufspreis = 15 € × 2,5 = 37,50 €"}
+
+
+,
       {n:"46", q:"Listeneinkaufspreis 400 €, Rabatt 10%, Skonto 2%, Bezugskosten 8 €. Berechnen Sie den Bezugspreis.", a:"400 € − 40 € (Rabatt 10%) = 360 € (Zieleinkaufspreis)\n360 € − 7,20 € (Skonto 2%) = 352,80 € (Bareinkaufspreis)\n352,80 € + 8 € (Bezugskosten) = 360,80 € Bezugspreis"},
       {n:"47", q:"Bruttoverkaufspreis 59,50 €, Kalkulationsfaktor 1,70. Wie hoch ist der Bezugspreis?", a:"Bezugspreis = Bruttoverkaufspreis / Kalkulationsfaktor = 59,50 / 1,70 = 35 €"}
     ]},
@@ -2207,49 +2316,67 @@ const FRAGENKATALOG = {
       {n:"48", q:"Nennen Sie die richtige Reihenfolge bei der Warenannahme (5 Schritte).", a:"1. Empfängeranschrift prüfen\n2. Anzahl und äußere Beschaffenheit der Packstücke prüfen\n3. Begleitpapiere unterschreiben\n4. Wareneingang im WWS erfassen\n5. Ware einlagern"},
       {n:"49", q:"Nennen Sie die 3 Mängelarten beim Wareneingang.", a:"1. Mengenmangel: weniger Artikel geliefert als bestellt\n2. Sachmangel: falsche Qualität, falsches Modell\n3. Rechtsmangel: Dritter hat Rechte an der Ware"},
       {n:"50", q:"Was versteht man unter Aktiva und Passiva in der Bilanz?", a:"Aktiva = was das Unternehmen hat (Anlage- und Umlaufvermögen)\nPassiva = woher das Geld kommt (Eigenkapital und Fremdkapital)\nAktiva = Passiva (Bilanzgleichung)"},
-      {n:"51", q:"Wie berechnet man die Eigenkapitalquote? EK = 80.000 €, FK = 120.000 €.", a:"Gesamtkapital = EK + FK = 200.000 €\nEigenkapitalquote = (80.000 / 200.000) × 100 = 40%"},
-      {n:"52", q:"Was ist der Unterschied zwischen Umsatz und Gewinn?", a:"Umsatz = Erlöse aus Verkäufen (Menge × Preis)\nGewinn = Umsatz − Kosten\nMerke: Hoher Umsatz bedeutet nicht automatisch hohen Gewinn!"},
+      {n:"51", q:"Wie berechnet man die Eigenkapitalquote? EK = 80.000 €, FK = 120.000 €.", a:"Gesamtkapital = EK + FK = 200.000 €\nEigenkapitalquote = (80.000 / 200.000) × 100 = 40 %"},
+      {n:"52", q:"Was ist der Unterschied zwischen Umsatz und Gewinn?", a:"Umsatz = Erlöse aus Verkäufen (Menge × Preis)\nGewinn = Umsatz – Kosten\nMerke: Hoher Umsatz bedeutet nicht automatisch hohen Gewinn!"},
       {n:"53", q:"Was bedeutet FIFO beim Lager? Wann wird es angewendet?", a:"FIFO = First In, First Out: Die zuerst eingelagerten Waren werden zuerst entnommen.\nAnwendung: Bei verderblichen Waren (Lebensmittel), Ware mit Haltbarkeitsdatum"}
+
+
+
     ]}
   ],
   3: [
     { section: "Wirtschaftliche Grundlagen", qs: [
       {n:"54", q:"Was versteht man unter dem ökonomischen Prinzip? Nennen Sie Maximal- und Minimalprinzip.", a:"Maximalprinzip: Mit gegebenen Mitteln den größtmöglichen Erfolg erzielen.\nMinimalprinzip: Einen bestimmten Erfolg mit möglichst geringen Mitteln erzielen."},
-      {n:"55", q:"Beschreiben Sie den einfachen Wirtschaftskreislauf zwischen Haushalten und Unternehmen.", a:"Güter fließen von Unternehmen zu Haushalten.\nGeldströme fließen von Haushalten zu Unternehmen (Kaufpreise).\nUnternehmen zahlen Löhne/Gehälter an Haushalte.\nHaushalte stellen Arbeitskraft als Produktionsfaktor bereit."},
-      {n:"56", q:"Zu welchem Wirtschaftssektor gehört der Einzelhandel? Nennen Sie 2 weitere Branchen.", a:"Tertiärsektor (Dienstleistungssektor).\nWeitere Branchen: Versicherungen, Banken, Transport und Logistik"},
-      {n:"57", q:"Was ist ein Gleichgewichtspreis? Wie entsteht er?", a:"Der Gleichgewichtspreis entsteht am Schnittpunkt von Angebots- und Nachfragekurve.\nDort entspricht die angebotene Menge genau der nachgefragten Menge – der Markt räumt sich."}
+      {n:"55", q:"Beschreiben Sie den einfachen Wirtschaftskreislauf zwischen Haushalten und Unternehmen.", a:"Güter fließen von Unternehmen zu Haushalten. Geldströme fließen von Haushalten zu Unternehmen (Kaufpreise). Unternehmen zahlen Löhne/Gehälter an Haushalte. Haushalte stellen Arbeitskraft als Produktionsfaktor bereit."},
+      {n:"56", q:"Zu welchem Wirtschaftssektor gehört der Einzelhandel? Nennen Sie 2 weitere Branchen.", a:"Tertiärsektor (Dienstleistungssektor). Weitere Branchen: Versicherungen, Banken, Transport und Logistik"}
+
+
+,
+      {n:"57", q:"Was ist ein Gleichgewichtspreis? Wie entsteht er?", a:"Der Gleichgewichtspreis entsteht am Schnittpunkt von Angebots- und Nachfragekurve.\nDort entspricht die angebotene Menge genau der nachgefragten Menge – der Markt räumt sich."},
+      {n:"58", q:"Was ist der Unterschied zwischen einem bürgerlichen Kauf, einseitigen und zweiseitigen Handelskauf?", a:"Bürgerlicher Kauf (BGB): Beide Parteien sind Privatpersonen\nEinseitiger Handelskauf (HGB): Nur eine Seite ist Kaufmann (z.B. Privatperson kauft im Warenhaus)\nZweiseitiger Handelskauf (HGB): Beide Seiten sind Kaufleute (B2B)"}
     ]},
     { section: "Kaufvertrag & Geschäftsfähigkeit", qs: [
-      {n:"58", q:"Was ist der Unterschied zwischen einem bürgerlichen Kauf, einseitigen und zweiseitigen Handelskauf?", a:"Bürgerlicher Kauf (BGB): Beide Parteien sind Privatpersonen\nEinseitiger Handelskauf (HGB): Nur eine Seite ist Kaufmann\nZweiseitiger Handelskauf (HGB): Beide Seiten sind Kaufleute (B2B)"},
+      
       {n:"59", q:"Was versteht man unter Geschäftsfähigkeit? Welche Stufen gibt es?", a:"0–6 Jahre: Geschäftsunfähig → Rechtsgeschäfte sind NICHTIG\n7–17 Jahre: Beschränkt geschäftsfähig → Eltern müssen zustimmen (außer Taschengeldparagraph)\nAb 18 Jahre: Voll geschäftsfähig → alle Rechtsgeschäfte möglich"},
       {n:"60", q:"Was besagt der Taschengeldparagraph (§ 110 BGB)?", a:"Minderjährige können Rechtsgeschäfte abschließen, die sie vollständig mit eigenem Taschengeld bezahlen. Der Vertrag ist dann gültig."},
       {n:"61", q:"Was ist der Unterschied zwischen Eigentum und Besitz?", a:"Eigentum = rechtliche Herrschaft (z.B. Bank ist Eigentümer des finanzierten Autos)\nBesitz = tatsächliche Herrschaft (z.B. Käufer hat das Auto in Händen)\nBeides kann getrennt sein!"},
       {n:"62", q:"Was ist Gewährleistung? Wie lange gilt sie und was sind die Rechte des Käufers?", a:"Gewährleistung = gesetzlicher Anspruch des Käufers bei Mangel an der Kaufsache.\nDauer: 2 Jahre ab Kauf\nErste 6 Monate: Beweislast beim Händler\nRecht auf Nacherfüllung (Reparatur oder Ersatz) geht vor."},
       {n:"63", q:"Was ist der Unterschied zwischen Gewährleistung und Garantie?", a:"Gewährleistung: Gesetzlich, 2 Jahre, Anspruch gegen Händler\nGarantie: Freiwillig, Dauer vom Hersteller festgelegt, kann länger als 2 Jahre sein\nGarantie hebt Gewährleistungsrechte NICHT auf!"},
       {n:"64", q:"Was müssen Unternehmen beim Fernabsatz (Online-Handel) beachten?", a:"1. Kunden müssen schriftlich über das Widerrufsrecht informiert werden\n2. 14-tägiges Widerrufsrecht für Verbraucher\n3. Recht auf Nacherfüllung gilt auch online"},
-      {n:"65", q:"Was ist Eigentumsvorbehalt beim Teilzahlungskauf?", a:"Der Käufer wird erst mit vollständiger Bezahlung der letzten Rate Eigentümer der Ware. Bis zur vollständigen Zahlung bleibt der Verkäufer Eigentümer."}
+      {n:"65", q:"Was ist Eigentumsvorbehalt beim Teilzahlungskauf?", a:"Der Käufer wird erst mit vollständiger Bezahlung der letzten Rate Eigentümer der Ware. Bis zur vollständigen Zahlung bleibt der Verkäufer Eigentümer – Sicherheit für den Verkäufer."}
+
+
     ]},
     { section: "Berufsausbildung & Arbeitsrecht", qs: [
       {n:"66", q:"Nennen Sie 5 Pflichtinhalte des Ausbildungsvertrags nach BBiG.", a:"1. Ausbildungsberuf und Ausbildungsort\n2. Ausbildungsdauer\n3. Ausbildungsvergütung (steigt pro Lehrjahr)\n4. Probezeit (min. 1 Monat, max. 4 Monate)\n5. Urlaubsanspruch\nNICHT Pflicht: Berufsschulmodell"},
       {n:"67", q:"Wann kann das Ausbildungsverhältnis gekündigt werden?", a:"Während der Probezeit: Jederzeit fristlos, ohne Angabe von Gründen\nNach der Probezeit: Außerordentlich fristlos bei wichtigem Grund, oder durch Azubi bei Berufswechsel (4-Wochen-Frist)"},
       {n:"68", q:"Welche wichtigen Regeln enthält das Jugendarbeitsschutzgesetz (JArbSchG)?", a:"Max. 8 Stunden täglich / 5 Tage die Woche\nPause: ab 4,5 h → 30 Min. | ab 6 h → 60 Min.\nPause frühestens 1 Std. nach Beginn, spätestens 1 Std. vor Ende\nKeine Sonntagsarbeit für Jugendliche\nBerufsschulbesuch muss ermöglicht werden"},
       {n:"69", q:"Arbeitszeit 09:00 bis 18:00 Uhr (Jugendlicher). Wie lange muss die Pause mindestens sein und bis wann spätestens?", a:"9 Stunden Arbeit → 60 Minuten Pause\nPause spätestens 1 Stunde vor Ende: bis 17:00 Uhr\nFrühestens 1 Stunde nach Beginn: ab 10:00 Uhr"},
-      {n:"70", q:"Was ist Tarifautonomie?", a:"Das Recht der Tarifvertragsparteien (Gewerkschaft und Arbeitgeberverband), ohne staatliche Einflussnahme Tarifverträge abzuschließen."},
-      {n:"71", q:"Was regelt ein Manteltarifvertrag? Was ein Entgelttarifvertrag?", a:"Manteltarifvertrag: Regelt allgemeine Arbeitsbedingungen (Urlaub, Kündigung, Arbeitszeit, Überstunden)\nEntgelttarifvertrag: Regelt die Höhe der Vergütung (Löhne und Gehälter)"}
+      {n:"70", q:"Was ist Tarifautonomie?", a:"Das Recht der Tarifvertragsparteien (Gewerkschaft und Arbeitgeberverband), ohne staatliche Einflussnahme Tarifverträge abzuschließen."}
+,
+      {n:"71", q:"Was regelt ein Manteltarifvertrag? Was ein Entgelttarifvertrag?", a:"Manteltarifvertrag: Regelt allgemeine Arbeitsbedingungen (Urlaub, Kündigung, Arbeitszeit, Überstunden)\nEntgelttarifvertrag: Regelt die Höhe der Vergütung (Löhne und Gehälter)"},
+      {n:"72", q:"Nennen Sie die 5 Zweige der Sozialversicherung.", a:"1. Krankenversicherung\n2. Pflegeversicherung\n3. Rentenversicherung\n4. Arbeitslosenversicherung\n5. Unfallversicherung (Berufsgenossenschaft)"},
+      {n:"73", q:"Was ist die Besonderheit der Unfallversicherung im Vergleich zu anderen Sozialversicherungszweigen?", a:"Die Unfallversicherung wird vollständig vom Arbeitgeber finanziert (kein Arbeitnehmeranteil). Sie zahlt bei Arbeitsunfällen und Wegeunfällen (auf dem Weg zur Arbeit)."},
+      {n:"74", q:"Wie hoch ist der Beitragssatz zur Pflegeversicherung und wer zahlt ihn?", a:"Ca. 3,4% Beitrag – je zur Hälfte von Arbeitnehmer und Arbeitgeber.\nMerke: KV-Mitglieder werden automatisch auch in die Pflegeversicherung aufgenommen."}
     ]},
     { section: "Sozialversicherung & Umwelt", qs: [
-      {n:"72", q:"Nennen Sie die 5 Zweige der Sozialversicherung.", a:"1. Krankenversicherung\n2. Pflegeversicherung\n3. Rentenversicherung\n4. Arbeitslosenversicherung\n5. Unfallversicherung (Berufsgenossenschaft)"},
-      {n:"73", q:"Was ist die Besonderheit der Unfallversicherung im Vergleich zu anderen Sozialversicherungszweigen?", a:"Die Unfallversicherung wird vollständig vom Arbeitgeber finanziert (kein Arbeitnehmeranteil). Sie zahlt bei Arbeitsunfällen und Wegeunfällen."},
-      {n:"74", q:"Wie hoch ist der Beitragssatz zur Pflegeversicherung und wer zahlt ihn?", a:"Ca. 3,4% Beitrag – je zur Hälfte von Arbeitnehmer und Arbeitgeber.\nMerke: KV-Mitglieder werden automatisch auch in die Pflegeversicherung aufgenommen."},
+      
       {n:"75", q:"Nennen Sie 3 Maßnahmen zum Umweltschutz im Einzelhandel.", a:"1. Wertstoffrecycling: Verpackungen einem Entsorgungssystem zuführen\n2. Kostenlose Rücknahme von Umverpackungen (gesetzliche Pflicht)\n3. Leihverpackungen (gehen an Hersteller zurück → Kreislaufwirtschaft)"},
       {n:"76", q:"Was ist der Unterschied zwischen Lohn und Gehalt?", a:"Lohn: zeitabhängige oder stückzahlabhängige Vergütung für Arbeiter (variable Höhe)\nGehalt: festes monatliches Entgelt für Angestellte (gleichbleibende Höhe)"},
-      {n:"77", q:"Was ist Tarifbindung?", a:"Tarifbindung bedeutet, dass die Tarifvertragsparteien direkt an den abgeschlossenen Tarifvertrag gebunden sind."},
+      {n:"77", q:"Was ist Tarifbindung?", a:"Tarifbindung bedeutet, dass die Tarifvertragsparteien (Gewerkschaft und Arbeitgeberverband) direkt an den abgeschlossenen Tarifvertrag gebunden sind."},
       {n:"78", q:"Was ist der Unterschied zwischen Primär-, Sekundär- und Tertiärsektor?", a:"Primärsektor: Urproduktion (Landwirtschaft, Bergbau)\nSekundärsektor: Verarbeitung (Industrie, Handwerk)\nTertiärsektor: Dienstleistungen (Handel, Banken, Versicherungen)"},
       {n:"79", q:"Nennen Sie 3 Maßnahmen zur Arbeitssicherheit im Lager.", a:"1. Festes Schuhwerk bei gefährlichen Arbeiten tragen\n2. Auf dem Boden liegendes Verpackungsmaterial sofort entsorgen\n3. Notausgänge niemals blockieren"},
       {n:"80", q:"Was ist Angebot und Nachfrage? Was passiert bei steigendem Preis?", a:"Angebot: steigt bei höherem Preis (steigende Angebotskurve)\nNachfrage: sinkt bei höherem Preis (fallende Nachfragekurve)\nBei steigendem Preis: mehr Anbieter, aber weniger Käufer"},
       {n:"81", q:"Welcher Beleg muss zu Beginn der Ausbildung vorgelegt werden?", a:"Der Nachweis über die ärztliche Erstuntersuchung nach dem Jugendarbeitsschutzgesetz."},
       {n:"82", q:"Was versteht man unter einer Leihverpackung?", a:"Eine Verpackung, die nach Gebrauch an den Hersteller zurückgegeben wird und erneut verwendet werden kann (Kreislaufwirtschaft)."},
       {n:"83", q:"Wann ist ein Rechtsgeschäft eines 7-Jährigen wirksam?", a:"Wenn es sich um ein ausschließlich rechtlich vorteilhaftes Geschäft handelt (z.B. Schenkungsannahme) ODER wenn es nach dem Taschengeldparagraph vollständig mit eigenem Taschengeld bezahlt wird."}
+
+
+
+
+
+
+
     ]}
   ]
 };
