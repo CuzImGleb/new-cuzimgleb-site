@@ -1164,7 +1164,7 @@ function updateStartBtn() {
   }
   btn.disabled = false;
   if (hasPart4) {
-    countEl.textContent = total + ' Fragen · Lernmodus (Fragenkatalog enthält nur offene Fragen)';
+    countEl.textContent = total + ' Fragen · Lernmodus';
   } else if (state.mode === 'learn') {
     countEl.textContent = total + ' Fragen';
   } else {
@@ -1300,29 +1300,30 @@ function checkOpenNotEmpty() {
 
 // ==================== KI BEWERTUNG ====================
 async function evaluateWithAI(question, userAnswer, musterloesung) {
-  const prompt = `Du bist ein IHK-Prüfer für Kaufleute im Einzelhandel. Bewerte die Schülerantwort auf die folgende Prüfungsfrage.
+  const prompt = `Du bist ein wohlwollender IHK-Prüfer für Kaufleute im Einzelhandel. Bewerte die Schülerantwort inhaltlich – NICHT als Textvergleich mit der Musterlösung.
 
 FRAGE: ${question}
 
-MUSTERLÖSUNG (Kernpunkte):
+MUSTERLÖSUNG (Referenz-Kernpunkte):
 ${musterloesung}
 
 SCHÜLERANTWORT:
 ${userAnswer}
 
 Bewertungsregeln:
-- Sinngemäß richtige Antworten zählen als korrekt, auch wenn anders formuliert als die Musterlösung
-- Auch inhaltlich korrekte Punkte die NICHT in der Musterlösung stehen, aber zur Frage passen, dürfen als korrekt gewertet werden
-- Vage oder bedeutungslose Antworten zählen NICHT (z.B. "Nett" ist kein Vorteil der Teamarbeit)
-- Identifiziere für jeden genannten Schülerpunkt ob er korrekt ist, und liste alle fehlenden Kernpunkte auf
+- Bewertet wird der INHALT, nicht die Formulierung. Sinngemäß korrekte Antworten zählen als richtig.
+- Ein Kernpunkt gilt als erfüllt, wenn die Schülerantwort die gleiche BEDEUTUNG vermittelt – auch mit anderen Worten, vereinfacht oder aus einer anderen Perspektive erklärt.
+- Auch inhaltlich richtige Punkte, die NICHT in der Musterlösung stehen, aber zur Frage passen, zählen als korrekt.
+- Vage oder bedeutungslose Antworten zählen NICHT (z.B. "Es ist anders" ohne Erklärung).
+- WICHTIG: In "missing" dürfen NUR Punkte stehen, die der Schüler wirklich NICHT erwähnt hat – auch nicht sinngemäß. Wenn ein Punkt inhaltlich bereits in "correct_points" erfasst ist, darf er NICHT zusätzlich in "missing" auftauchen.
 
 Antworte NUR als JSON in exakt diesem Format (kein Markdown, keine Erklärung drumherum):
 {
   "got": <Anzahl erfüllter Kernpunkte als Zahl>,
   "total": <Gesamtanzahl geforderter Kernpunkte laut Frage als Zahl>,
   "ok": <true wenn got >= total*0.5, sonst false>,
-  "correct_points": ["<korrekt erkannter Punkt 1>", "<korrekt erkannter Punkt 2>"],
-  "missing": ["<fehlender Kernpunkt 1>", "<fehlender Kernpunkt 2>"]
+  "correct_points": ["<korrekt erkannter Punkt 1 – in eigenen Worten>", "<korrekt erkannter Punkt 2>"],
+  "missing": ["<Kernpunkt den der Schüler wirklich nicht genannt hat>"]
 }`;
 
   const response = await fetch("/.netlify/functions/anthropic-proxy", {
