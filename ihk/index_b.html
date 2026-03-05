@@ -1164,7 +1164,7 @@ function updateStartBtn() {
   }
   btn.disabled = false;
   if (hasPart4) {
-    countEl.textContent = total + ' Fragen · Lernmodus (Fragenkatalog enthält nur offene Fragen)';
+    countEl.textContent = total + ' Fragen · Lernmodus';
   } else if (state.mode === 'learn') {
     countEl.textContent = total + ' Fragen';
   } else {
@@ -1325,7 +1325,7 @@ Antworte NUR als JSON in exakt diesem Format (kein Markdown, keine Erklärung dr
   "missing": ["<fehlender Kernpunkt 1>", "<fehlender Kernpunkt 2>"]
 }`;
 
-  const response = await fetch("/.netlify/functions/anthropic-proxy", {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
