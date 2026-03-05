@@ -312,6 +312,10 @@
     <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>Weiter →</button>
     <button class="btn btn-danger" onclick="endQuiz()" style="margin-left:auto;">Prüfung beenden</button>
   </div>
+  <!-- AI evaluation feedback (shown before advancing) -->
+  <div id="ai-feedback-box" style="display:none; margin-top:12px; background:white; border-radius:10px; padding:18px 22px; box-shadow:0 2px 12px rgba(0,0,0,0.08); border-left:5px solid #1F4E79;">
+    <div id="ai-feedback-content"></div>
+  </div>
 </div>
 
 <!-- RESULTS SCREEN -->
@@ -1058,42 +1062,6 @@ const QUESTIONS = {
     { id:183, cat:"Recht", type:"open",
       q:"Was müssen Unternehmen beim Fernabsatz (Online-Handel) beachten?",
       answer:"1. Kunden müssen schriftlich über das Widerrufsrecht informiert werden\n2. 14-tägiges Widerrufsrecht für Verbraucher\n3. Recht auf Nacherfüllung gilt auch online" },
-    { id:184, cat:"Recht", type:"open",
-      q:"Was ist Eigentumsvorbehalt beim Teilzahlungskauf?",
-      answer:"Der Käufer wird erst mit vollständiger Bezahlung der letzten Rate Eigentümer der Ware. Bis zur vollständigen Zahlung bleibt der Verkäufer Eigentümer – Sicherheit für den Verkäufer." },
-    { id:185, cat:"Arbeitsrecht", type:"open",
-      q:"Was ist Tarifautonomie?",
-      answer:"Das Recht der Tarifvertragsparteien (Gewerkschaft und Arbeitgeberverband), ohne staatliche Einflussnahme Tarifverträge abzuschließen." },
-    { id:186, cat:"Sozialversicherung", type:"open",
-      q:"Nennen Sie die 5 Zweige der Sozialversicherung.",
-      answer:"1. Krankenversicherung\n2. Pflegeversicherung\n3. Rentenversicherung\n4. Arbeitslosenversicherung\n5. Unfallversicherung (Berufsgenossenschaft)" },
-    { id:187, cat:"Sozialversicherung", type:"open",
-      q:"Was ist die Besonderheit der Unfallversicherung im Vergleich zu anderen Sozialversicherungszweigen?",
-      answer:"Die Unfallversicherung wird vollständig vom Arbeitgeber finanziert (kein Arbeitnehmeranteil). Sie zahlt bei Arbeitsunfällen und Wegeunfällen (auf dem Weg zur Arbeit)." },
-    { id:188, cat:"Sozialversicherung", type:"open",
-      q:"Wie hoch ist der Beitragssatz zur Pflegeversicherung und wer zahlt ihn?",
-      answer:"Ca. 3,4% Beitrag – je zur Hälfte von Arbeitnehmer und Arbeitgeber.\nMerke: KV-Mitglieder werden automatisch auch in die Pflegeversicherung aufgenommen." },
-    { id:189, cat:"Arbeitsrecht", type:"open",
-      q:"Was ist Tarifbindung?",
-      answer:"Tarifbindung bedeutet, dass die Tarifvertragsparteien (Gewerkschaft und Arbeitgeberverband) direkt an den abgeschlossenen Tarifvertrag gebunden sind." },
-    { id:190, cat:"Wirtschaft", type:"open",
-      q:"Was ist der Unterschied zwischen Primär-, Sekundär- und Tertiärsektor?",
-      answer:"Primärsektor: Urproduktion (Landwirtschaft, Bergbau)\nSekundärsektor: Verarbeitung (Industrie, Handwerk)\nTertiärsektor: Dienstleistungen (Handel, Banken, Versicherungen)" },
-    { id:191, cat:"Arbeitssicherheit", type:"open",
-      q:"Nennen Sie 3 Maßnahmen zur Arbeitssicherheit im Lager.",
-      answer:"1. Festes Schuhwerk bei gefährlichen Arbeiten tragen\n2. Auf dem Boden liegendes Verpackungsmaterial sofort entsorgen\n3. Notausgänge niemals blockieren" },
-    { id:192, cat:"Wirtschaft", type:"open",
-      q:"Was ist Angebot und Nachfrage? Was passiert bei steigendem Preis?",
-      answer:"Angebot: steigt bei höherem Preis (steigende Angebotskurve)\nNachfrage: sinkt bei höherem Preis (fallende Nachfragekurve)\nBei steigendem Preis: mehr Anbieter, aber weniger Käufer" },
-    { id:193, cat:"Ausbildung", type:"open",
-      q:"Welcher Beleg muss zu Beginn der Ausbildung vorgelegt werden?",
-      answer:"Der Nachweis über die ärztliche Erstuntersuchung nach dem Jugendarbeitsschutzgesetz." },
-    { id:194, cat:"Warenwirtschaft", type:"open",
-      q:"Was versteht man unter einer Leihverpackung?",
-      answer:"Eine Verpackung, die nach Gebrauch an den Hersteller zurückgegeben wird und erneut verwendet werden kann (Kreislaufwirtschaft)." },
-    { id:195, cat:"Recht", type:"open",
-      q:"Wann ist ein Rechtsgeschäft eines 7-Jährigen wirksam?",
-      answer:"Wenn es sich um ein ausschließlich rechtlich vorteilhaftes Geschäft handelt (z.B. Schenkungsannahme) ODER wenn es nach dem Taschengeldparagraph vollständig mit eigenem Taschengeld bezahlt wird." },
 ]
 };
 // ==================== STATE ====================
@@ -1125,8 +1093,48 @@ function show(id) {
 function togglePart(p) {
   const btn = document.querySelector(`.part-btn[data-part="${p}"]`);
   const idx = state.selectedParts.indexOf(p);
-  if (idx === -1) { state.selectedParts.push(p); btn.classList.add('selected'); }
-  else { state.selectedParts.splice(idx, 1); btn.classList.remove('selected'); }
+
+  if (idx === -1) {
+    if (p === 4) {
+      // Selecting Fragenkatalog → deselect all others and lock them
+      state.selectedParts = [4];
+      document.querySelectorAll('.part-btn').forEach(b => {
+        const bp = parseInt(b.dataset.part);
+        if (bp !== 4) {
+          b.classList.remove('selected');
+          b.style.opacity = '0.35';
+          b.style.pointerEvents = 'none';
+          b.title = 'Nicht kombinierbar mit Fragenkatalog';
+        }
+      });
+      btn.classList.add('selected');
+    } else {
+      // Selecting 1/2/3 → ensure part 4 is deselected and unlocked
+      if (state.selectedParts.includes(4)) {
+        state.selectedParts = [];
+        const btn4 = document.querySelector('.part-btn[data-part="4"]');
+        btn4.classList.remove('selected');
+        document.querySelectorAll('.part-btn').forEach(b => {
+          b.style.opacity = '';
+          b.style.pointerEvents = '';
+          b.title = '';
+        });
+      }
+      state.selectedParts.push(p);
+      btn.classList.add('selected');
+    }
+  } else {
+    state.selectedParts.splice(idx, 1);
+    btn.classList.remove('selected');
+    // If deselecting part 4 → unlock all others
+    if (p === 4) {
+      document.querySelectorAll('.part-btn').forEach(b => {
+        b.style.opacity = '';
+        b.style.pointerEvents = '';
+        b.title = '';
+      });
+    }
+  }
   updateStartBtn();
 }
 
@@ -1184,6 +1192,7 @@ function startQuiz() {
   state.correct = 0;
   state.userAnswers = [];
   state.finished = false;
+  state.openEvaluated = false;
 
   // Timer
   let totalTime = 0;
@@ -1255,8 +1264,13 @@ function renderQuestion() {
   document.getElementById('feedback-title').textContent = '';
   document.getElementById('feedback-text').textContent = '';
 
+  // Reset AI feedback box
+  document.getElementById('ai-feedback-box').style.display = 'none';
+  document.getElementById('ai-feedback-content').innerHTML = '';
+
   // Next btn
   document.getElementById('btn-next').disabled = true;
+  document.getElementById('btn-next').textContent = 'Weiter →';
   document.getElementById('btn-show-answer').style.display = 'none';
 
   // Content
@@ -1278,7 +1292,52 @@ function renderQuestion() {
 
 function checkOpenNotEmpty() {
   const val = document.getElementById('open-ans')?.value?.trim();
-  document.getElementById('btn-next').disabled = !val;
+  // Only enable if not yet evaluated
+  if (!state.openEvaluated) {
+    document.getElementById('btn-next').disabled = !val;
+  }
+}
+
+// ==================== KI BEWERTUNG ====================
+async function evaluateWithAI(question, userAnswer, musterloesung) {
+  const prompt = `Du bist ein IHK-Prüfer für Kaufleute im Einzelhandel. Bewerte die Schülerantwort auf die folgende Prüfungsfrage.
+
+FRAGE: ${question}
+
+MUSTERLÖSUNG (Kernpunkte):
+${musterloesung}
+
+SCHÜLERANTWORT:
+${userAnswer}
+
+Bewertungsregeln:
+- Sinngemäß richtige Antworten zählen als korrekt, auch wenn anders formuliert als die Musterlösung
+- Auch inhaltlich korrekte Punkte die NICHT in der Musterlösung stehen, aber zur Frage passen, dürfen als korrekt gewertet werden
+- Vage oder bedeutungslose Antworten zählen NICHT (z.B. "Nett" ist kein Vorteil der Teamarbeit)
+- Identifiziere für jeden genannten Schülerpunkt ob er korrekt ist, und liste alle fehlenden Kernpunkte auf
+
+Antworte NUR als JSON in exakt diesem Format (kein Markdown, keine Erklärung drumherum):
+{
+  "got": <Anzahl erfüllter Kernpunkte als Zahl>,
+  "total": <Gesamtanzahl geforderter Kernpunkte laut Frage als Zahl>,
+  "ok": <true wenn got >= total*0.5, sonst false>,
+  "correct_points": ["<korrekt erkannter Punkt 1>", "<korrekt erkannter Punkt 2>"],
+  "missing": ["<fehlender Kernpunkt 1>", "<fehlender Kernpunkt 2>"]
+}`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 500,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const data = await response.json();
+  const raw = data.content.map(b => b.text || '').join('').trim();
+  const clean = raw.replace(/```json|```/g, '').trim();
+  return JSON.parse(clean);
 }
 
 function selectOption(idx) {
@@ -1317,17 +1376,105 @@ function showAnswer() {
   document.getElementById('feedback-text').textContent = q.answer;
 }
 
-function nextQuestion() {
+async function nextQuestion() {
   const q = state.questions[state.currentIdx];
+
+  // ── OPEN QUESTION: two-step flow ──
   if (q.type === 'open') {
-    const val = document.getElementById('open-ans')?.value?.trim() || '(keine Antwort)';
+    // Step 2: already evaluated → advance
+    if (state.openEvaluated) {
+      state.openEvaluated = false;
+      document.getElementById('ai-feedback-box').style.display = 'none';
+      state.currentIdx++;
+      if (state.currentIdx >= state.questions.length) {
+        endQuiz();
+      } else {
+        renderQuestion();
+      }
+      return;
+    }
+
+    // Step 1: evaluate with AI
+    const val = document.getElementById('open-ans')?.value?.trim() || '';
+    const btn = document.getElementById('btn-next');
+    btn.disabled = true;
+    btn.textContent = '🤖 KI bewertet…';
+
+    // Show musterlösung too (so user sees both)
+    showAnswer();
+
+    let aiResult = null;
+    try {
+      aiResult = await evaluateWithAI(q.q, val || '(keine Antwort)', q.answer);
+    } catch(e) {
+      aiResult = { got: 0, total: '?', ok: false, missing: 'Bewertung fehlgeschlagen – bitte selbst vergleichen.' };
+    }
+
+    // Save answer with AI result
+    const isCorrect = aiResult.ok === true;
     state.userAnswers.push({
       q: q.q, type: 'open', cat: q.cat, part: getPart(q),
-      given: val, correct: q.answer, isCorrect: null
+      given: val || '(keine Antwort)', correct: q.answer,
+      isCorrect,
+      aiScore: aiResult
     });
     state.answered++;
+    if (isCorrect) state.correct++;
+    document.getElementById('score-display').textContent = `${state.correct} / ${state.answered} richtig`;
+
+    // Render AI feedback
+    const pct = (typeof aiResult.total === 'number' && aiResult.total > 0)
+      ? Math.round((aiResult.got / aiResult.total) * 100)
+      : null;
+    const color = isCorrect ? '#375623' : '#C00000';
+    const bgColor = isCorrect ? '#E2EFDA' : '#FCE4D6';
+    const icon = isCorrect ? '✅' : '❌';
+    const scoreLabel = (typeof aiResult.total === 'number')
+      ? `${aiResult.got} / ${aiResult.total} Kernpunkte`
+      : 'Bewertung';
+
+    // Build correct/missing point lists
+    const correctList = Array.isArray(aiResult.correct_points) && aiResult.correct_points.length > 0
+      ? aiResult.correct_points.map(p => `<li style="margin:3px 0;">✅ ${p}</li>`).join('')
+      : (aiResult.got > 0 ? `<li style="margin:3px 0;">✅ ${aiResult.got} Punkt(e) erkannt</li>` : '');
+    const missingList = Array.isArray(aiResult.missing) && aiResult.missing.length > 0
+      ? aiResult.missing.map(p => `<li style="margin:3px 0;">❌ ${p}</li>`).join('')
+      : (typeof aiResult.missing === 'string' && aiResult.missing !== 'Alle Kernpunkte getroffen!'
+          ? `<li style="margin:3px 0;">❌ ${aiResult.missing}</li>` : '');
+    const allCorrect = missingList === '';
+
+    document.getElementById('ai-feedback-content').innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <span style="font-size:1.5rem;">${icon}</span>
+        <span style="font-weight:bold; color:${color}; font-size:1.05rem;">KI-Bewertung: ${scoreLabel}</span>
+        ${pct !== null ? `<span style="background:${bgColor}; color:${color}; border-radius:20px; padding:3px 12px; font-size:0.85rem; font-weight:bold;">${pct}%</span>` : ''}
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:0.88rem;">
+        <div style="background:#E2EFDA; border-radius:8px; padding:12px;">
+          <div style="font-weight:bold; color:#375623; margin-bottom:6px;">✓ Richtige Punkte</div>
+          <ul style="list-style:none; padding:0; margin:0; color:#2a4a1e; line-height:1.5;">
+            ${correctList || '<li style="color:#888; font-style:italic;">Keine erkannt</li>'}
+          </ul>
+        </div>
+        <div style="background:#FCE4D6; border-radius:8px; padding:12px;">
+          <div style="font-weight:bold; color:#C00000; margin-bottom:6px;">✗ Fehlende Punkte</div>
+          <ul style="list-style:none; padding:0; margin:0; color:#7a1a00; line-height:1.5;">
+            ${allCorrect ? '<li style="color:#375623; font-style:italic;">Alle Kernpunkte getroffen! 🎉</li>' : missingList}
+          </ul>
+        </div>
+      </div>`;
+
+    document.getElementById('ai-feedback-box').style.display = 'block';
+    document.getElementById('ai-feedback-box').style.borderColor = color;
+
+    // Update button to advance
+    state.openEvaluated = true;
+    btn.textContent = 'Nächste Frage →';
+    btn.disabled = false;
+    return;
   }
 
+  // ── MC QUESTION: advance immediately ──
   state.currentIdx++;
   if (state.currentIdx >= state.questions.length) {
     endQuiz();
@@ -1403,6 +1550,12 @@ function showResults() {
   }
 
   let pct = mcAnswered > 0 ? Math.round((state.correct / mcAnswered) * 100) : null;
+  // If mix of open+mc or only open: include AI-evaluated open questions
+  const aiEvaluated = state.userAnswers.filter(a => a.type === 'open' && a.isCorrect !== null);
+  const totalScored = state.userAnswers.filter(a => a.isCorrect !== null).length;
+  if (totalScored > 0) {
+    pct = Math.round((state.correct / totalScored) * 100);
+  }
   let ihk = pct !== null ? getIHKGrade(pct) : null;
   let scoreText = pct !== null ? pct + ' Pkt.' : '–';
   let grade = '';
@@ -1430,7 +1583,8 @@ function showResults() {
   document.getElementById('stat-pct').textContent = pct !== null ? pct + ' Pkt.' : '–';
   document.getElementById('stat-correct').textContent = state.correct;
   document.getElementById('stat-wrong').textContent = wrong;
-  document.getElementById('stat-open').textContent = openAnswered;
+  const unevaluated = state.userAnswers.filter(a => a.type === 'open' && a.isCorrect === null).length;
+  document.getElementById('stat-open').textContent = unevaluated;
   document.getElementById('result-time').textContent = `Zeit: ${min}m ${sec}s`;
 
   show('results');
@@ -1439,13 +1593,52 @@ function showResults() {
 function showReview() {
   const list = document.getElementById('review-list');
   list.innerHTML = state.userAnswers.map((a, i) => {
-    let cls = a.type === 'open' ? 'r-open' : (a.isCorrect ? 'r-correct' : 'r-wrong');
-    let icon = a.type === 'open' ? '📝' : (a.isCorrect ? '✓' : '✗');
+    let cls, icon;
+    if (a.type === 'open') {
+      if (a.isCorrect === true)       { cls = 'r-correct'; icon = '✅'; }
+      else if (a.isCorrect === false) { cls = 'r-wrong';   icon = '❌'; }
+      else                            { cls = 'r-open';    icon = '📝'; }
+    } else {
+      cls = a.isCorrect ? 'r-correct' : 'r-wrong';
+      icon = a.isCorrect ? '✓' : '✗';
+    }
+
+    let aiHtml = '';
+    if (a.type === 'open' && a.aiScore) {
+      const s = a.aiScore;
+      const pctR = (typeof s.total === 'number' && s.total > 0) ? Math.round((s.got/s.total)*100) : null;
+      const correctL = Array.isArray(s.correct_points) && s.correct_points.length > 0
+        ? s.correct_points.map(p => `<li>✅ ${p}</li>`).join('')
+        : (s.got > 0 ? `<li>✅ ${s.got} Punkt(e) erkannt</li>` : '<li style="color:#888;font-style:italic;">Keine erkannt</li>');
+      const missingArr = Array.isArray(s.missing) ? s.missing : (s.missing ? [s.missing] : []);
+      const missingL = missingArr.length > 0
+        ? missingArr.map(p => `<li>❌ ${p}</li>`).join('')
+        : '<li style="color:#375623;font-style:italic;">Alle Kernpunkte getroffen! 🎉</li>';
+      aiHtml = `<div style="margin-top:10px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:0.85rem; font-weight:bold; color:${a.isCorrect ? '#375623' : '#C00000'};">
+          KI-Bewertung: ${s.got}/${s.total} Kernpunkte${pctR !== null ? ` · ${pctR}%` : ''}
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.82rem;">
+          <div style="background:#E2EFDA; border-radius:6px; padding:10px;">
+            <div style="font-weight:bold; color:#375623; margin-bottom:4px;">✓ Richtige Punkte</div>
+            <ul style="list-style:none; padding:0; margin:0; color:#2a4a1e; line-height:1.6;">${correctL}</ul>
+          </div>
+          <div style="background:#FCE4D6; border-radius:6px; padding:10px;">
+            <div style="font-weight:bold; color:#C00000; margin-bottom:4px;">✗ Fehlende Punkte</div>
+            <ul style="list-style:none; padding:0; margin:0; color:#7a1a00; line-height:1.6;">${missingL}</ul>
+          </div>
+        </div>
+      </div>`;
+    }
+
     return `<div class="review-item ${cls}">
       <div class="review-q">${icon} Frage ${i+1} [${a.cat}]: ${a.q}</div>
       <div class="review-given"><strong>Deine Antwort:</strong> ${a.given}</div>
-      ${a.type !== 'open' ? `<div class="review-correct"><strong>Richtige Antwort:</strong> ${a.correct}</div>` : ''}
-      ${a.type !== 'open' ? `<div style="font-size:0.85rem; color:#555; margin-top:6px;">${a.explain}</div>` : `<div style="font-size:0.85rem; color:#555; margin-top:6px;"><strong>Musterlösung:</strong> ${a.correct}</div>`}
+      ${a.type !== 'open'
+        ? `<div class="review-correct"><strong>Richtige Antwort:</strong> ${a.correct}</div>
+           <div style="font-size:0.85rem; color:#555; margin-top:6px;">${a.explain}</div>`
+        : `<div style="font-size:0.85rem; color:#555; margin-top:6px;"><strong>Musterlösung:</strong> ${a.correct}</div>${aiHtml}`
+      }
     </div>`;
   }).join('');
   show('review');
