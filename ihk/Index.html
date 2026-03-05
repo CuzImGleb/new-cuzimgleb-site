@@ -1304,31 +1304,26 @@ async function evaluateWithAI(question, userAnswer, musterloesung) {
 
 FRAGE: ${question}
 
-MUSTERLÖSUNG (Referenz-Kernpunkte):
+MUSTERLÖSUNG:
 ${musterloesung}
 
 SCHÜLERANTWORT:
 ${userAnswer}
 
-Deine Aufgabe – Schritt für Schritt:
-1. Zähle die Kernpunkte der Musterlösung → das ist "total".
-2. Prüfe jeden Kernpunkt: Hat der Schüler ihn SINNGEMÄSS erfüllt? Formulierung ist egal, nur Bedeutung zählt.
-   WICHTIG: Wenn ein Kernpunkt mehrere Teilaspekte hat (z.B. "gesetzlich, 2 Jahre, gegen den Händler"), zählt er trotzdem als EIN Kernpunkt. Wenn der Schüler den Hauptaspekt trifft, aber einen Detailaspekt weglässt, gilt der Kernpunkt als ERFÜLLT – erwähne den fehlenden Detail höchstens als Hinweis in correct_points, aber NICHT als eigenen missing-Punkt.
-3. Zähle die erfüllten Kernpunkte → das ist "got".
-4. "correct_points" = alle Punkte die der Schüler richtig hatte (kurz in eigenen Worten, inkl. kleiner Hinweise auf fehlende Details).
-5. "missing" = nur Kernpunkte, die der Schüler inhaltlich KOMPLETT nicht erwähnt hat.
-
-LOGISCHE PFLICHT: Wenn got == total, dann muss missing ein leeres Array [] sein.
-Ein Punkt kann NICHT gleichzeitig in correct_points UND in missing stehen.
-Die Summe von got + missing.length muss gleich total sein.
+Anleitung:
+- Jede ZEILE der Musterlösung ist genau EIN Kernpunkt. Zähle die Zeilen → das ist "total". Erfinde keine neuen Kernpunkte.
+- Prüfe jede Zeile: Hat der Schüler den Kern dieser Zeile sinngemäß erwähnt? Wenn ja → erfüllt. Fehlende Details innerhalb einer Zeile machen den Kernpunkt nicht ungültig.
+- "got" = Anzahl erfüllter Kernpunkte. "missing" = die Zeilen, die wirklich komplett fehlen.
+- REGEL: got + missing.length == total. Nicht mehr, nicht weniger.
+- REGEL: Wenn got == total → missing muss [] sein.
 
 Antworte NUR als JSON, kein Markdown:
 {
   "got": <Zahl>,
   "total": <Zahl>,
   "ok": <true wenn got >= total*0.5>,
-  "correct_points": ["<richtig erkannter Punkt>"],
-  "missing": ["<wirklich fehlender Punkt>"]
+  "correct_points": ["<erfüllter Kernpunkt kurz zusammengefasst>"],
+  "missing": ["<komplett fehlender Kernpunkt>"]
 }`;
 
   const response = await fetch("/.netlify/functions/anthropic-proxy", {
