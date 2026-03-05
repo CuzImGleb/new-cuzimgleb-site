@@ -1325,7 +1325,7 @@ Antworte NUR als JSON in exakt diesem Format (kein Markdown, keine Erklärung dr
   "missing": ["<fehlender Kernpunkt 1>", "<fehlender Kernpunkt 2>"]
 }`;
 
-  const response = await fetch("netlify/functions/anthropic-proxy", {
+  const response = await fetch("/.netlify/functions/anthropic-proxy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
