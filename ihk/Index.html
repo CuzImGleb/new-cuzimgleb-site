@@ -1304,7 +1304,7 @@ async function evaluateWithAI(question, userAnswer, musterloesung) {
 
 FRAGE: ${question}
 
-MUSTERLÖSUNG (nur als Referenz – keine offizielle Lösung):
+MUSTERLÖSUNG (nur als Referenz):
 ${musterloesung}
 
 SCHÜLERANTWORT:
@@ -1312,16 +1312,17 @@ ${userAnswer}
 
 Aufgabe:
 Prüfe ob der Schüler die wesentlichen Inhalte der Musterlösung sinngemäß abgedeckt hat.
-- Formulierung ist komplett egal, nur der Inhalt zählt
-- Eigene richtige Ergänzungen des Schülers die Sinn ergeben → ebenfalls als korrekt werten
-- Was hat der Schüler gut gemacht? Was fehlt inhaltlich noch?
-- "ok": true wenn der Schüler den Großteil (mind. 50%) des wesentlichen Inhalts abgedeckt hat
+- Formulierung ist egal, nur Inhalt und Ergebnis zählen
+- Bei Rechenaufgaben: wenn das Ergebnis stimmt → ok: true, missing: []
+- Eigene sinnvolle Ergänzungen des Schülers ebenfalls als korrekt werten
+- WICHTIG: Wenn ok = true, dann muss missing zwingend [] sein. Niemals bei einer korrekten Antwort etwas in missing schreiben.
+- missing nur befüllen wenn wirklich wesentliche Inhalte fehlen
 
 Antworte NUR als JSON, kein Markdown:
 {
   "ok": <true oder false>,
   "correct_points": ["<was der Schüler richtig hatte, kurz>"],
-  "missing": ["<was inhaltlich noch fehlt, kurz>"]
+  "missing": ["<was inhaltlich wirklich fehlt – leer lassen wenn ok=true>"]
 }`;
 
   const response = await fetch("/.netlify/functions/anthropic-proxy", {
@@ -1460,11 +1461,12 @@ async function nextQuestion() {
     const correctList = Array.isArray(aiResult.correct_points) && aiResult.correct_points.length > 0
       ? aiResult.correct_points.map(p => `<li style="margin:3px 0;">✅ ${p}</li>`).join('')
       : '';
-    const rawMissing = Array.isArray(aiResult.missing) ? aiResult.missing : [];
+    // If ok=true, never show missing points regardless of what AI returned
+    const rawMissing = (!isCorrect && Array.isArray(aiResult.missing)) ? aiResult.missing : [];
     const missingList = rawMissing.length > 0
       ? rawMissing.map(p => `<li style="margin:3px 0;">❌ ${p}</li>`).join('')
       : '';
-    const allCorrect = missingList === '';
+    const allCorrect = isCorrect || missingList === '';
 
     document.getElementById('ai-feedback-content').innerHTML = `
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
