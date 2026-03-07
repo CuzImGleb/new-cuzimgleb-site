@@ -1394,18 +1394,43 @@ async function nextQuestion() {
       return;
     }
 
-    // Step 1: evaluate with AI
+    // Step 1: evaluate with AI (skip if empty → save API costs)
     const val = document.getElementById('open-ans')?.value?.trim() || '';
     const btn = document.getElementById('btn-next');
+
+    // Show musterlösung
+    showAnswer();
+
+    if (!val) {
+      // Empty answer → skip AI, count as wrong, no API call
+      state.userAnswers.push({
+        q: q.q, type: 'open', cat: q.cat, part: getPart(q),
+        given: '(keine Antwort)', correct: q.answer,
+        isCorrect: false, aiScore: null
+      });
+      state.answered++;
+      document.getElementById('score-display').textContent = `${state.correct} / ${state.answered} richtig`;
+
+      document.getElementById('ai-feedback-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.3rem;">⏭️</span>
+          <span style="color:#888; font-style:italic;">Keine Antwort eingegeben – Frage übersprungen.</span>
+        </div>`;
+      document.getElementById('ai-feedback-box').style.display = 'block';
+      document.getElementById('ai-feedback-box').style.borderColor = '#aaa';
+
+      state.openEvaluated = true;
+      btn.textContent = 'Nächste Frage →';
+      btn.disabled = false;
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = '🤖 KI bewertet…';
 
-    // Show musterlösung too (so user sees both)
-    showAnswer();
-
     let aiResult = null;
     try {
-      aiResult = await evaluateWithAI(q.q, val || '(keine Antwort)', q.answer);
+      aiResult = await evaluateWithAI(q.q, val, q.answer);
     } catch(e) {
       aiResult = { got: 0, total: '?', ok: false, missing: 'Bewertung fehlgeschlagen – bitte selbst vergleichen.' };
     }
@@ -1414,7 +1439,7 @@ async function nextQuestion() {
     const isCorrect = aiResult.ok === true;
     state.userAnswers.push({
       q: q.q, type: 'open', cat: q.cat, part: getPart(q),
-      given: val || '(keine Antwort)', correct: q.answer,
+      given: val, correct: q.answer,
       isCorrect,
       aiScore: aiResult
     });
