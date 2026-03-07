@@ -3,30 +3,17 @@ exports.handler = async function(event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const body = JSON.parse(event.body);
-
-  // Convert Anthropic-style messages to OpenAI/Groq format
-  const groqBody = {
-    model: 'llama-3.1-8b-instant',
-    max_tokens: body.max_tokens || 500,
-    messages: body.messages
-  };
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01'
     },
-    body: JSON.stringify(groqBody)
+    body: event.body
   });
 
   const data = await response.json();
-
-  // Convert Groq response back to Anthropic-style so the HTML needs no changes
-  const converted = {
-    content: [{ type: 'text', text: data.choices?.[0]?.message?.content || '' }]
-  };
 
   return {
     statusCode: response.status,
@@ -34,6 +21,6 @@ exports.handler = async function(event) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*'
     },
-    body: JSON.stringify(converted)
+    body: JSON.stringify(data)
   };
 };

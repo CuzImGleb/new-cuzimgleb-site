@@ -1300,36 +1300,36 @@ function checkOpenNotEmpty() {
 
 // ==================== KI BEWERTUNG ====================
 async function evaluateWithAI(question, userAnswer, musterloesung) {
-  const prompt = `Du bist ein wohlwollender Lernhelfer. Vergleiche die Schülerantwort mit der Musterlösung.
+  const prompt = `Du bist ein IHK-Prüfer für Kaufleute im Einzelhandel. Bewerte die Schülerantwort auf die folgende Prüfungsfrage.
 
 FRAGE: ${question}
 
-MUSTERLÖSUNG (nur als Referenz):
+MUSTERLÖSUNG (Kernpunkte):
 ${musterloesung}
 
 SCHÜLERANTWORT:
 ${userAnswer}
 
-Aufgabe:
-Prüfe ob der Schüler die wesentlichen Inhalte der Musterlösung sinngemäß abgedeckt hat.
-- Formulierung ist egal, nur Inhalt und Ergebnis zählen
-- Bei Rechenaufgaben: wenn das Ergebnis stimmt → ok: true, missing: []
-- Eigene sinnvolle Ergänzungen des Schülers ebenfalls als korrekt werten
-- WICHTIG: Wenn ok = true, dann muss missing zwingend [] sein. Niemals bei einer korrekten Antwort etwas in missing schreiben.
-- missing nur befüllen wenn wirklich wesentliche Inhalte fehlen
+Bewertungsregeln:
+- Sinngemäß richtige Antworten zählen als korrekt, auch wenn anders formuliert als die Musterlösung
+- Auch inhaltlich korrekte Punkte die NICHT in der Musterlösung stehen, aber zur Frage passen, dürfen als korrekt gewertet werden
+- Vage oder bedeutungslose Antworten zählen NICHT (z.B. "Nett" ist kein Vorteil der Teamarbeit)
+- Identifiziere für jeden genannten Schülerpunkt ob er korrekt ist, und liste alle fehlenden Kernpunkte auf
 
-Antworte NUR als JSON, kein Markdown:
+Antworte NUR als JSON in exakt diesem Format (kein Markdown, keine Erklärung drumherum):
 {
-  "ok": <true oder false>,
-  "correct_points": ["<was der Schüler richtig hatte, kurz>"],
-  "missing": ["<was inhaltlich wirklich fehlt – leer lassen wenn ok=true>"]
+  "got": <Anzahl erfüllter Kernpunkte als Zahl>,
+  "total": <Gesamtanzahl geforderter Kernpunkte laut Frage als Zahl>,
+  "ok": <true wenn got >= total*0.5, sonst false>,
+  "correct_points": ["<korrekt erkannter Punkt 1>", "<korrekt erkannter Punkt 2>"],
+  "missing": ["<fehlender Kernpunkt 1>", "<fehlender Kernpunkt 2>"]
 }`;
 
   const response = await fetch("/.netlify/functions/anthropic-proxy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 500,
       messages: [{ role: "user", content: prompt }]
     })
@@ -1397,41 +1397,15 @@ async function nextQuestion() {
     // Step 1: evaluate with AI
     const val = document.getElementById('open-ans')?.value?.trim() || '';
     const btn = document.getElementById('btn-next');
+    btn.disabled = true;
+    btn.textContent = '🤖 KI bewertet…';
 
     // Show musterlösung too (so user sees both)
     showAnswer();
 
-    // If answer is empty, skip AI and show 0 points immediately
-    if (!val) {
-      const totalLines = q.answer.split('\n').filter(l => l.trim()).length;
-      const aiResult = { got: 0, total: totalLines, ok: false, correct_points: [], missing: q.answer.split('\n').filter(l => l.trim()) };
-      const isCorrect = false;
-      state.userAnswers.push({
-        q: q.q, type: 'open', cat: q.cat, part: getPart(q),
-        given: '(keine Antwort)', correct: q.answer,
-        isCorrect, aiScore: aiResult
-      });
-      state.answered++;
-      document.getElementById('score-display').textContent = `${state.correct} / ${state.answered} richtig`;
-      document.getElementById('ai-feedback-content').innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-          <span style="font-size:1.5rem;">❌</span>
-          <span style="font-weight:bold; color:#C00000; font-size:1.05rem;">Keine Antwort eingegeben – 0 / ${totalLines} Kernpunkte</span>
-        </div>`;
-      document.getElementById('ai-feedback-box').style.display = 'block';
-      document.getElementById('ai-feedback-box').style.borderColor = '#C00000';
-      state.openEvaluated = true;
-      btn.textContent = 'Nächste Frage →';
-      btn.disabled = false;
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = '🤖 KI bewertet…';
-
     let aiResult = null;
     try {
-      aiResult = await evaluateWithAI(q.q, val, q.answer);
+      aiResult = await evaluateWithAI(q.q, val || '(keine Antwort)', q.answer);
     } catch(e) {
       aiResult = { got: 0, total: '?', ok: false, missing: 'Bewertung fehlgeschlagen – bitte selbst vergleichen.' };
     }
@@ -1455,39 +1429,39 @@ async function nextQuestion() {
     const color = isCorrect ? '#375623' : '#C00000';
     const bgColor = isCorrect ? '#E2EFDA' : '#FCE4D6';
     const icon = isCorrect ? '✅' : '❌';
-    const scoreLabel = isCorrect ? 'Gut gemacht!' : 'Noch nicht vollständig';
+    const scoreLabel = (typeof aiResult.total === 'number')
+      ? `${aiResult.got} / ${aiResult.total} Kernpunkte`
+      : 'Bewertung';
 
     // Build correct/missing point lists
     const correctList = Array.isArray(aiResult.correct_points) && aiResult.correct_points.length > 0
       ? aiResult.correct_points.map(p => `<li style="margin:3px 0;">✅ ${p}</li>`).join('')
-      : '';
-    // If ok=true, never show missing points regardless of what AI returned
-    const rawMissing = (!isCorrect && Array.isArray(aiResult.missing)) ? aiResult.missing : [];
-    const missingList = rawMissing.length > 0
-      ? rawMissing.map(p => `<li style="margin:3px 0;">❌ ${p}</li>`).join('')
-      : '';
-    const allCorrect = isCorrect || missingList === '';
+      : (aiResult.got > 0 ? `<li style="margin:3px 0;">✅ ${aiResult.got} Punkt(e) erkannt</li>` : '');
+    const missingList = Array.isArray(aiResult.missing) && aiResult.missing.length > 0
+      ? aiResult.missing.map(p => `<li style="margin:3px 0;">❌ ${p}</li>`).join('')
+      : (typeof aiResult.missing === 'string' && aiResult.missing !== 'Alle Kernpunkte getroffen!'
+          ? `<li style="margin:3px 0;">❌ ${aiResult.missing}</li>` : '');
+    const allCorrect = missingList === '';
 
     document.getElementById('ai-feedback-content').innerHTML = `
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
         <span style="font-size:1.5rem;">${icon}</span>
         <span style="font-weight:bold; color:${color}; font-size:1.05rem;">KI-Bewertung: ${scoreLabel}</span>
+        ${pct !== null ? `<span style="background:${bgColor}; color:${color}; border-radius:20px; padding:3px 12px; font-size:0.85rem; font-weight:bold;">${pct}%</span>` : ''}
       </div>
-      <div style="display:grid; grid-template-columns: ${allCorrect ? '1fr' : '1fr 1fr'}; gap:12px; font-size:0.88rem;">
-        ${correctList ? `<div style="background:#E2EFDA; border-radius:8px; padding:12px;">
-          <div style="font-weight:bold; color:#375623; margin-bottom:6px;">✓ Das hast du richtig</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:0.88rem;">
+        <div style="background:#E2EFDA; border-radius:8px; padding:12px;">
+          <div style="font-weight:bold; color:#375623; margin-bottom:6px;">✓ Richtige Punkte</div>
           <ul style="list-style:none; padding:0; margin:0; color:#2a4a1e; line-height:1.5;">
-            ${correctList}
-            ${allCorrect ? '<li style="margin-top:6px; color:#375623; font-style:italic; font-weight:bold;">🎉 Alles Wesentliche getroffen!</li>' : ''}
+            ${correctList || '<li style="color:#888; font-style:italic;">Keine erkannt</li>'}
           </ul>
-        </div>` : ''}
-        ${!allCorrect ? `
+        </div>
         <div style="background:#FCE4D6; border-radius:8px; padding:12px;">
-          <div style="font-weight:bold; color:#C00000; margin-bottom:6px;">✗ Das fehlt noch</div>
+          <div style="font-weight:bold; color:#C00000; margin-bottom:6px;">✗ Fehlende Punkte</div>
           <ul style="list-style:none; padding:0; margin:0; color:#7a1a00; line-height:1.5;">
-            ${missingList}
+            ${allCorrect ? '<li style="color:#375623; font-style:italic;">Alle Kernpunkte getroffen! 🎉</li>' : missingList}
           </ul>
-        </div>` : ''}
+        </div>
       </div>`;
 
     document.getElementById('ai-feedback-box').style.display = 'block';
