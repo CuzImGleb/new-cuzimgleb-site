@@ -1164,7 +1164,7 @@ function updateStartBtn() {
   }
   btn.disabled = false;
   if (hasPart4) {
-    countEl.textContent = total + ' Fragen · Lernmodus (Fragenkatalog enthält nur offene Fragen)';
+    countEl.textContent = total + ' Fragen · Lernmodus';
   } else if (state.mode === 'learn') {
     countEl.textContent = total + ' Fragen';
   } else {
@@ -1313,14 +1313,16 @@ ${userAnswer}
 Bewertungsregeln:
 - Sinngemäß richtige Antworten zählen als korrekt, auch wenn anders formuliert als die Musterlösung
 - Auch inhaltlich korrekte Punkte die NICHT in der Musterlösung stehen, aber zur Frage passen, dürfen als korrekt gewertet werden
-- Vage oder bedeutungslose Antworten zählen NICHT (z.B. "Nett" ist kein Vorteil der Teamarbeit)
-- Identifiziere für jeden genannten Schülerpunkt ob er korrekt ist, und liste alle fehlenden Kernpunkte auf
+- Stichwortartige oder kompakte Antworten die das Kernwissen klar zeigen (z.B. "LOB > Kritik > Ermutigung") zählen genauso wie ausformulierte Antworten
+- Nur wirklich vage oder bedeutungslose Aussagen zählen NICHT (z.B. "Nett", "Gut", "Wichtig" ohne Kontext)
+- Sei großzügig: Im Zweifel lieber einen Punkt geben als nicht
+- WICHTIG: Wenn ein Schülerpunkt als korrekt gewertet wurde, darf der gleiche oder inhaltlich überschneidende Punkt NICHT gleichzeitig als fehlend gelistet werden. Richtig und Fehlend dürfen sich niemals inhaltlich überschneiden.
 
 Antworte NUR als JSON in exakt diesem Format (kein Markdown, keine Erklärung drumherum):
 {
   "got": <Anzahl erfüllter Kernpunkte als Zahl>,
   "total": <Gesamtanzahl geforderter Kernpunkte laut Frage als Zahl>,
-  "ok": <true wenn got >= total*0.5, sonst false>,
+  "ok": <true wenn got >= total*0.33, sonst false>,
   "correct_points": ["<korrekt erkannter Punkt 1>", "<korrekt erkannter Punkt 2>"],
   "missing": ["<fehlender Kernpunkt 1>", "<fehlender Kernpunkt 2>"]
 }`;
