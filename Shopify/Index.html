@@ -1577,6 +1577,74 @@
     .cat-grid { grid-template-columns: repeat(2, 1fr); }
     .evp-stats { grid-template-columns: 1fr 1fr; }
   }
+
+  /* ── TREND TOOLTIP ── */
+  .trend-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: help;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .trend-row:hover { background: rgba(255,255,255,0.07); }
+
+  .trend-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #1e1e2e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    z-index: 999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+  .trend-row:hover .trend-tooltip,
+  .trend-row.tooltip-open .trend-tooltip {
+    display: block;
+    animation: fadeIn 0.15s ease;
+  }
+  .trend-tooltip-title {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 8px;
+  }
+  .trend-tooltip-row {
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    align-items: baseline;
+    gap: 6px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .trend-tooltip-row:last-child { border-bottom: none; }
+  .trend-tooltip-row .tt-cond { color: var(--muted); }
+  .trend-tooltip-row .tt-result { white-space: nowrap; font-weight: 700; }
+  .trend-tooltip-note {
+    margin-top: 8px;
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    opacity: 0.6;
+    line-height: 1.5;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 8px;
+  }
 </style>
 </head>
 <body>
@@ -3197,9 +3265,17 @@
             <div style="font-size:15px;font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">€${(result.market_max||0).toFixed(2)}</div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:8px;">
-          <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Preistrend <span style="opacity:0.5;font-size:9px;">(Schätzung)</span></span>
+        <div class="trend-row" id="trendRow" onclick="this.classList.toggle('tooltip-open')">
+          <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Preistrend <span style="opacity:0.5;font-size:9px;">(Schätzung) ⓘ</span></span>
           <span style="font-size:12px;font-weight:700;color:${trendColor};font-family:'DM Mono',monospace;">${trendIcon} ${result.trend.charAt(0).toUpperCase() + result.trend.slice(1)}</span>
+          <div class="trend-tooltip">
+            <div class="trend-tooltip-title">Wie wird der Trend berechnet?</div>
+            <div class="trend-tooltip-row"><span>📉</span><span class="tt-cond">≥50% der Anbieter nahe MIN-Preis + Spread &gt;20%</span><span class="tt-result" style="color:var(--red)">Fallend</span></div>
+            <div class="trend-tooltip-row"><span>📉</span><span class="tt-cond">Extreme Preisspanne &gt;50% (starker Preiskampf)</span><span class="tt-result" style="color:var(--red)">Fallend</span></div>
+            <div class="trend-tooltip-row"><span>➡️</span><span class="tt-cond">Enge Preisspanne &lt;15% (Markt eingespielt)</span><span class="tt-result" style="color:var(--warn)">Stabil</span></div>
+            <div class="trend-tooltip-row"><span>📈</span><span class="tt-cond">Wenige Anbieter nahe MIN, mittlerer Spread</span><span class="tt-result" style="color:var(--green)">Steigend</span></div>
+            <div class="trend-tooltip-note">⚠️ Kein echter Preisverlauf — nur Momentaufnahme der aktuellen Preisstruktur. Für echte Trends Idealo-Preisverlauf nutzen.</div>
+          </div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;"><span style="color:var(--green);font-size:8px;">●</span> MIN = günstigster Anbieter</div>
@@ -3334,6 +3410,14 @@
   // INIT
   // ═══════════════════════════════════════════
   updateTx();
+
+  // Trend-Tooltip: beim Klick außerhalb schließen (Mobile)
+  document.addEventListener('click', function(e) {
+    const row = document.getElementById('trendRow');
+    if (row && !row.contains(e.target)) {
+      row.classList.remove('tooltip-open');
+    }
+  });
 </script>
 </body>
 </html>
