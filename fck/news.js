@@ -68,7 +68,7 @@ async function loadNews() {
   try {
     const items = (await fetchRSSItems())
       .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
-      .slice(0, 6);
+      .slice(0, 8);
 
     if (!items.length) {
       container.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Keine News gefunden.</div>';
