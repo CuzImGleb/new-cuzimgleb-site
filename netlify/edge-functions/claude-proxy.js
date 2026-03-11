@@ -31,7 +31,7 @@ export default async function handler(request, context) {
     const incoming = await request.json();
     const { productName, marketLabel, baseCosts, aiFeePercent, aiFeeFixed, aiVatRate, targetMargin } = incoming;
 
-    // ── Step 1: Web search for REAL current prices ──
+    // ── Step 1: Web search – max_tokens niedrig halten ──
     const searchResp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -40,24 +40,27 @@ export default async function handler(request, context) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        system: 'Du bist ein Preisrecherche-Assistent für deutsche Online-Shops. Suche immer auf Idealo.de, Amazon.de, MediaMarkt.de und Saturn.de nach aktuellen Preisen.',
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 800,
+        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }],
+        system: 'Suche Preise auf deutschen Shops. Antworte kurz: nur Produktname, Preise und Quellen. Maximal 300 Wörter.',
         messages: [{
           role: 'user',
-          content: `Suche aktuelle Verkaufspreise für "${productName}" auf deutschen Online-Shops. Suche auf idealo.de, amazon.de, mediamarkt.de und saturn.de. Nenne konkrete Preise mit Quelle.`
+          content: `Aktuelle Preise für "${productName}" auf idealo.de und amazon.de. Nur Preise und Quellen, kein Fließtext.`
         }]
       }),
     });
 
     const searchData = await searchResp.json();
+
+    // Nur Text-Blöcke, auf 1500 Zeichen kürzen
     const searchText = (searchData.content || [])
       .filter(b => b.type === 'text')
       .map(b => b.text)
-      .join('\n');
+      .join('\n')
+      .slice(0, 1500);
 
-    // ── Step 2: Structure into JSON ──
+    // ── Step 2: JSON strukturieren ──
     const structResp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -66,18 +69,17 @@ export default async function handler(request, context) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        system: 'Du bist ein JSON-only Assistent. Antworte AUSSCHLIESSLICH mit einem validen JSON-Objekt. Kein Text, kein Markdown.',
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1024,
+        system: 'JSON-only. Kein Text, kein Markdown.',
         messages: [{
           role: 'user',
-          content: `Suchergebnisse für "${productName}":
-${searchText}
+          content: `Preisdaten: ${searchText}
 
-Meine Kalkulation: Netto-Kosten €${baseCosts}, Fee ${aiFeePercent}%+€${aiFeeFixed}, MwSt ${aiVatRate}%, Zielmarge ${Math.round(targetMargin*100)}%
+Produkt: "${productName}" | Kosten: €${baseCosts} | Fee: ${aiFeePercent}%+€${aiFeeFixed} | MwSt: ${aiVatRate}% | Zielmarge: ${Math.round(targetMargin*100)}%
 
-Erstelle JSON mit den echten gefundenen Preisen. Falls ein Shop nicht gefunden: Preis weglassen (0.00).
-{"product_found":true,"product_name":"VOLLER NAME","competitors":[{"source":"Amazon.de","price":0.00,"note":""},{"source":"Idealo günstigster","price":0.00,"note":"Bestpreis"},{"source":"MediaMarkt","price":0.00,"note":""},{"source":"Saturn","price":0.00,"note":""},{"source":"Otto","price":0.00,"note":""}],"market_min":0.00,"market_max":0.00,"market_avg":0.00,"recommended_evp":0.00,"evp_strategy":"competitive","analysis":"Marktlage in 2-3 Sätzen","risks":"Risiken in 1-2 Sätzen","trend":"stabil"}`
+JSON mit echten Preisen aus den Daten (0.00 wenn nicht gefunden):
+{"product_found":true,"product_name":"NAME","competitors":[{"source":"Amazon.de","price":0.00,"note":""},{"source":"Idealo günstigster","price":0.00,"note":""},{"source":"MediaMarkt","price":0.00,"note":""},{"source":"Saturn","price":0.00,"note":""},{"source":"Otto","price":0.00,"note":""}],"market_min":0.00,"market_max":0.00,"market_avg":0.00,"recommended_evp":0.00,"evp_strategy":"competitive","analysis":"Kurz","risks":"Kurz","trend":"stabil"}`
         }]
       }),
     });
