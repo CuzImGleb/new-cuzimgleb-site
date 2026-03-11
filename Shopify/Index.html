@@ -3063,27 +3063,10 @@
     const grid = document.getElementById('aiCompPriceGrid');
     grid.innerHTML = '';
     const sortedComps = [...(result.competitors || [])].sort((a, b) => a.price - b.price);
-    // Map source names to search URLs
-    function getSourceUrl(source, productName) {
-      const q = encodeURIComponent(productName);
-      const s = source.toLowerCase();
-      if (s.includes('amazon'))     return `https://www.amazon.de/s?k=${q}`;
-      if (s.includes('idealo'))     return `https://www.idealo.de/preisvergleich/MainSearchProductCategory.html?q=${q}`;
-      if (s.includes('mediamarkt')) return `https://www.mediamarkt.de/de/search.html?query=${q}`;
-      if (s.includes('saturn'))     return `https://www.saturn.de/de/search.html?query=${q}`;
-      if (s.includes('otto'))       return `https://www.otto.de/suche/${q}/`;
-      if (s.includes('ebay'))       return `https://www.ebay.de/sch/i.html?_nkw=${q}`;
-      if (s.includes('conrad'))     return `https://www.conrad.de/de/search.html?search=${q}`;
-      if (s.includes('notebooksbilliger') || s.includes('nbb')) return `https://www.notebooksbilliger.de/suche?q=${q}`;
-      if (s.includes('cyberport'))  return `https://www.cyberport.de/suche/?q=${q}`;
-      if (s.includes('alternate'))  return `https://www.alternate.de/search?query=${q}`;
-      if (s.includes('real'))       return `https://www.real.de/search/?searchterm=${q}`;
-      // Generic Google Shopping fallback
-      return `https://www.google.de/search?q=${q}+${encodeURIComponent(source)}+preis`;
-    }
-
     sortedComps.forEach((c, i) => {
-      const url = getSourceUrl(c.source, result.product_name || '');
+      // Direkte URL vom Scraper (Idealo/Geizhals Redirect) — Fallback: Google Shopping
+      const q = encodeURIComponent(result.product_name || '');
+      const url = c.url || `https://www.google.de/search?q=${q}+${encodeURIComponent(c.source)}+preis`;
       const el = document.createElement('a');
       el.href = url;
       el.target = '_blank';
