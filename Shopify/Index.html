@@ -2967,7 +2967,7 @@
       result.competitors     = Array.isArray(result.competitors) ? result.competitors : [];
       result.competitors     = result.competitors
         .filter(c => c && parseFloat(c.price) > 0)
-        .map(c => ({ source: String(c.source || '?'), price: parseFloat(c.price), note: String(c.note || '') }));
+        .map(c => ({ source: String(c.source || '?'), price: parseFloat(c.price), note: String(c.note || ''), url: String(c.url || '') }));
       result.market_min      = parseFloat(result.market_min)      || 0;
       result.market_max      = parseFloat(result.market_max)      || 0;
       result.market_avg      = parseFloat(result.market_avg)      || 0;
