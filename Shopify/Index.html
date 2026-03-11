@@ -2052,9 +2052,10 @@
             <div class="ai-step-icon">2</div>
             <div class="ai-step-body">
               <div class="ai-step-label">Marktpreise suchen</div>
-              <div class="ai-step-desc" id="aiShopStatusDesc">Bing Shopping wird durchsucht<span class="ai-thinking-dots"></span></div>
+              <div class="ai-step-desc" id="aiShopStatusDesc">Idealo &amp; Geizhals werden durchsucht<span class="ai-thinking-dots"></span></div>
               <div class="ai-shop-list" id="aiShopList">
-                <div class="ai-shop-item pending" id="shop-google"><span class="shop-icon">🔍</span><span class="shop-name">Bing Shopping</span><span class="shop-result"></span></div>
+                <div class="ai-shop-item pending" id="shop-idealo"><span class="shop-icon">🔍</span><span class="shop-name">Idealo.de</span><span class="shop-result"></span></div>
+                <div class="ai-shop-item pending" id="shop-geizhals"><span class="shop-icon">🔍</span><span class="shop-name">Geizhals.de</span><span class="shop-result"></span></div>
               </div>
             </div>
             <div class="ai-step-time" id="aisteptime1"></div>
@@ -2853,15 +2854,18 @@
       const SCRAPER_API = (window.SCRAPER_API_URL || '').replace(/\/$/, '');
       if (!SCRAPER_API) throw new Error('SCRAPER_API_URL nicht gesetzt.');
 
-      // ── Single Bing Shopping request ──
+      // ── Idealo + Geizhals request ──
       const aiShopList = document.getElementById('aiShopList');
-      const googleChip = document.getElementById('shop-google');
+      const idealoChip = document.getElementById('shop-idealo');
+      const geizhalsChip = document.getElementById('shop-geizhals');
       aiShopList.style.display = 'flex';
 
-      // Mark Google chip as active
-      googleChip.className = 'ai-shop-item active';
-      googleChip.querySelector('.shop-icon').textContent = '⟳';
-      document.getElementById('aiShopStatusDesc').innerHTML = 'Bing Shopping wird durchsucht<span class="ai-thinking-dots"></span>';
+      // Mark both chips as active
+      idealoChip.className = 'ai-shop-item active';
+      idealoChip.querySelector('.shop-icon').textContent = '⟳';
+      geizhalsChip.className = 'ai-shop-item active';
+      geizhalsChip.querySelector('.shop-icon').textContent = '⟳';
+      document.getElementById('aiShopStatusDesc').innerHTML = 'Idealo &amp; Geizhals werden durchsucht<span class="ai-thinking-dots"></span>';
 
       const FETCH_URL = `${SCRAPER_API}/api/prices`;
       console.log('[Scraper] URL:', FETCH_URL, '| Produkt:', productName);
@@ -2882,25 +2886,47 @@
         console.log('[Scraper] data:', scraperData);
         if (!r.ok) throw new Error(scraperData?.error || `HTTP ${r.status}`);
       } catch (e) {
-        googleChip.className = 'ai-shop-item done-empty';
-        googleChip.querySelector('.shop-icon').textContent = '✗';
-        googleChip.querySelector('.shop-result').textContent = e.name === 'AbortError' ? 'Timeout' : e.message;
+        idealoChip.className = 'ai-shop-item done-empty';
+        idealoChip.querySelector('.shop-icon').textContent = '✗';
+        idealoChip.querySelector('.shop-result').textContent = e.name === 'AbortError' ? 'Timeout' : e.message;
+        geizhalsChip.className = 'ai-shop-item done-empty';
+        geizhalsChip.querySelector('.shop-icon').textContent = '✗';
+        geizhalsChip.querySelector('.shop-result').textContent = e.name === 'AbortError' ? 'Timeout' : '';
         throw new Error(`Scraper Fehler: ${e.message}`);
       }
 
       const competitors = scraperData.competitors || [];
       const validPrices = competitors.filter(c => c.price > 0).map(c => c.price);
 
-      // Update Google chip to done
-      googleChip.className = 'ai-shop-item done-found';
-      googleChip.querySelector('.shop-icon').textContent = '✓';
-      googleChip.querySelector('.shop-result').textContent = `${validPrices.length} Shops`;
+      // Zähle Ergebnisse pro Quelle
+      const idealoCount = competitors.filter(c => c.price > 0 && c.via === 'Idealo').length;
+      const geizhalsCount = competitors.filter(c => c.price > 0 && c.via === 'Geizhals').length;
+
+      // Update Idealo chip
+      idealoChip.className = idealoCount > 0 ? 'ai-shop-item done-found' : 'ai-shop-item done-empty';
+      idealoChip.querySelector('.shop-icon').textContent = idealoCount > 0 ? '✓' : '○';
+      idealoChip.querySelector('.shop-result').textContent = idealoCount > 0 ? `${idealoCount} Shops` : 'keine';
+      if (scraperData.idealo_product_url && idealoCount > 0) {
+        idealoChip.style.cursor = 'pointer';
+        idealoChip.title = 'Auf Idealo öffnen';
+        idealoChip.onclick = () => window.open(scraperData.idealo_product_url, '_blank');
+      }
+
+      // Update Geizhals chip
+      geizhalsChip.className = geizhalsCount > 0 ? 'ai-shop-item done-found' : 'ai-shop-item done-empty';
+      geizhalsChip.querySelector('.shop-icon').textContent = geizhalsCount > 0 ? '✓' : '○';
+      geizhalsChip.querySelector('.shop-result').textContent = geizhalsCount > 0 ? `${geizhalsCount} Shops` : 'keine';
 
       // Render found shops as chips
       competitors.filter(c => c.price > 0).forEach(c => {
         const chip = document.createElement('div');
         chip.className = 'ai-shop-item done-found';
         chip.innerHTML = `<span class="shop-icon">🛒</span><span class="shop-name">${c.source}</span><span class="shop-result">€${c.price.toFixed(2)}</span>`;
+        if (c.url) {
+          chip.style.cursor = 'pointer';
+          chip.title = `${c.source} öffnen`;
+          chip.onclick = () => window.open(c.url, '_blank');
+        }
         aiShopList.appendChild(chip);
       });
 
@@ -2917,7 +2943,7 @@
         market_avg: scraperData.market_avg || 0,
         recommended_evp: scraperData.market_avg || 0,
         evp_strategy: 'competitive',
-        analysis: `Bing Shopping Daten von ${validPrices.length} Shops. Günstigster: €${(scraperData.market_min||0).toFixed(2)}, Durchschnitt: €${(scraperData.market_avg||0).toFixed(2)}.`,
+        analysis: `Idealo & Geizhals Daten von ${validPrices.length} Shops. Günstigster: €${(scraperData.market_min||0).toFixed(2)}, Durchschnitt: €${(scraperData.market_avg||0).toFixed(2)}.`,
         risks: 'Preise ändern sich täglich – regelmäßige Überprüfung empfohlen.',
         trend: 'stabil',
       });
