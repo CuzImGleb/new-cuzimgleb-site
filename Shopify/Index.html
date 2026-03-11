@@ -1001,6 +1001,60 @@
 
   /* AI Loading */
   /* ── LOADING PROGRESS ── */
+  /* ── SHOP STATUS LIST (in loading step 2) ── */
+  .ai-shop-list {
+    display: none;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .ai-shop-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+
+  .ai-shop-item .shop-icon { font-size: 12px; }
+  .ai-shop-item .shop-result { margin-left: 2px; font-weight: 700; }
+
+  .ai-shop-item.pending { opacity: 0.45; }
+
+  .ai-shop-item.active {
+    border-color: var(--ai);
+    color: var(--ai);
+    background: rgba(167,139,250,0.12);
+    box-shadow: 0 0 10px rgba(167,139,250,0.2);
+    animation: shopPulse 1.2s ease-in-out infinite;
+  }
+
+  .ai-shop-item.done-found {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(0,229,160,0.08);
+  }
+
+  .ai-shop-item.done-empty {
+    border-color: var(--border);
+    color: var(--muted);
+    opacity: 0.45;
+    text-decoration: line-through;
+  }
+
+  @keyframes shopPulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(167,139,250,0.2); }
+    50% { box-shadow: 0 0 16px rgba(167,139,250,0.5); }
+  }
+
   .ai-loading {
     display: none;
     flex-direction: column;
@@ -1998,7 +2052,14 @@
             <div class="ai-step-icon">2</div>
             <div class="ai-step-body">
               <div class="ai-step-label">Marktpreise suchen</div>
-              <div class="ai-step-desc">Idealo, Amazon, Geizhals, Preisvergleich.de<span class="ai-thinking-dots"></span></div>
+              <div class="ai-step-desc" id="aiShopStatusDesc">Idealo, Amazon, Geizhals, MediaMarkt, Saturn<span class="ai-thinking-dots"></span></div>
+              <div class="ai-shop-list" id="aiShopList">
+                <div class="ai-shop-item pending" id="shop-Idealo"><span class="shop-icon">🛒</span><span class="shop-name">Idealo</span><span class="shop-result"></span></div>
+                <div class="ai-shop-item pending" id="shop-Geizhals"><span class="shop-icon">🛒</span><span class="shop-name">Geizhals</span><span class="shop-result"></span></div>
+                <div class="ai-shop-item pending" id="shop-Amazonde"><span class="shop-icon">🛒</span><span class="shop-name">Amazon.de</span><span class="shop-result"></span></div>
+                <div class="ai-shop-item pending" id="shop-MediaMarkt"><span class="shop-icon">🛒</span><span class="shop-name">MediaMarkt</span><span class="shop-result"></span></div>
+                <div class="ai-shop-item pending" id="shop-Saturn"><span class="shop-icon">🛒</span><span class="shop-name">Saturn</span><span class="shop-result"></span></div>
+              </div>
             </div>
             <div class="ai-step-time" id="aisteptime1"></div>
           </div>
@@ -2796,18 +2857,79 @@
       const SCRAPER_API = (window.SCRAPER_API_URL || '').replace(/\/$/, '');
       if (!SCRAPER_API) throw new Error('SCRAPER_API_URL nicht gesetzt.');
 
-      let scraperData;
-      try {
-        const r = await fetch(`${SCRAPER_API}/api/prices`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: productName }),
-        });
-        scraperData = await r.json();
-        if (!r.ok) throw new Error(scraperData?.error || `HTTP ${r.status}`);
-      } catch (e) {
-        throw new Error(`Scraper API Fehler: ${e.message}`);
+      // ── Show shop list ──
+      document.getElementById('aiShopList').style.display = 'flex';
+      document.getElementById('aiShopStatusDesc').innerHTML = 'Scrappe Shops live<span class="ai-thinking-dots"></span>';
+
+      const SHOPS = [
+        { id: 'Idealo',     label: 'Idealo',      domId: 'shop-Idealo'     },
+        { id: 'Geizhals',   label: 'Geizhals',    domId: 'shop-Geizhals'   },
+        { id: 'Amazon.de',  label: 'Amazon.de',   domId: 'shop-Amazonde'   },
+        { id: 'MediaMarkt', label: 'MediaMarkt',  domId: 'shop-MediaMarkt' },
+        { id: 'Saturn',     label: 'Saturn',      domId: 'shop-Saturn'     },
+      ];
+
+      function setShopState(domId, state, resultText) {
+        const el = document.getElementById(domId);
+        if (!el) return;
+        el.className = 'ai-shop-item ' + state;
+        const iconEl = el.querySelector('.shop-icon');
+        const resultEl = el.querySelector('.shop-result');
+        if (iconEl) {
+          iconEl.textContent = state === 'active' ? '⟳' : state === 'done-found' ? '✓' : state === 'done-empty' ? '✗' : '🛒';
+        }
+        if (resultEl && resultText !== undefined) resultEl.textContent = resultText;
       }
+
+      const collectedCompetitors = [];
+      let productNameFromScrape = productName;
+
+      for (const shop of SHOPS) {
+        setShopState(shop.domId, 'active', '');
+        document.getElementById('aiLoadingStatus').textContent = `Scrappe ${shop.label}...`;
+        try {
+          const r = await fetch(`${SCRAPER_API}/api/prices`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: productName, source: shop.id }),
+          });
+          const data = await r.json();
+          const results = data.results || [];
+          if (results.length > 0) {
+            const best = results[0];
+            if (!productNameFromScrape || productNameFromScrape === productName) {
+              productNameFromScrape = data.product_name || productName;
+            }
+            collectedCompetitors.push({
+              source: shop.id,
+              price: best.price,
+              note: results.length > 1 ? `${results.length} Angebote` : '',
+              url: best.url || '',
+            });
+            setShopState(shop.domId, 'done-found', `€${best.price.toFixed(2)}`);
+          } else {
+            collectedCompetitors.push({ source: shop.id, price: 0, note: 'nicht gefunden', url: '' });
+            setShopState(shop.domId, 'done-empty', '–');
+          }
+        } catch (e) {
+          collectedCompetitors.push({ source: shop.id, price: 0, note: 'Fehler', url: '' });
+          setShopState(shop.domId, 'done-empty', '–');
+        }
+      }
+
+      // Build scraperData from collected results
+      const validPrices = collectedCompetitors.filter(c => c.price > 0).map(c => c.price);
+      const scraperData = {
+        query: productName,
+        product_name: productNameFromScrape,
+        product_found: validPrices.length > 0,
+        competitors: collectedCompetitors,
+        market_min: validPrices.length ? Math.min(...validPrices) : 0,
+        market_max: validPrices.length ? Math.max(...validPrices) : 0,
+        market_avg: validPrices.length ? Math.round(validPrices.reduce((a, b) => a + b, 0) / validPrices.length * 100) / 100 : 0,
+      };
+
+      document.getElementById('aiLoadingStatus').textContent = `${validPrices.length} Preise gefunden — analysiere...`;
 
       rawJson = JSON.stringify({
         product_found: scraperData.product_found !== false,
