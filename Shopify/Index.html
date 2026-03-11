@@ -2941,7 +2941,26 @@
         evp_strategy: 'competitive',
         analysis: `Idealo & Geizhals Daten von ${validPrices.length} Shops. Günstigster: €${(scraperData.market_min||0).toFixed(2)}, Durchschnitt: €${(scraperData.market_avg||0).toFixed(2)}.`,
         risks: 'Preise ändern sich täglich – regelmäßige Überprüfung empfohlen.',
-        trend: 'stabil',
+        trend: (() => {
+          // Heuristik aus aktueller Preisstruktur (kein Verlauf verfügbar)
+          const prices = validPrices.slice().sort((a, b) => a - b);
+          if (prices.length < 2) return 'stabil';
+          const min = prices[0];
+          const max = prices[prices.length - 1];
+          const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+          const spread = (max - min) / avg;            // rel. Preisspanne
+          const lowCluster = prices.filter(p => p <= min * 1.05).length;
+          const lowShare = lowCluster / prices.length; // Anteil nahe Tiefstkurs
+          // Viele nahe MIN + großer Spread → Preiskampf → fallend
+          if (lowShare >= 0.5 && spread > 0.2) return 'fallend';
+          // Extremer Spread → Druck nach unten → fallend
+          if (spread > 0.5) return 'fallend';
+          // Enger Markt → stabil
+          if (spread < 0.15) return 'stabil';
+          // Wenige nahe MIN, mittlerer Spread → Preisniveau hoch → steigend
+          if (lowShare <= 0.2 && spread >= 0.15) return 'steigend';
+          return 'stabil';
+        })(),
       });
 
       // Strip any accidental markdown fences
@@ -3179,7 +3198,7 @@
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:8px;">
-          <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Preistrend</span>
+          <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Preistrend <span style="opacity:0.5;font-size:9px;">(Schätzung)</span></span>
           <span style="font-size:12px;font-weight:700;color:${trendColor};font-family:'DM Mono',monospace;">${trendIcon} ${result.trend.charAt(0).toUpperCase() + result.trend.slice(1)}</span>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
