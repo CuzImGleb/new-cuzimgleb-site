@@ -2786,21 +2786,47 @@
       // Step 1: Market research via model knowledge
       setStep(1);
 
-      const reqPrompt = `Marktpreisanalyse: "${productName}" (${marketLabel})
-Kosten netto: €${baseCosts.toFixed(2)} | Fee: ${aiFeePercent}%+€${aiFeeFixed.toFixed(2)} | MwSt: ${aiVatRate}% | Zielmarge: ${(targetMargin*100).toFixed(0)}%
+      const reqPrompt = `Produkt: "${productName}"
+Markt: ${marketLabel}
+Meine Netto-Gesamtkosten: €${baseCosts.toFixed(2)} | Shopify-Fee: ${aiFeePercent}%+€${aiFeeFixed.toFixed(2)} | MwSt: ${aiVatRate}% | Zielmarge: ${(targetMargin*100).toFixed(0)}%
 
-Antworte NUR mit JSON, absolut kein Text davor oder danach:
-{"product_found":true,"product_name":"NAME","competitors":[{"source":"Amazon.de","price":0.00,"note":""},{"source":"MediaMarkt","price":0.00,"note":""},{"source":"Saturn","price":0.00,"note":""},{"source":"Idealo","price":0.00,"note":""},{"source":"Otto","price":0.00,"note":""}],"market_min":0.00,"market_max":0.00,"market_avg":0.00,"recommended_evp":0.00,"evp_strategy":"match","analysis":"Marktbewertung","risks":"Risiken","trend":"stabil"}
+Recherchiere den aktuellen deutschen Marktpreis für GENAU dieses Produkt/Modell.
+Falls es eine Modellnummer ist: Erkenne das vollständige Produkt und nutze bekannte Preise.
+Gib realistische Preise an – keine Phantasiezahlen.
 
-Zahlen als number. Falls unbekannt: product_found=false, Kategorie-Schätzung.`;
+Antworte NUR mit diesem JSON (alle Preise als Zahlen, kein String, kein Text drumherum):
+{
+  "product_found": true,
+  "product_name": "VOLLSTÄNDIGER OFFIZIELLER PRODUKTNAME",
+  "competitors": [
+    {"source": "Amazon.de", "price": 0.00, "note": "Prime / Verkäufer"},
+    {"source": "Idealo günstigster", "price": 0.00, "note": "Bestpreis"},
+    {"source": "MediaMarkt", "price": 0.00, "note": ""},
+    {"source": "Saturn", "price": 0.00, "note": ""},
+    {"source": "Otto", "price": 0.00, "note": ""}
+  ],
+  "market_min": 0.00,
+  "market_max": 0.00,
+  "market_avg": 0.00,
+  "recommended_evp": 0.00,
+  "evp_strategy": "competitive",
+  "analysis": "2-3 Sätze: Marktlage, typischer Preis, Wettbewerb",
+  "risks": "1-2 Sätze: Hauptrisiken beim Verkauf",
+  "trend": "stabil"
+}
+
+Wenn Produkt wirklich unbekannt: product_found=false, aber trotzdem sinnvolle Kategorie-Schätzpreise.`;
 
       document.getElementById('aiLoadingStatus').textContent = 'Verbinde mit Server...';
 
       const reqBody = JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        system: 'Du bist ein JSON-only Assistent. Antworte IMMER ausschließlich mit einem validen JSON-Objekt. Niemals Markdown, niemals Text davor oder danach.',
-        messages: [{ role: 'user', content: reqPrompt }]
+        productName,
+        marketLabel,
+        baseCosts,
+        aiFeePercent,
+        aiFeeFixed,
+        aiVatRate,
+        targetMargin,
       });
 
       let data = null;
