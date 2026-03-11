@@ -2,8 +2,8 @@
    FCK Dashboard – news.js  |  2026 Rewrite
    =================================================== */
 
-const RSS_API = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://news.google.com/rss/search?q=1.+FC+Kaiserslautern&hl=de&gl=DE&ceid=DE:de')}`;
-const GNEWS_API = `https://gnews.io/api/v4/search?q=%221.%20FC%20Kaiserslautern%22&lang=de&country=de&sortby=publishedAt&apikey=3f09132026fd587878b0a048d922c2ee`;
+const RSS_API   = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://news.google.com/rss/search?q=1.+FC+Kaiserslautern&hl=de&gl=DE&ceid=DE:de')}`;
+const GNEWS_API = '/.netlify/functions/gnews'; // Netlify Function – kein CORS Problem
 
 function extractSource(title) {
   const parts = title.split(' - ');
@@ -34,28 +34,46 @@ function newsItemHTML(item, large = false) {
     </div>`;
 }
 
+async function fetchRSSItems() {
+  const res  = await fetch(RSS_API);
+  const data = await res.json();
+  if (!data?.items?.length) return [];
+  return data.items.map(item => ({
+    title:   item.title,
+    link:    item.link,
+    pubDate: item.pubDate,
+    source:  extractSource(item.title),
+    image:   item.enclosure?.link || null
+  }));
+}
+
+async function fetchGNewsItems() {
+  const res  = await fetch(GNEWS_API);
+  const data = await res.json();
+  if (!data?.articles?.length) return [];
+  return data.articles.map(a => ({
+    title:   a.title,
+    link:    a.url,
+    pubDate: a.publishedAt,
+    source:  a.source.name,
+    image:   a.image || null
+  }));
+}
+
 // ── Dashboard preview (index.html) ───────────────────
 async function loadNews() {
   const container = document.getElementById('news-list2');
   if (!container) return;
 
   try {
-    const res  = await fetch(RSS_API);
-    const data = await res.json();
-
-    if (!data?.items?.length) { container.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Keine News gefunden.</div>'; return; }
-
-    const items = data.items
+    const items = (await fetchRSSItems())
       .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
-      .slice(0, 6)
-      .map(item => ({
-        title:   item.title,
-        link:    item.link,
-        pubDate: item.pubDate,
-        source:  extractSource(item.title),
-        image:   item.enclosure?.link || null
-      }));
+      .slice(0, 6);
 
+    if (!items.length) {
+      container.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Keine News gefunden.</div>';
+      return;
+    }
     container.innerHTML = items.map(i => newsItemHTML(i)).join('');
   } catch (err) {
     console.error('News dashboard:', err);
@@ -69,36 +87,22 @@ async function loadFullNews() {
   if (!container) return;
 
   try {
-    const [rssRes, gnewsRes] = await Promise.allSettled([
-      fetch(RSS_API).then(r => r.json()),
-      fetch(GNEWS_API).then(r => r.json())
+    const [rssItems, gnewsItems] = await Promise.allSettled([
+      fetchRSSItems(),
+      fetchGNewsItems()
     ]);
 
-    const rssItems = rssRes.status === 'fulfilled'
-      ? (rssRes.value.items || []).map(item => ({
-          title:   item.title,
-          link:    item.link,
-          pubDate: item.pubDate,
-          source:  extractSource(item.title),
-          image:   null
-        }))
-      : [];
-
-    const gnewsItems = gnewsRes.status === 'fulfilled'
-      ? (gnewsRes.value.articles || []).map(a => ({
-          title:   a.title,
-          link:    a.url,
-          pubDate: a.publishedAt,
-          source:  a.source.name,
-          image:   a.image
-        }))
-      : [];
-
-    const all = [...rssItems, ...gnewsItems]
+    const all = [
+      ...(rssItems.status === 'fulfilled' ? rssItems.value : []),
+      ...(gnewsItems.status === 'fulfilled' ? gnewsItems.value : [])
+    ]
       .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
       .slice(0, 20);
 
-    if (!all.length) { container.innerHTML = '<div style="color:var(--muted);padding:16px">Keine News gefunden.</div>'; return; }
+    if (!all.length) {
+      container.innerHTML = '<div style="color:var(--muted);padding:16px">Keine News gefunden.</div>';
+      return;
+    }
 
     container.innerHTML = all.map((item, i) => {
       const el = document.createElement('div');
