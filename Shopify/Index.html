@@ -2885,23 +2885,25 @@
       let productNameFromScrape = productName;
 
       const FETCH_URL = `${SCRAPER_API}/api/prices`;
-      console.log(`[Scraper] API URL: ${FETCH_URL}`);
-      console.log(`[Scraper] Produkt: "${productName}"`);
+      console.log('[Scraper] URL:', FETCH_URL, '| Produkt:', productName);
 
       for (const shop of SHOPS) {
         setShopState(shop.domId, 'active', '');
         document.getElementById('aiLoadingStatus').textContent = `Scrappe ${shop.label}...`;
-        console.log(`[Scraper] → Starte Fetch: ${shop.id}`);
+        console.log(`[Scraper] → ${shop.id}`);
         try {
+          const ctrl = new AbortController();
+          const fetchTimer = setTimeout(() => ctrl.abort(), 25000);
           const r = await fetch(FETCH_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query: productName, source: shop.id }),
+            signal: ctrl.signal,
           });
+          clearTimeout(fetchTimer);
           console.log(`[Scraper] ← ${shop.id} HTTP ${r.status}`);
           const data = await r.json();
           console.log(`[Scraper] ← ${shop.id} data:`, data);
-          if (!r.ok) throw new Error(`HTTP ${r.status}: ${data?.error || 'Unbekannter Fehler'}`);
           const results = data.results || [];
           if (results.length > 0) {
             const best = results[0];
@@ -2920,12 +2922,10 @@
             setShopState(shop.domId, 'done-empty', '–');
           }
         } catch (e) {
-          console.error(`[Scraper] ✗ ${shop.id}:`, e.message);
-          collectedCompetitors.push({ source: shop.id, price: 0, note: `Fehler: ${e.message}`, url: '' });
-          setShopState(shop.domId, 'done-empty', '!');
-          if (!document.getElementById('aiLoadingStatus').textContent.includes('⚠')) {
-            document.getElementById('aiLoadingStatus').textContent = `⚠ ${shop.id}: ${e.message}`;
-          }
+          const safeNote = e.name === 'AbortError' ? 'Timeout' : 'Fehler';
+          console.error(`[Scraper] ✗ ${shop.id}: ${e.name} – ${e.message}`);
+          collectedCompetitors.push({ source: shop.id, price: 0, note: safeNote, url: '' });
+          setShopState(shop.domId, 'done-empty', e.name === 'AbortError' ? '⏱' : '✗');
         }
       }
 
@@ -2961,12 +2961,6 @@
 
       // Strip any accidental markdown fences
       rawJson = rawJson.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
-
-      // Fix double-encoded JSON
-      if (rawJson.includes('\\"')) {
-        rawJson = rawJson.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\\\/g, '\\');
-      }
-
       let result;
       try {
         result = JSON.parse(rawJson);
