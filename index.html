@@ -1,114 +1,211 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>CuzImGleb</title>
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:url" content="https://cuzimgleb.de">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="CuzImGleb.de - Portfolio">
-    <meta property="og:description" content="CuzImGleb Landing Page">
-    <meta property="og:image" content="https://cuzimgleb.de/logo.png">
-    <meta property="og:image:width" content="300">
-    <meta property="og:image:height" content="300">
-    <meta content="#3E4657" data-react-helmet="true" name="theme-color" />
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="cuzimgleb.de">
-    <meta property="twitter:url" content="https://cuzimgleb.de">
-    <meta name="twitter:title" content="CuzImGleb.de - Portfolio">
-    <meta name="twitter:description" content="CuzImGleb Landing Page">
-    <meta name="twitter:image" content="https://cuzimgleb.de/logo.png">
-
-    <link rel="icon" type="image/png" href="/content/tab-icons/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/content/tab-icons/favicon.svg" />
-    <link rel="shortcut icon" href="/content/tab-icons/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/content/tab-icons/apple-touch-icon.png" />
-    <link rel="manifest" href="/content/tab-icons/site.webmanifest" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="a3fdfe20-c56c-4cde-b748-42f58fc282f4" data-blockingmode="auto" type="text/javascript"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CuzImGleb — Portfolio</title>
+  <meta name="description" content="CuzImGleb – Reseller, Streamer & Coding-Enthusiast aus Kaiserslautern.">
+  <meta property="og:url" content="https://cuzimgleb.de">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="CuzImGleb — Portfolio">
+  <meta property="og:description" content="Reseller, Streamer & Coding-Enthusiast aus Kaiserslautern.">
+  <meta property="og:image" content="https://cuzimgleb.de/logo.png">
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="300">
+  <meta name="theme-color" content="#080810">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="cuzimgleb.de">
+  <meta name="twitter:title" content="CuzImGleb — Portfolio">
+  <meta name="twitter:description" content="Reseller, Streamer & Coding-Enthusiast aus Kaiserslautern.">
+  <meta name="twitter:image" content="https://cuzimgleb.de/logo.png">
+  <link rel="icon" type="image/png" href="/content/tab-icons/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/svg+xml" href="/content/tab-icons/favicon.svg">
+  <link rel="shortcut icon" href="/content/tab-icons/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/content/tab-icons/apple-touch-icon.png">
+  <link rel="manifest" href="/content/tab-icons/site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="a3fdfe20-c56c-4cde-b748-42f58fc282f4" data-blockingmode="auto" type="text/javascript"></script>
 </head>
-
 <body>
-    <div id="loader">
-        <div class="spinner"></div>
+
+  <!-- Loader -->
+  <div id="loader">
+    <div class="loader-inner">
+      <img src="logo.png" alt="Logo" class="loader-logo">
+      <div class="loader-bar"><div class="loader-progress"></div></div>
     </div>
-    <header class="header">
-        <div class="container">
-            <a href="#" class="logo">
-                <img src="logo.png" alt="CuzImGleb Logo">
+  </div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="#" class="logo" id="logoLink" aria-label="Home">
+        <img src="logo.png" alt="CuzImGleb Logo">
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="#">Home</a></li>
+          <li><a href="#about">Über mich</a></li>
+          <li><a href="#projects">Projekte</a></li>
+          <li><a href="https://status.cuzimgleb.de/" target="_blank" rel="noopener">Status</a></li>
+          <li class="nav-cta"><a href="mailto:info@cuzimgleb.de">Kontakt</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="noise"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Kaiserslautern, Deutschland
+      </div>
+      <div class="hero-title">
+        <span class="title-name">CuzImGleb</span>
+      </div>
+      <p class="hero-subtitle">Reseller &nbsp;&middot;&nbsp; Streamer &nbsp;&middot;&nbsp; Coding Staff</p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">
+          Projekte ansehen <i class="fas fa-arrow-down"></i>
+        </a>
+        <a href="#about" class="btn btn-ghost">Über mich</a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="about">
+    <div class="section-container">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <span class="section-label">Über mich</span>
+          <h2>Hey, ich bin Gleb.</h2>
+          <p>20 Jahre alt, aus Kaiserslautern. Ich beschaeftige mich mit Reselling, Streaming und Coding. Wenn ich nicht gerade code, streame ich oder vertiefe mich in meine Interessen.</p>
+          <p>Hier findest du meine aktuellen Projekte und alles über mich.</p>
+        </div>
+        <div class="about-stats reveal">
+          <div class="about-stat-row">
+            <div class="stat-card">
+              <div class="stat-num">3+</div>
+              <div class="stat-label">Aktive Projekte</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">FCK</div>
+              <div class="stat-label">Fan seit Geburt</div>
+            </div>
+          </div>
+          <div class="about-stat-row">
+            <div class="stat-card">
+              <div class="stat-num">KL</div>
+              <div class="stat-label">Kaiserslautern</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">&#8734;</div>
+              <div class="stat-label">Kaffee konsumiert</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="projects">
+    <div class="section-container">
+      <div class="projects-header reveal">
+        <span class="section-label">Projekte</span>
+        <h2 class="section-title">Meine Projekte</h2>
+        <p class="section-desc">Von Fan-Dashboards bis Reselling-Kanälen - hier ist, was ich so treibe.</p>
+      </div>
+      <div class="projects-grid">
+        <div class="project-card reveal">
+          <div class="project-img-wrap">
+            <img src="logo.png" alt="CuzImGleb" class="project-img">
+          </div>
+          <div class="project-body">
+            <span class="project-badge">Portfolio</span>
+            <h3>CuzImGleb Landing Page</h3>
+            <p>Der zentrale Anlaufpunkt für alle meine Projekte, Social-Media-Links und Infos über mich.</p>
+            <a href="#" class="btn btn-outline" id="backHomepage">
+              <i class="fas fa-check"></i>&nbsp; Du bist bereits hier
             </a>
-            <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-            <nav id="nav-menu">
-                <ul class="nav-list">
-                    <li><a href="#" id="scrollToTop">Home</a></li>
-                    <li><a href="#about">Über mich</a></li>
-                    <li><a href="#projects">Projekte</a></li>
-                    <li><a href="https://status.cuzimgleb.de/">Services Status</a></li>
-                    <li><a href="mailto:info@cuzimgleb.de">Kontakt</a></li>
-                </ul>
-            </nav>
+          </div>
         </div>
-    </header>
-    <div class="hero">
-        <h1>CuzImGleb</h1>
-        <p>Reseller, Streamer, Coding Staff</p>
-        <a href="#about" class="btn">Start</a>
+        <div class="project-card featured reveal">
+          <div class="project-img-wrap fck-bg">
+            <img src="content/landing-page/Logo_1_FC_Kaiserslautern.svg" alt="1. FC Kaiserslautern" class="project-img contain">
+          </div>
+          <div class="project-body">
+            <span class="project-badge red">Dashboard</span>
+            <h3>1. FC Kaiserslautern Dashboard</h3>
+            <p>Live-Tabelle, Serien, kommende Spiele und FCK-News auf einen Blick - für echte Betze-Fans.</p>
+            <a href="https://cuzimgleb.de/fck" class="btn btn-primary">
+              Zum Dashboard <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-img-wrap dark-bg">
+            <img src="content/landing-page/dealomateu.png" alt="Dealomat" class="project-img">
+          </div>
+          <div class="project-body">
+            <span class="project-badge blue">Reselling</span>
+            <h3>Dealomat</h3>
+            <p>Deine #1 Quelle fuer alternatives Reselling - profitable eBay-Angebote und smarte Strategien.</p>
+            <a href="https://x.com/dealomat_de" target="_blank" rel="noopener" class="btn btn-ghost">
+              Auf X folgen <i class="fas fa-arrow-up-right-from-square"></i>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-    <section id="about" class="about">
-        <div class="container">
-            <h2>Über mich</h2>
-            <p>Hey! Ich bin Gleb – 20 Jahre alt, aus Kaiserslautern. Ich beschäftige mich mit Reselling, Streaming und Coding. Wenn ich nicht gerade code, streame ich oder vertiefe mich in meine persönlichen Interessen.</p>
-            <p>Hier findest du meine aktuellen Projekte und mehr über mich.</p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img src="logo.png" alt="CuzImGleb" class="footer-logo">
+          <span>CuzImGleb</span>
         </div>
-    </section>
-    <section id="projects" class="projects">
-        <div class="container">
-            <h2>Meine Projekte</h2>
-            <div class="slider">
-                <button class="prev" onclick="prevSlide()">&#10094;</button>
-                <div class="slides">
-                    <div class="slide">
-                        <img src="logo.png" alt="CuzImGleb Landing Page">
-                        <h3>CuzImGleb Landing Page</h3>
-                        <p>Der Hauptpunkt für alle meine Projekte und Infos über mich!</p>
-                        <a href="#" id="backHomepage" class="btn">Du bist schon bereits hier -_-</a>
-                    </div>
-                    <div class="slide">
-                        <img src="content/landing-page/Logo_1_FC_Kaiserslautern.svg" alt="1. FC Kaiserslautern - Dashboard">
-                        <h3>1. FC Kaiserslautern - Dashboard</h3>
-                        <p>CuzImGleb’s FCK-Dashboard bietet dir eine detaillierte Übersicht über die 2. Bundesliga Tabelle, ungeschlagene Serien, kommende Spiele und mehr – alles rund um den 1. FC Kaiserslautern. Schau vorbei und überzeuge dich selbst!</p>
-                        <a href="https://cuzimgleb.de/fck" class="btn">Mehr erfahren</a>
-                    </div>
-                    <div class="slide">
-                        <img src="content/landing-page/dealomateu.png" alt="Dealomat">
-                        <h3>Dealomat</h3>
-                        <p>Dealomat – Deine #1 Quelle für alternatives Reselling! Finde profitable eBay-Angebote, versteckte Schnäppchen und smarte Reselling-Strategien. Schau vorbei und überzeuge dich selbst!</p>
-                        <a href="https://x.com/dealomat_de" target="_blank" class="btn">Mehr erfahren</a>
-                    </div>
-                </div>
-                <button class="next" onclick="nextSlide()">&#10095;</button>
-            </div>
-            <div class="dots">
-                <span class="dot" onclick="currentSlide(1)"></span>
-                <span class="dot" onclick="currentSlide(2)"></span>
-                <span class="dot" onclick="currentSlide(3)"></span>
-            </div>
+        <div class="footer-socials">
+          <a href="https://discord.gg/eXErJNvJth" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+          <a href="https://www.twitter.com/heycuzimgleb" target="_blank" rel="noopener" aria-label="X / Twitter"><i class="fab fa-x-twitter"></i></a>
+          <a href="https://www.twitch.tv/heycuzimgleb" target="_blank" rel="noopener" aria-label="Twitch"><i class="fab fa-twitch"></i></a>
+          <a href="https://www.instagram.com/heycuzimgleb" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.youtube.com/@heycuzimgleb" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
         </div>
-    </section>
-    <footer class="footer">
-        <p>Folge mir auf Social Media:</p>
-        <a href="https://discord.gg/eXErJNvJth"><i class="fab fa-discord"></i></a>
-        <a href="https://www.twitter.com/heycuzimgleb"><i class="fab fa-x"></i></a>
-        <a href="https://www.twitch.tv/heycuzimgleb"><i class="fab fa-twitch"></i></a>
-        <a href="https://www.instagram.com/heycuzimgleb"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.youtube.com/@heycuzimgleb"><i class="fab fa-youtube"></i></a>
-        <p>© 2024-2025 CuzImGleb | Made by Gleb | <a href="impressum.html">Impressum</a> | <a href="privacy.html">Datenschutzerklärung</a></p>
-    </footer>
-    <script src="script.js"></script>
+      </div>
+      <div class="footer-bottom">
+        <span>&#169; 2024&#8211;2026 CuzImGleb &middot; Made by Gleb</span>
+        <div class="footer-links">
+          <a href="impressum.html">Impressum</a>
+          <a href="privacy.html">Datenschutz</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

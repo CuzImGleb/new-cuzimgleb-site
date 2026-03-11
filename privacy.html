@@ -1,129 +1,186 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>CuzImGleb</title>
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:url" content="https://cuzimgleb.de">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="CuzImGleb.de - Portfolio">
-    <meta property="og:description" content="CuzImGleb Landing Page">
-    <meta property="og:image" content="https://cuzimgleb.de/logo.png">
-    <meta property="og:image:width" content="300">
-    <meta property="og:image:height" content="300">
-    <meta content="#3E4657" data-react-helmet="true" name="theme-color" />
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="cuzimgleb.de">
-    <meta property="twitter:url" content="https://cuzimgleb.de">
-    <meta name="twitter:title" content="CuzImGleb.de - Portfolio">
-    <meta name="twitter:description" content="CuzImGleb Landing Page">
-    <meta name="twitter:image" content="https://cuzimgleb.de/logo.png">
-
-    <link rel="icon" type="image/png" href="/content/tab-icons/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/content/tab-icons/favicon.svg" />
-    <link rel="shortcut icon" href="/content/tab-icons/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/content/tab-icons/apple-touch-icon.png" />
-    <link rel="manifest" href="/content/tab-icons/site.webmanifest" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="privacy.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datenschutz &#8212; CuzImGleb</title>
+  <meta property="og:url" content="https://cuzimgleb.de/privacy">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Datenschutz &#8212; CuzImGleb">
+  <meta property="og:description" content="Datenschutzerkl&#228;rung von CuzImGleb">
+  <meta property="og:image" content="https://cuzimgleb.de/logo.png">
+  <meta name="theme-color" content="#080810">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="cuzimgleb.de">
+  <link rel="icon" type="image/png" href="/content/tab-icons/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/svg+xml" href="/content/tab-icons/favicon.svg">
+  <link rel="shortcut icon" href="/content/tab-icons/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/content/tab-icons/apple-touch-icon.png">
+  <link rel="manifest" href="/content/tab-icons/site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="privacy.css">
 </head>
-
 <body>
-    <div id="loader">
-        <div class="spinner"></div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo" aria-label="Home">
+        <img src="logo.png" alt="CuzImGleb Logo">
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="/#about">&#220;ber mich</a></li>
+          <li><a href="/#projects">Projekte</a></li>
+          <li><a href="https://status.cuzimgleb.de/" target="_blank" rel="noopener">Status</a></li>
+          <li class="nav-cta"><a href="mailto:info@cuzimgleb.de">Kontakt</a></li>
+        </ul>
+      </nav>
     </div>
-    <header class="header">
-        <div class="container">
-            <a href="#" class="logo">
-                <img src="logo.png" alt="CuzImGleb Logo">
-            </a>
-            <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-            <nav id="nav-menu">
-                <ul class="nav-list">
-                    <li><a href="https://cuzimgleb.de">Home</a></li>
-                    <li><a href="https://cuzimgleb.de/#about">Über mich</a></li>
-                    <li><a href="https://cuzimgleb.de/#projects">Projekte</a></li>
-                    <li><a href="https://status.cuzimgleb.de/">Services Status</a></li>
-                    <li><a href="mailto:info@cuzimgleb.de">Kontakt</a></li>
-                </ul>
-            </nav>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page-main">
+    <div class="page-container">
+
+      <div class="page-hero reveal">
+        <span class="section-label">Rechtliches</span>
+        <h1 class="page-title">Datenschutz&shy;erkl&#228;rung</h1>
+      </div>
+
+      <!-- Allgemeines -->
+      <div class="legal-card reveal">
+        <h2>Allgemeiner Hinweis und Pflichtinformationen</h2>
+
+        <h3>Benennung der verantwortlichen Stelle</h3>
+        <p>Die verantwortliche Stelle f&#252;r die Datenverarbeitung auf dieser Website ist:</p>
+        <p>
+          Gleb Yerschov<br>
+          Kurt-Schumacher-Str. 84<br>
+          67663 Kaiserslautern<br>
+          Deutschland
+        </p>
+        <p>Die verantwortliche Stelle entscheidet allein oder gemeinsam mit anderen &#252;ber die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.B. Namen, Kontaktdaten o.&#160;&#196;.).</p>
+
+        <h3>Widerruf Ihrer Einwilligung zur Datenverarbeitung</h3>
+        <p>Nur mit Ihrer ausdr&#252;cklichen Einwilligung sind einige Vorg&#228;nge der Datenverarbeitung m&#246;glich. Ein Widerruf Ihrer bereits erteilten Einwilligung ist jederzeit m&#246;glich. F&#252;r den Widerruf gen&#252;gt eine formlose Mitteilung per E-Mail. Die Rechtm&#228;&#223;igkeit der bis zum Widerruf erfolgten Datenverarbeitung bleibt vom Widerruf unber&#252;hrt.</p>
+
+        <h3>Recht auf Beschwerde bei der zust&#228;ndigen Aufsichtsbeh&#246;rde</h3>
+        <p>Als Betroffener steht Ihnen im Falle eines datenschutzrechtlichen Versto&#223;es ein Beschwerderecht bei der zust&#228;ndigen Aufsichtsbeh&#246;rde zu. Zust&#228;ndige Aufsichtsbeh&#246;rde bez&#252;glich datenschutzrechtlicher Fragen ist der Landesdatenschutzbeauftragte des Bundeslandes, in dem sich der Sitz unseres Unternehmens befindet. Der folgende Link stellt eine Liste der Datenschutzbeauftragten sowie deren Kontaktdaten bereit: <a href="https://www.bfdi.bund.de/DE/Infothek/Anschriften_Links/anschriften_links-node.html" target="_blank" rel="noopener">bfdi.bund.de</a>.</p>
+
+        <h3>Recht auf Daten&#252;bertragbarkeit</h3>
+        <p>Ihnen steht das Recht zu, Daten, die wir auf Grundlage Ihrer Einwilligung oder in Erf&#252;llung eines Vertrags automatisiert verarbeiten, an sich oder an Dritte aush&#228;ndigen zu lassen. Die Bereitstellung erfolgt in einem maschinenlesbaren Format. Sofern Sie die direkte &#220;bertragung der Daten an einen anderen Verantwortlichen verlangen, erfolgt dies nur, soweit es technisch machbar ist.</p>
+
+        <h3>Recht auf Auskunft, Berichtigung, Sperrung, L&#246;schung</h3>
+        <p>Sie haben jederzeit im Rahmen der geltenden gesetzlichen Bestimmungen das Recht auf unentgeltliche Auskunft &#252;ber Ihre gespeicherten personenbezogenen Daten, Herkunft der Daten, deren Empf&#228;nger und den Zweck der Datenverarbeitung und ggf. ein Recht auf Berichtigung, Sperrung oder L&#246;schung dieser Daten. Diesbez&#252;glich und auch zu weiteren Fragen zum Thema personenbezogene Daten k&#246;nnen Sie sich jederzeit &#252;ber die im Impressum aufgef&#252;hrten Kontaktm&#246;glichkeiten an uns wenden.</p>
+
+        <h3>SSL- bzw. TLS-Verschl&#252;sselung</h3>
+        <p>Aus Sicherheitsgr&#252;nden und zum Schutz der &#220;bertragung vertraulicher Inhalte, die Sie an uns als Seitenbetreiber senden, nutzt unsere Website eine SSL- bzw. TLS-Verschl&#252;sselung. Damit sind Daten, die Sie &#252;ber diese Website &#252;bermitteln, f&#252;r Dritte nicht mitlesbar. Sie erkennen eine verschl&#252;sselte Verbindung an der &#8222;https://&#8220; Adresszeile Ihres Browsers und am Schloss-Symbol in der Browserzeile.</p>
+
+        <h3>Cookies</h3>
+        <p>Unsere Website verwendet Cookies. Das sind kleine Textdateien, die Ihr Webbrowser auf Ihrem Endger&#228;t speichert. Cookies helfen uns dabei, unser Angebot nutzerfreundlicher, effektiver und sicherer zu machen.</p>
+        <p>Einige Cookies sind &#8222;Session-Cookies.&#8220; Solche Cookies werden nach Ende Ihrer Browser-Sitzung von selbst gel&#246;scht. Hingegen bleiben andere Cookies auf Ihrem Endger&#228;t bestehen, bis Sie diese selbst l&#246;schen. Solche Cookies helfen uns, Sie bei R&#252;ckkehr auf unserer Website wiederzuerkennen.</p>
+        <p>Mit einem modernen Webbrowser k&#246;nnen Sie das Setzen von Cookies &#252;berwachen, einschr&#228;nken oder unterbinden. Viele Webbrowser lassen sich so konfigurieren, dass Cookies mit dem Schlie&#223;en des Programms von selbst gel&#246;scht werden. Die Deaktivierung von Cookies kann eine eingeschr&#228;nkte Funktionalit&#228;t unserer Website zur Folge haben.</p>
+        <p>Das Setzen von Cookies, die zur Aus&#252;bung elektronischer Kommunikationsvorg&#228;nge oder der Bereitstellung bestimmter, von Ihnen erw&#252;nschter Funktionen notwendig sind, erfolgt auf Grundlage von Art.&#160;6 Abs.&#160;1 lit.&#160;f DSGVO.</p>
+      </div>
+
+      <!-- Cloudflare CDN -->
+      <div class="legal-card reveal">
+        <h2>Cloudflare CDN</h2>
+
+        <h3>Art und Umfang der Verarbeitung</h3>
+        <p>Wir verwenden zur ordnungsgem&#228;&#223;en Bereitstellung der Inhalte unserer Website Cloudflare CDN. Cloudflare CDN ist ein Dienst der Cloudflare, Inc., welcher auf unserer Website als Content Delivery Network (CDN) fungiert.</p>
+        <p>Ein CDN tr&#228;gt dazu bei, Inhalte unseres Onlineangebotes, insbesondere Dateien wie Grafiken oder Skripte, mit Hilfe regional oder international verteilter Server schneller bereitzustellen. Wenn Sie auf diese Inhalte zugreifen, stellen Sie eine Verbindung zu Servern der Cloudflare, Inc. her, wobei Ihre IP-Adresse und ggf. Browserdaten wie Ihr User-Agent &#252;bermittelt werden.</p>
+
+        <h3>Zweck und Rechtsgrundlage</h3>
+        <p>Die Nutzung des Content Delivery Networks erfolgt auf Grundlage unserer berechtigten Interessen gem&#228;&#223; Art.&#160;6 Abs.&#160;1 lit.&#160;f DSGVO. Wir beabsichtigen, personenbezogene Daten an Drittl&#228;nder au&#223;erhalb des Europ&#228;ischen Wirtschaftsraums, insbesondere die USA, zu &#252;bermitteln. Die Daten&#252;bermittlung in die USA erfolgt nach Art.&#160;45 Abs.&#160;1 DSGVO auf Grundlage des Angemessenheitsbeschlusses der Europ&#228;ischen Kommission. Die beteiligten US-Unternehmen sind nach dem EU-U.S. Data Privacy Framework (EU-U.S. DPF) zertifiziert.</p>
+
+        <h3>Speicherdauer</h3>
+        <p>Die konkrete Speicherdauer der verarbeiteten Daten ist nicht durch uns beeinflussbar, sondern wird von Cloudflare, Inc. bestimmt. Weitere Hinweise finden Sie in der Datenschutzerkl&#228;rung f&#252;r Cloudflare CDN: <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a>.</p>
+      </div>
+
+      <!-- Font Awesome -->
+      <div class="legal-card reveal">
+        <h2>Font Awesome</h2>
+
+        <h3>Art und Umfang der Verarbeitung</h3>
+        <p>Wir verwenden zur ordnungsgem&#228;&#223;en Bereitstellung der Inhalte unserer Website Font Awesome des Anbieters Fonticons, Inc.</p>
+
+        <h3>Zweck und Rechtsgrundlage</h3>
+        <p>Der Einsatz von Font Awesome erfolgt auf Grundlage Ihrer Einwilligung gem&#228;&#223; Art.&#160;6 Abs.&#160;1 lit.&#160;a DSGVO und &#167;&#160;25 Abs.&#160;1 TDDDG. Wir beabsichtigen, personenbezogene Daten an Drittl&#228;nder au&#223;erhalb des Europ&#228;ischen Wirtschaftsraums, insbesondere die USA, zu &#252;bermitteln. Zudem holen wir vor einem solchen Drittlandtransfer Ihre Einwilligung nach Art.&#160;49 Abs.&#160;1 Satz&#160;1 lit.&#160;a DSGVO ein.</p>
+
+        <h3>Speicherdauer</h3>
+        <p>Die konkrete Speicherdauer der verarbeiteten Daten ist nicht durch uns beeinflussbar, sondern wird von Fonticons, Inc. bestimmt. Weitere Hinweise finden Sie in der Datenschutzerkl&#228;rung f&#252;r Font Awesome CDN: <a href="https://fontawesome.com/privacy" target="_blank" rel="noopener">fontawesome.com/privacy</a>.</p>
+      </div>
+
+      <!-- Cookiebot -->
+      <div class="legal-card reveal">
+        <h2>Cookiebot</h2>
+
+        <h3>Art und Umfang der Verarbeitung</h3>
+        <p>Wir haben auf unserer Website Cookiebot integriert. Cookiebot ist eine Zustimmungsl&#246;sung der Cybot A/S, Havnegade 39, 1058 Copenhagen, Denmark, mit der die Einwilligung zur Speicherung von Cookies erhalten und dokumentiert werden kann.</p>
+
+        <h3>Zweck und Rechtsgrundlage</h3>
+        <p>Die Nutzung des Dienstes erfolgt auf Grundlage der gesetzlich vorgeschriebenen Zustimmung zur Verwendung von Cookies gem&#228;&#223; Art.&#160;6 Abs.&#160;1 lit.&#160;c DSGVO.</p>
+
+        <h3>Speicherdauer</h3>
+        <p>Die konkrete Speicherdauer der verarbeiteten Daten wird von Cybot A/S bestimmt. Weitere Hinweise finden Sie in der Datenschutzerkl&#228;rung f&#252;r Cookiebot: <a href="https://www.cookiebot.com/de/privacy-policy/" target="_blank" rel="noopener">cookiebot.com/de/privacy-policy</a>.</p>
+      </div>
+
+      <!-- Usercentrics -->
+      <div class="legal-card reveal">
+        <h2>Usercentrics</h2>
+
+        <h3>Art und Umfang der Verarbeitung</h3>
+        <p>Wir haben auf unserer Website Usercentrics integriert. Usercentrics ist eine Zustimmungsl&#246;sung der Usercentrics GmbH, Rosental 4, 80331 Munich, Germany, mit der die Einwilligung zur Speicherung von Cookies erhalten und dokumentiert werden kann.</p>
+
+        <h3>Zweck und Rechtsgrundlage</h3>
+        <p>Die Nutzung des Dienstes erfolgt auf Grundlage der gesetzlich vorgeschriebenen Zustimmung zur Verwendung von Cookies gem&#228;&#223; Art.&#160;6 Abs.&#160;1 lit.&#160;c DSGVO.</p>
+
+        <h3>Speicherdauer</h3>
+        <p>Die konkrete Speicherdauer der verarbeiteten Daten wird von Usercentrics GmbH bestimmt. Weitere Hinweise finden Sie in der Datenschutzerkl&#228;rung f&#252;r Usercentrics: <a href="https://usercentrics.com/privacy-policy/" target="_blank" rel="noopener">usercentrics.com/privacy-policy</a>.</p>
+      </div>
+
+      <p class="source-note reveal">Quelle: Datenschutz-Konfigurator von <a href="https://www.hub24.de" target="_blank" rel="noopener">Herold Unternehmensberatung</a></p>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img src="logo.png" alt="CuzImGleb" class="footer-logo">
+          <span>CuzImGleb</span>
         </div>
-    </header>
-    <div class="hero">
-        <h1>Datenschutzerklärung</h1>
-            <h3>Allgemeiner Hinweis und Pflichtinformationen</h3>
-            <h3>Benennung der verantwortlichen Stelle</h3>
-            <p>Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:</p>
-            <p><span id="s3-t-ansprechpartner">Gleb Yerschov</span><br><span id="s3-t-strasse">Kurt-Schumacher-Str. 84</span><br><span id="s3-t-plz">67663</span> <span id="s3-t-ort">Kaiserslautern</span></p>
-            <p>Die verantwortliche Stelle entscheidet allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.B. Namen, Kontaktdaten o. Ä.).</p>
-            <h3>Widerruf Ihrer Einwilligung zur Datenverarbeitung</h3>
-            <p>Nur mit Ihrer ausdrücklichen Einwilligung sind einige Vorgänge der Datenverarbeitung möglich. Ein Widerruf Ihrer bereits erteilten Einwilligung ist jederzeit möglich. Für den Widerruf genügt eine formlose Mitteilung per E-Mail. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Datenverarbeitung bleibt vom Widerruf unberührt.</p>
-            <h3>Recht auf Beschwerde bei der zuständigen Aufsichtsbehörde</h3>
-            <p>Als Betroffener steht Ihnen im Falle eines datenschutzrechtlichen Verstoßes ein Beschwerderecht bei der zuständigen Aufsichtsbehörde zu. Zuständige Aufsichtsbehörde bezüglich datenschutzrechtlicher Fragen ist der Landesdatenschutzbeauftragte des Bundeslandes, in dem sich der Sitz unseres Unternehmens befindet. Der folgende Link stellt eine Liste der Datenschutzbeauftragten sowie deren Kontaktdaten bereit: <a href="https://www.bfdi.bund.de/DE/Infothek/Anschriften_Links/anschriften_links-node.html" target="_blank" class="keychainify-checked">https://www.bfdi.bund.de/DE/Infothek/Anschriften_Links/anschriften_links-node.html.</a></p>
-            <h3>Recht auf Datenübertragbarkeit</h3>
-            <p>Ihnen steht das Recht zu, Daten, die wir auf Grundlage Ihrer Einwilligung oder in Erfüllung eines Vertrags automatisiert verarbeiten, an sich oder an Dritte aushändigen zu lassen. Die Bereitstellung erfolgt in einem maschinenlesbaren Format. Sofern Sie die direkte Übertragung der Daten an einen anderen Verantwortlichen verlangen, erfolgt dies nur, soweit es technisch machbar ist.</p>
-            <h3>Recht auf Auskunft, Berichtigung, Sperrung, Löschung</h3>
-            <p>Sie haben jederzeit im Rahmen der geltenden gesetzlichen Bestimmungen das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, Herkunft der Daten, deren Empfänger und den Zweck der Datenverarbeitung und ggf. ein Recht auf Berichtigung, Sperrung oder Löschung dieser Daten. Diesbezüglich und auch zu weiteren Fragen zum Thema personenbezogene Daten können Sie sich jederzeit über die im Impressum aufgeführten Kontaktmöglichkeiten an uns wenden.</p>
-            <h3>SSL- bzw. TLS-Verschlüsselung</h3>
-            <p>Aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte, die Sie an uns als Seitenbetreiber senden, nutzt unsere Website eine SSL-bzw. TLS-Verschlüsselung. Damit sind Daten, die Sie über diese Website übermitteln, für Dritte nicht mitlesbar. Sie erkennen eine verschlüsselte Verbindung an der „https://“ Adresszeile Ihres Browsers und am Schloss-Symbol in der Browserzeile.</p>
-
-            <h3>Cookies</h3>
-            <p>Unsere Website verwendet Cookies. Das sind kleine Textdateien, die Ihr Webbrowser auf Ihrem Endgerät speichert. Cookies helfen uns dabei, unser Angebot nutzerfreundlicher, effektiver und sicherer zu machen.</p>
-            <p>Einige Cookies sind “Session-Cookies.” Solche Cookies werden nach Ende Ihrer Browser-Sitzung von selbst gelöscht. Hingegen bleiben andere Cookies auf Ihrem Endgerät bestehen, bis Sie diese selbst löschen. Solche Cookies helfen uns, Sie bei Rückkehr auf unserer Website wiederzuerkennen.</p>
-            <p>Mit einem modernen Webbrowser können Sie das Setzen von Cookies überwachen, einschränken oder unterbinden. Viele Webbrowser lassen sich so konfigurieren, dass Cookies mit dem Schließen des Programms von selbst gelöscht werden. Die Deaktivierung von Cookies kann eine eingeschränkte Funktionalität unserer Website zur Folge haben.</p>
-            <p>Das Setzen von Cookies, die zur Ausübung elektronischer Kommunikationsvorgänge oder der Bereitstellung bestimmter, von Ihnen erwünschter Funktionen (z.B. Warenkorb) notwendig sind, erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Als Betreiber dieser Website haben wir ein berechtigtes Interesse an der Speicherung von Cookies zur technisch fehlerfreien und reibungslosen Bereitstellung unserer Dienste. Sofern die Setzung anderer Cookies (z.B. für Analyse-Funktionen) erfolgt, werden diese in dieser Datenschutzerklärung separat behandelt.</p>
-
-            <h3>Cloudflare CDN</h3>
-            <h3>Art und Umfang der Verarbeitung</h3>
-            <p>Wir verwenden zur ordnungsgemäßen Bereitstellung der Inhalte unserer Website Cloudflare CDN. Cloudflare CDN ist ein Dienst der Cloudflare, Inc., welcher auf unserer Website als Content Delivery Network (CDN) fungiert.</p>
-            <p>Ein CDN trägt dazu bei, Inhalte unseres Onlineangebotes, insbesondere Dateien wie Grafiken oder Skripte, mit Hilfe regional oder international verteilter Server schneller bereitzustellen. Wenn Sie auf diese Inhalte zugreifen, stellen Sie eine Verbindung zu Servern der Cloudflare, Inc., her, wobei Ihre IP-Adresse und ggf. Browserdaten wie Ihr User-Agent übermittelt werden. Diese Daten werden ausschließlich zu den oben genannten Zwecken und zur Aufrechterhaltung der Sicherheit und Funktionalität von Cloudflare CDN verarbeitet.</p>
-            <h3>Zweck und Rechtsgrundlage</h3>
-            <p>Die Nutzung des Content Delivery Networks erfolgt auf Grundlage unserer berechtigten Interessen, d.h. Interesse an einer sicheren und effizienten Bereitstellung sowie der Optimierung unseres Onlineangebotes gemäß Art. 6 Abs. 1 lit. f. DSGVO.</p>
-            <p>Wir beabsichtigen personenbezogenen Daten an Drittländer außerhalb des Europäischen Wirtschaftsraums, insbesondere die USA, zu übermitteln. Die Datenübermittlung in die USA erfolgt nach Art. 45 Abs. 1 DSGVO auf Grundlage des Angemessenheitsbeschluss der Europäischen Kommission. Die beteiligten US-Unternehmen und/oder deren US-Unterauftragnehmer sind nach dem EU-U.S. Data Privacy Framework (EU-U.S. DPF) zertifiziert.</p>
-            <h3>Speicherdauer</h3>
-            <p>Die konkrete Speicherdauer der verarbeiteten Daten ist nicht durch uns beeinflussbar, sondern wird von Cloudflare, Inc. bestimmt. Weitere Hinweise finden Sie in der Datenschutzerklärung für Cloudflare CDN: <a href="https://www.cloudflare.com/privacypolicy/" class="keychainify-checked">https://www.cloudflare.com/privacypolicy/</a>.</p>
-
-            <h3>Font Awesome</h3>
-            <h3>Art und Umfang der Verarbeitung</h3>
-            <p>Wir verwenden zur ordnungsgemäßen Bereitstellung der Inhalte unserer Website Font Awesome des Anbieters Fonticons, Inc..</p>
-            <h3>Zweck und Rechtsgrundlage</h3>
-            <p>Der Einsatz von Font Awesome erfolgt auf Grundlage Ihrer Einwilligung gemäß Art. 6 Abs. 1 lit. a. DSGVO und § 25 Abs. 1 TDDDG.</p>
-            <p>Wir beabsichtigen personenbezogenen Daten an Drittländer außerhalb des Europäischen Wirtschaftsraums, insbesondere die USA, zu übermitteln. In Fällen, in denen kein Angemessenheitsbeschluss der Europäischen Kommission existiert haben wir mit den Empfängern der Daten anderweitige geeignete Garantien im Sinne der Art. 44 ff. DSGVO vereinbart. Dies sind – sofern nicht anders angegeben – Standardvertragsklauseln der EU-Kommission gemäß Durchführungsbeschluss (EU) 2021/914 vom 4. Juni 2021. Eine Kopie dieser Standardvertragsklauseln können Sie unter <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32021D0914&from=DE" class="keychainify-checked">https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32021D0914&from=DE</a> einsehen.</p>
-            <p>Zudem holen wir vor einem solchen Drittlandtransfer Ihre Einwilligung nach Art. 49 Abs. 1 Satz 1 lit. a. DSGVO ein, die Sie über die Einwilligung im Consent Manager (oder sonstigen Formularen, Registrierungen etc.) erteilen. Wir weisen Sie darauf hin, dass bei Drittlandübermittlungen im Detail unbekannte Risiken (z.B. die Datenverarbeitung durch Sicherheitsbehörden des Drittlandes, deren genauer Umfang und deren Folgen für Sie wir nicht kennen, auf die wir keinen Einfluss haben und von denen Sie unter Umständen keine Kenntnis erlangen) bestehen können.</p>
-            <h3>Speicherdauer</h3>
-            <p>Die konkrete Speicherdauer der verarbeiteten Daten ist nicht durch uns beeinflussbar, sondern wird von Fonticons, Inc. bestimmt. Weitere Hinweise finden Sie in der Datenschutzerklärung für Font Awesome CDN: <a href="https://fontawesome.com/privacy" class="keychainify-checked">https://fontawesome.com/privacy</a>.</p>
-
-            <h3>Cookiebot</h3>
-            <h3>Art und Umfang der Verarbeitung</h3>
-            <p>Wir haben auf unserer Website Cookiebot integriert. Cookiebot ist eine Zustimmungslösung der Cybot A/S, Havnegade 39, 1058 Copenhagen, Denmark, mit der die Einwilligung zur Speicherung von Cookies erhalten und dokumentiert werden kann. Cookiebot nutzt Cookies oder andere Web-Technologien, um Nutzer wiederzuerkennen und die erteilte oder widerrufene Einwilligung zu speichern.</p>
-            <h3>Zweck und Rechtsgrundlage</h3>
-            <p>Die Nutzung des Dienstes erfolgt auf Grundlage die gesetzlich vorgeschriebene Zustimmung zur Verwendung von Cookies zu erhalten gemäß Art. 6 Abs. 1 lit. c. DSGVO.</p>
-            <h3>Speicherdauer</h3>
-            <p>Die konkrete Speicherdauer der verarbeiteten Daten ist nicht durch uns beeinflussbar, sondern wird von Cybot A/S bestimmt. Weitere Hinweise finden Sie in der Datenschutzerklärung für Cookiebot: <a href="https://www.cookiebot.com/de/privacy-policy/" class="keychainify-checked">https://www.cookiebot.com/de/privacy-policy/</a>.</p>
-
-            <h3>Usercentrics</h3>
-            <h3>Art und Umfang der Verarbeitung</h3>
-            <p>Wir haben auf unserer Website Usercentrics integriert. Usercentrics ist eine Zustimmungslösung der Usercentrics GmbH, Rosental 4, 80331 Munich, Germany, mit der die Einwilligung zur Speicherung von Cookies erhalten und dokumentiert werden kann. Usercentrics nutzt Cookies oder andere Web-Technologien, um Nutzer wiederzuerkennen und die erteilte oder widerrufene Einwilligung zu speichern.</p>
-            <h3>Zweck und Rechtsgrundlage</h3>
-            <p>Die Nutzung des Dienstes erfolgt auf Grundlage die gesetzlich vorgeschriebene Zustimmung zur Verwendung von Cookies zu erhalten gemäß Art. 6 Abs. 1 lit. c. DSGVO.</p>
-            <h3>Speicherdauer</h3>
-            <p>Die konkrete Speicherdauer der verarbeiteten Daten ist nicht durch uns beeinflussbar, sondern wird von Usercentrics GmbH bestimmt. Weitere Hinweise finden Sie in der Datenschutzerklärung für Usercentrics: <a href="https://usercentrics.com/privacy-policy/" class="keychainify-checked">https://usercentrics.com/privacy-policy/</a>.</p>
-
-            <p><small>Quelle: Datenschutz-Konfigurator von <a href="https://www.hub24.de" target="_blank" class="keychainify-checked">Herold Unternehmensberatung</a></small></p>
+        <div class="footer-socials">
+          <a href="https://discord.gg/eXErJNvJth" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+          <a href="https://www.twitter.com/heycuzimgleb" target="_blank" rel="noopener" aria-label="X / Twitter"><i class="fab fa-x-twitter"></i></a>
+          <a href="https://www.twitch.tv/heycuzimgleb" target="_blank" rel="noopener" aria-label="Twitch"><i class="fab fa-twitch"></i></a>
+          <a href="https://www.instagram.com/heycuzimgleb" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.youtube.com/@heycuzimgleb" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&#169; 2024&#8211;2026 CuzImGleb &middot; Made by Gleb</span>
+        <div class="footer-links">
+          <a href="/impressum.html">Impressum</a>
+          <a href="/privacy.html">Datenschutz</a>
+        </div>
+      </div>
     </div>
-    <footer class="footer">
-        <p>Folge mir auf Social Media:</p>
-        <a href="https://discord.gg/eXErJNvJth"><i class="fab fa-discord"></i></a>
-        <a href="https://www.twitter.com/heycuzimgleb"><i class="fab fa-x"></i></a>
-        <a href="https://www.twitch.tv/heycuzimgleb"><i class="fab fa-twitch"></i></a>
-        <a href="https://www.instagram.com/heycuzimgleb"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.youtube.com/@heycuzimgleb"><i class="fab fa-youtube"></i></a>
-        <p>© 2024-2025 CuzImGleb | Made by Gleb | <a href="impressum.html">Impressum</a> | <a href="privacy.html">Datenschutzerklärung</a></p>
-    </footer>
-    <script src="script.js"></script>
+  </footer>
+
+  <script src="privacy.js"></script>
 </body>
 </html>

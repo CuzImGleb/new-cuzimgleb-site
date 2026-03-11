@@ -1,513 +1,340 @@
-// Sidebar Optimierung:
+/* ===================================================
+   FCK Dashboard – script.js  |  2026 Rewrite
+   =================================================== */
 
-document.querySelectorAll(".sidebar nav a").forEach(link => {
-  link.addEventListener("click", (e) => {
-    const href = link.getAttribute("href");
+// ── Loader ───────────────────────────────────────────
+window.addEventListener('load', () => document.body.classList.add('loaded'));
 
-    // 🔁 Active-Klasse aktualisieren
-    document.querySelectorAll(".sidebar nav a").forEach(a => a.classList.remove("active"));
-    link.classList.add("active");
+// ── Mobile Menu ──────────────────────────────────────
+const menuToggle = document.getElementById('menuToggle');
+const navLinks   = document.getElementById('nav-links');
+if (menuToggle) {
+  menuToggle.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    menuToggle.classList.toggle('open', open);
+  });
+}
 
-    // ⛔ Nur interne Navigation behandeln
-    if (href.startsWith("#")) {
-      e.preventDefault();
+// ── Nav highlight + smooth scroll ────────────────────
+document.querySelectorAll('.topnav-links a[data-targets]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.topnav-links a').forEach(a => a.classList.remove('active'));
+    link.classList.add('active');
+    if (navLinks) navLinks.classList.remove('open');
+    if (menuToggle) menuToggle.classList.remove('open');
 
-      const text = link.textContent.trim();
-      let targetIds = [];
-      if (text.includes("Tabelle")) targetIds = ["tabelle-box"];
-      else if (text.includes("Spiele")) targetIds = ["next-match-box", "upcoming-match-box", "last-matches"];
-      else if (text.includes("Serien")) targetIds = ["undefeated-series"];
-      else if (text.includes("Info")) targetIds = ["footer"];
-
-      targetIds.forEach((id, index) => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.classList.remove("highlight-effect");
-          void el.offsetWidth;
-          el.classList.add("highlight-effect");
-
-          if (index === 0) {
-            el.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        }
-      });
-    }
+    const targets = link.dataset.targets.split(',');
+    targets.forEach((id, i) => {
+      const el = document.getElementById(id.trim());
+      if (!el) return;
+      if (i === 0) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.classList.remove('highlight-effect');
+      void el.offsetWidth;
+      el.classList.add('highlight-effect');
+    });
   });
 });
 
-window.addEventListener("load", () => {
-  document.body.classList.add("loaded");
-});
+// ── API URLs ─────────────────────────────────────────
+const PROXY1 = 'https://corsproxy.io/?url=';
+const PROXY2 = 'https://api.allorigins.win/raw?url=';
 
-
-// URLs für die API-Abfrage – mit zwei verschiedenen Proxy-Diensten, falls einer nicht funktioniert
-const urls = [
-  'https://corsproxy.io/?url=https://api.openligadb.de/getbltable/bl2/2025',
-  'https://api.allorigins.win/raw?url=https://api.openligadb.de/getbltable/bl2/2025'
-];
-
-// Tabelle der 2. Bundesliga abrufen und anzeigen
-async function fetchTable() {
-  for (const url of urls) {
+async function fetchWithFallback(path) {
+  for (const proxy of [PROXY1, PROXY2]) {
     try {
-      const res = await fetch(url);
-      if (!res.ok) continue; // Wenn Request fehlschlägt, nächste URL versuchen
-      const data = await res.json();
+      const res = await fetch(proxy + encodeURIComponent(path));
+      if (!res.ok) continue;
+      return await res.json();
+    } catch { /* try next */ }
+  }
+  throw new Error('All proxies failed for: ' + path);
+}
 
-      const tbody = document.querySelector("#table tbody");
-      tbody.innerHTML = ""; // Alte Tabelleninhalte entfernen
+// ── Tabelle ───────────────────────────────────────────
+async function fetchTable() {
+  try {
+    const data = await fetchWithFallback('https://api.openligadb.de/getbltable/bl2/2025');
+    const tbody = document.querySelector('#table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-      // Für jedes Team eine Tabellenzeile erstellen
-      data.forEach((team, i) => {
-        const row = document.createElement("tr");
+    data.forEach((team, i) => {
+      const place = i + 1;
+      const isFCK = team.teamName.toLowerCase().includes('kaiserslautern');
+      let cls = isFCK ? 'highlight-fck' : '';
+      if (place <= 2)   cls += ' place-green';
+      else if (place === 3 || place === 16) cls += ' place-yellow';
+      else if (place >= 17) cls += ' place-red';
 
-        const place = i + 1;
-        let className = "";
+      const dot = (place <= 2 || place === 3 || place === 16 || place >= 17)
+        ? `<span class="place-dot"></span>` : '';
 
-        // Spezielle Hervorhebung für Kaiserslautern
-        if (team.teamName.toLowerCase().includes("kaiserslautern")) {
-          className += " highlight-fck";
-        }
-
-        // Farbmarkierungen je nach Tabellenplatz
-        if (place === 1 || place === 2) {
-          className += " place-green";
-        } else if (place === 3 || place === 16) {
-          className += " place-yellow";
-        } else if (place >= 17) {
-          className += " place-red";
-        }
-
-        row.className = className.trim();
-
-        row.innerHTML = `
-          <td>${place}.</td>
-          <td><img class="team-logo-small" src="${team.teamIconUrl}" alt="${team.teamName}"> ${team.teamName}</td>
-          <td>${team.points}</td>
-        `;
-        tbody.appendChild(row);
-      });
-      break; // Bei erfolgreichem Laden abbrechen
-    } catch (e) {
-      console.error("Fehler beim Laden von:", url, e);
-    }
+      const tr = document.createElement('tr');
+      tr.className = cls.trim();
+      tr.innerHTML = `
+        <td style="color:var(--muted);font-size:0.75rem">${dot}${place}</td>
+        <td><img class="team-logo-small" src="${team.teamIconUrl}" alt="${team.teamName}" loading="lazy"> ${team.teamName}</td>
+        <td style="text-align:right;font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:1rem">${team.points}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error('Tabelle:', err);
   }
 }
 fetchTable();
 
-// Nach dem Laden der Seite Daten abrufen und verarbeiten
-document.addEventListener("DOMContentLoaded", async () => {
+// ── Match Data ────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const seasons = ["2024", "2025"];
+    const seasons = ['2024', '2025'];
+    const leagues = ['bl2', 'dfb', 'dfbnat2526'];
     const allMatches = [];
 
-    // Alle Saisons laden
     for (const season of seasons) {
-      const seasonMatches = await fetchSeasonData(season);
-      allMatches.push(...seasonMatches);
+      for (const league of leagues) {
+        try {
+          const data = await fetchWithFallback(
+            `https://api.openligadb.de/getmatchdata/${league}/${season}`
+          );
+          if (Array.isArray(data)) allMatches.push(...data);
+        } catch { /* skip */ }
+      }
     }
 
-    // --- Filter ---
-    const filteredMatches = filterRelevantMatches(allMatches);
+    const relevant = allMatches.filter(m => {
+      const t1 = (m.team1?.teamName || '').toLowerCase();
+      const t2 = (m.team2?.teamName || '').toLowerCase();
+      return t1.includes('kaiserslautern') || t2.includes('kaiserslautern')
+          || t1.includes('deutschland')    || t2.includes('deutschland');
+    });
 
-    const allSortedMatches = [...filteredMatches].sort(
-      (a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime)
+    const sorted = [...relevant].sort((a, b) =>
+      new Date(a.matchDateTime) - new Date(b.matchDateTime)
     );
 
-    // --- Render ---
-    updateNextMatch(filteredMatches);
-    updateUpcomingMatches(filteredMatches);
-    updateLastMatches(allSortedMatches);
-    updateUndefeatedSeries(allSortedMatches);
-    renderUndefeatedSeriesVisual(allSortedMatches);
-  } catch (error) {
-    console.error("❌ Fehler beim Laden der Daten:", error);
+    renderNextMatch(relevant);
+    renderUpcoming(relevant);
+    renderLastMatches(sorted);
+    renderSeries(sorted);
+    renderSeriesVisual(sorted);
+  } catch (err) {
+    console.error('Match data:', err);
   }
 });
 
-
-// Daten aus BL2, DFB-Pokal und Länderspielen abrufen
-async function fetchSeasonData(season) {
-  const leagues = ["bl2", "dfb", "dfbnat2526"];
-  const results = [];
-
-  for (const league of leagues) {
-    const url = `https://corsproxy.io/?url=https://api.openligadb.de/getmatchdata/${league}/${season}`;
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Fehler bei ${league.toUpperCase()}: ${res.status}`);
-      const data = await res.json();
-      if (Array.isArray(data)) results.push(...data);
-    } catch (err) {
-      console.warn(`⚠️ ${league.toUpperCase()} konnte nicht geladen werden (${season}):`, err.message);
-    }
-  }
-
-  return results;
+function teamName(match, t) {
+  const isIntl = match.leagueShortcut?.toLowerCase() === 'dfbnat2526';
+  return isIntl ? t.teamName : (t.shortName || t.teamName);
 }
 
-
-// Filtert alle relevanten Spiele (FCK + Deutschland)
-function filterRelevantMatches(matches) {
-  return matches.filter(match => {
-    const team1 = (match.team1?.teamName || "").toLowerCase();
-    const team2 = (match.team2?.teamName || "").toLowerCase();
-
-    return (
-      team1.includes("kaiserslautern") ||
-      team2.includes("kaiserslautern") ||
-      team1.includes("deutschland") ||
-      team2.includes("deutschland")
-    );
-  });
-}
-
-
-// Zeigt das nächste FCK-Spiel an
-function updateNextMatch(matches) {
-  const nextMatch = matches
-    .filter(match => !match.matchIsFinished)
+// ── Next Match ────────────────────────────────────────
+function renderNextMatch(matches) {
+  const next = matches
+    .filter(m => !m.matchIsFinished)
     .sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime))[0];
 
-  if (!nextMatch) {
-    document.querySelector("#next-match-box .match-date").textContent = "Kein nächstes Spiel gefunden.";
+  if (!next) {
+    document.getElementById('next-date').textContent = 'Kein nächstes Spiel gefunden.';
     return;
   }
 
-  const fallbackIcon = "icons/default.png";
+  const fb = 'icons/default.png';
+  document.getElementById('next-logo-1').src = next.team1?.teamIconUrl || fb;
+  document.getElementById('next-logo-2').src = next.team2?.teamIconUrl || fb;
+  document.getElementById('next-name-1').textContent = teamName(next, next.team1);
+  document.getElementById('next-name-2').textContent = teamName(next, next.team2);
 
-  // Logos aktualisieren
-    document.querySelector("#next-match-box img[alt='Team 1']").src = nextMatch.team1?.teamIconUrl || fallbackIcon;
-    document.querySelector("#next-match-box img[alt='Team 2']").src = nextMatch.team2?.teamIconUrl || fallbackIcon;
-
-  // Datum & Uhrzeit formatieren
-  const matchDate = new Date(nextMatch.matchDateTime);
-  const daysOfWeek = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
-  const dayName = daysOfWeek[matchDate.getDay()];
-  const day = String(matchDate.getDate()).padStart(2, '0');
-  const month = String(matchDate.getMonth() + 1).padStart(2, '0');
-  const year = matchDate.getFullYear();
-  const hours = String(matchDate.getHours()).padStart(2, '0');
-  const minutes = String(matchDate.getMinutes()).padStart(2, '0');
-  const formattedDateTime = `${dayName} am ${day}.${month}.${year} um ${hours}:${minutes}`;
-
-  document.querySelector("#next-match-box .match-date").textContent = formattedDateTime;
+  const d = new Date(next.matchDateTime);
+  const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  document.getElementById('next-date').textContent =
+    `${days[d.getDay()]}, ${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} Uhr`;
 }
 
-// Zeigt die nächsten 10 Spiele an
-function updateUpcomingMatches(matches) {
-  const upcomingList = document.getElementById("upcoming-list");
-  const fallbackIcon = "icons/default.png";
-  upcomingList.innerHTML = '';
+// ── Upcoming ──────────────────────────────────────────
+function renderUpcoming(matches) {
+  const list = document.getElementById('upcoming-list');
+  if (!list) return;
+  list.innerHTML = '';
 
-  const upcomingMatches = matches
-    .filter(match => !match.matchIsFinished)
+  const upcoming = matches
+    .filter(m => !m.matchIsFinished)
     .sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime))
-    .slice(0, 14);
+    .slice(0, 12);
 
-  if (upcomingMatches.length === 0) {
-    upcomingList.innerHTML = "<li>Keine kommenden Spiele gefunden.</li>";
-    return;
-  }
+  if (!upcoming.length) { list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Keine kommenden Spiele.</div>'; return; }
 
-  upcomingMatches.forEach(match => {
-    const isNational = match.leagueShortcut?.toLowerCase() === "dfbnat2526";
+  upcoming.forEach(m => {
+    const isCup  = m.leagueShortcut?.toLowerCase() === 'dfb';
+    const isIntl = m.leagueShortcut?.toLowerCase() === 'dfbnat2526';
+    const t1 = teamName(m, m.team1);
+    const t2 = teamName(m, m.team2);
+    const d  = new Date(m.matchDateTime);
+    const fd = d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' });
+    const fb = 'icons/default.png';
 
-    // Wenn Nationalspiel → immer voller Teamname
-    const team1 = isNational ? match.team1.teamName : (match.team1.shortName || match.team1.teamName);
-    const team2 = isNational ? match.team2.teamName : (match.team2.shortName || match.team2.teamName);
-
-    const matchDate = new Date(match.matchDateTime);
-    const formattedDate = matchDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <img class="team-logo-small" src="${match.team1?.teamIconUrl || fallbackIcon}" alt="${team1}">
-      <span>${team1} vs ${team2}</span>
-      <img class="team-logo-small" src="${match.team2?.teamIconUrl || fallbackIcon}" alt="${team2}">
-      <span>${formattedDate}</span>
+    const div = document.createElement('div');
+    div.className = 'match-item' + (isCup ? ' cup' : isIntl ? ' intl' : '');
+    div.innerHTML = `
+      <div class="logo-wrap"><img src="${m.team1?.teamIconUrl || fb}" alt="${t1}" loading="lazy"></div>
+      <span class="teams">${t1} vs ${t2}</span>
+      <div class="logo-wrap"><img src="${m.team2?.teamIconUrl || fb}" alt="${t2}" loading="lazy"></div>
+      <span class="date-chip">${fd}</span>
     `;
-
-    if (match.leagueShortcut?.toLowerCase() === "dfb") {
-      li.style.backgroundColor = "#138f30c0"; // grün für Pokal
-      li.style.color = "#FFFFFF";
-    } else if (isNational) {
-      li.style.backgroundColor = "#808080c0"; // grau für Länderspiele
-      li.style.color = "#FFFFFF";
-    }
-
-    upcomingList.appendChild(li);
+    list.appendChild(div);
   });
 }
 
-// Zeigt die letzten 5 Spiele (mit Ergebnis) an
-function updateLastMatches(matches) {
-  const lastMatchList = document.getElementById("last-match-list");
-  const fallbackIcon = "icons/default.png";
-  lastMatchList.innerHTML = '';
+// ── Last Matches ──────────────────────────────────────
+function renderLastMatches(sorted) {
+  const list = document.getElementById('last-match-list');
+  if (!list) return;
+  list.innerHTML = '';
 
-  const lastMatches = matches
-    .filter(match => match.matchIsFinished)
+  const last = [...sorted]
+    .filter(m => m.matchIsFinished)
     .sort((a, b) => new Date(b.matchDateTime) - new Date(a.matchDateTime))
     .slice(0, 10);
 
-  if (lastMatches.length === 0) {
-    lastMatchList.innerHTML = "<li>Keine vergangenen Spiele gefunden.</li>";
-    return;
-  }
+  if (!last.length) { list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Keine Ergebnisse.</div>'; return; }
 
-  lastMatches.forEach(match => {
-    const isNational = match.leagueShortcut?.toLowerCase() === "dfbnat2526";
-    const team1 = isNational ? match.team1.teamName : (match.team1.shortName || match.team1.teamName);
-    const team2 = isNational ? match.team2.teamName : (match.team2.shortName || match.team2.teamName);
+  last.forEach(m => {
+    const isCup  = m.leagueShortcut?.toLowerCase() === 'dfb';
+    const isIntl = m.leagueShortcut?.toLowerCase() === 'dfbnat2526';
+    const t1 = teamName(m, m.team1);
+    const t2 = teamName(m, m.team2);
+    const result = m.matchResults.find(r => r.resultName === 'Endergebnis') || m.matchResults[0];
+    const fb = 'icons/default.png';
 
-    const result = match.matchResults.find(r => r.resultName === "Endergebnis") || match.matchResults[0];
-    const team1Goals = result.pointsTeam1;
-    const team2Goals = result.pointsTeam2;
-
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <img class="team-logo-small" src="${match.team1.teamIconUrl || fallbackIcon}" alt="${team1}">
-      <span>${team1} ${team1Goals} - ${team2Goals} ${team2}</span>
-      <img class="team-logo-small" src="${match.team2.teamIconUrl || fallbackIcon}" alt="${team2}">
+    const div = document.createElement('div');
+    div.className = 'match-item' + (isCup ? ' cup' : isIntl ? ' intl' : '');
+    div.innerHTML = `
+      <div class="logo-wrap"><img src="${m.team1?.teamIconUrl || fb}" alt="${t1}" loading="lazy"></div>
+      <span class="teams">${t1} vs ${t2}</span>
+      <div class="logo-wrap"><img src="${m.team2?.teamIconUrl || fb}" alt="${t2}" loading="lazy"></div>
+      <span class="score">${result.pointsTeam1}:${result.pointsTeam2}</span>
     `;
-
-    if (match.leagueShortcut?.toLowerCase() === "dfb") {
-      li.style.backgroundColor = "#138f30c0";
-      li.style.color = "#FFFFFF";
-    } else if (match.leagueShortcut?.toLowerCase() === "dfbnat2526") {
-      li.style.backgroundColor = "#808080c0";
-      li.style.color = "#FFFFFF";
-    }
-
-
-    lastMatchList.appendChild(li);
+    list.appendChild(div);
   });
 }
 
-// Analyse der aktuellen und längsten Serie ohne Niederlage
-function updateUndefeatedSeries(matches) {
+// ── Series Stats ──────────────────────────────────────
+function renderSeries(sorted) {
+  let current = 0, longest = 0, longestDate = null;
 
-  matches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
+  sorted.forEach(m => {
+    if (!m.matchIsFinished) return;
+    if (m.leagueShortcut?.toLowerCase() === 'dfb') return;
 
-  let currentSeries = 0;
-  let longestSeries = 0;
-  let isSeriesActive = true;
-  let currentSeriesEndDate = null;
-  let longestSeriesEndDate = null;
+    const res = m.matchResults[1];
+    if (!res) return;
+    const g1 = res.pointsTeam1, g2 = res.pointsTeam2;
+    const isFCK1 = m.team1.teamName.toLowerCase().includes('kaiserslautern') || m.team1.shortName?.toLowerCase().includes('kaiserslautern');
+    const isFCK2 = m.team2.teamName.toLowerCase().includes('kaiserslautern') || m.team2.shortName?.toLowerCase().includes('kaiserslautern');
+    const undefeated = (isFCK1 && g1 >= g2) || (isFCK2 && g2 >= g1);
 
-  for (const match of matches) {
-    if (match.leagueShortcut?.toLowerCase() === "dfb") continue;
-    if (!match.matchIsFinished) continue;
-
-    const team1Goals = match.matchResults[1].pointsTeam1;
-    const team2Goals = match.matchResults[1].pointsTeam2;
-
-    const isFCKTeam1 = match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team1.shortName?.toLowerCase() === "kaiserslautern";
-    const isFCKTeam2 = match.team2.teamName.toLowerCase() === "1. fc kaiserslautern" || match.team2.shortName?.toLowerCase() === "kaiserslautern";
-
-    const matchDate = match.matchDateTime ? new Date(match.matchDateTime).toLocaleDateString("de-DE") : "Datum unbekannt";
-
-    let isUndefeated = (isFCKTeam1 && team1Goals >= team2Goals) || (isFCKTeam2 && team2Goals >= team1Goals);
-
-    if (isUndefeated) {
-      if (!isSeriesActive) {
-        currentSeries = 1;
-        isSeriesActive = true;
-      } else {
-        currentSeries++;
-      }
-      currentSeriesEndDate = matchDate;
-
-      if (currentSeries > longestSeries) {
-        longestSeries = currentSeries;
-        longestSeriesEndDate = currentSeriesEndDate;
-      }
+    if (undefeated) {
+      current++;
+      if (current > longest) { longest = current; longestDate = new Date(m.matchDateTime).toLocaleDateString('de-DE'); }
     } else {
-      currentSeries = 0;
-      isSeriesActive = false;
+      current = 0;
     }
+  });
 
-  }
+  const el = document.getElementById('undefeated-series-count');
+  if (el) el.textContent = current;
 
-  // UI-Update
-  const unstoppableElement = document.getElementById("undefeated-series-count");
-  if (unstoppableElement) {
-    unstoppableElement.textContent = currentSeries;
-  }
-
-  const highscoreElement = document.getElementById("undefeated-series-highscore");
-  if (highscoreElement) {
-    if (longestSeriesEndDate) {
-      highscoreElement.textContent = `Die längste Serie war ${longestSeries} Spiele am ${longestSeriesEndDate}`;
-    } else {
-      highscoreElement.textContent = `Keine längste Serie vorhanden.`;
-    }
-  }
-
-  return { currentSeries, longestSeries };
+  const hs = document.getElementById('undefeated-series-highscore');
+  if (hs) hs.textContent = longestDate
+    ? `Längste Serie: ${longest} Spiele (zuletzt ${longestDate})`
+    : 'Noch keine Serie vorhanden.';
 }
 
+// ── Series Visual ─────────────────────────────────────
+function renderSeriesVisual(sorted) {
+  const currentContainer = document.getElementById('undefeated-current-list');
+  const longestContainer = document.getElementById('undefeated-longest-list');
+  if (!currentContainer || !longestContainer) return;
 
-function renderUndefeatedSeriesVisual(matches) {
-  const currentContainer = document.getElementById("undefeated-current-list");
-  const longestContainer = document.getElementById("undefeated-longest-list");
-  currentContainer.innerHTML = "";
-  longestContainer.innerHTML = "";
+  let tempSeries = [], longestSeries = [];
 
-  matches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
+  sorted.forEach(m => {
+    if (!m.matchIsFinished) return;
+    if (m.leagueName?.toLowerCase().includes('dfb') && !m.leagueName?.toLowerCase().includes('bundesliga')) return;
 
-  let currentSeries = [];
-  let longestSeries = [];
-  let tempSeries = [];
+    const isFCK1 = m.team1.teamName.toLowerCase().includes('kaiserslautern') || m.team1.shortName?.toLowerCase().includes('kaiserslautern');
+    const isFCK2 = m.team2.teamName.toLowerCase().includes('kaiserslautern') || m.team2.shortName?.toLowerCase().includes('kaiserslautern');
+    if (!isFCK1 && !isFCK2) return;
 
-  for (const match of matches) {
-    if (match.leagueName?.toLowerCase().includes("dfb")) continue;
-    if (!match.matchIsFinished) continue;
+    const res = m.matchResults?.[1];
+    if (!res) return;
 
-    const isFCKTeam1 =
-      match.team1.teamName.toLowerCase() === "1. fc kaiserslautern" ||
-      match.team1.shortName?.toLowerCase() === "kaiserslautern";
-    const isFCKTeam2 =
-      match.team2.teamName.toLowerCase() === "1. fc kaiserslautern" ||
-      match.team2.shortName?.toLowerCase() === "kaiserslautern";
+    const fckGoals = isFCK1 ? res.pointsTeam1 : res.pointsTeam2;
+    const oppGoals = isFCK1 ? res.pointsTeam2 : res.pointsTeam1;
+    const opponent = isFCK1 ? m.team2 : m.team1;
 
-    if (!isFCKTeam1 && !isFCKTeam2) continue;
-
-    const team1Goals = match.matchResults?.[1]?.pointsTeam1 ?? null;
-    const team2Goals = match.matchResults?.[1]?.pointsTeam2 ?? null;
-
-    let fckGoals, opponentGoals, opponent;
-    if (isFCKTeam1) {
-      fckGoals = team1Goals;
-      opponentGoals = team2Goals;
-      opponent = match.team2;
-    } else {
-      fckGoals = team2Goals;
-      opponentGoals = team1Goals;
-      opponent = match.team1;
-    }
-
-    let resultType = null;
-    if (fckGoals > opponentGoals) {
-      resultType = "win";
-    } else if (fckGoals === opponentGoals) {
-      resultType = "draw";
-    } else {
+    if (fckGoals < oppGoals) {
       if (tempSeries.length > longestSeries.length) longestSeries = [...tempSeries];
       tempSeries = [];
-      continue;
+      return;
     }
-
-    const matchDate = match.matchDateTime
-      ? new Date(match.matchDateTime).toLocaleDateString()
-      : "Datum unbekannt";
-
-    const logoUrl = opponent.teamIconUrl || "icons/default.png";
-    const opponentName = opponent.teamName;
 
     tempSeries.push({
-      type: resultType,
-      date: matchDate,
-      logo: logoUrl,
-      opponent: opponentName,
-      result: `${fckGoals}:${opponentGoals}`,
-      tournament: match.leagueName || match.group?.groupName || "Unbekannt"
+      type: fckGoals > oppGoals ? 'win' : 'draw',
+      date: new Date(m.matchDateTime).toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' }),
+      logo: opponent.teamIconUrl || 'icons/default.png',
+      opponent: opponent.teamName,
+      result: `${fckGoals}:${oppGoals}`,
+      tournament: m.leagueName || m.group?.groupName || '–'
     });
-  }
+  });
 
   if (tempSeries.length > longestSeries.length) longestSeries = [...tempSeries];
-  currentSeries = [...tempSeries];
 
-function renderSeries(container, series) {
-  for (const game of series) {
-    const item = document.createElement("div");
-    item.classList.add("series-item");
-    const symbol = game.type === "win" ? "✔" : "–";
-    const circleClass = game.type === "win" ? "series-win" : "series-draw";
+  buildSeriesDOM(currentContainer, tempSeries);
+  buildSeriesDOM(longestContainer, longestSeries);
+}
 
-    const tooltipText = `
-      Gegner: ${game.opponent}<br>
-      Ergebnis: ${game.result}<br>
-      Turnier: ${game.tournament}
-    `;
+function buildSeriesDOM(container, series) {
+  container.innerHTML = '';
+  if (!series.length) { container.innerHTML = '<span style="color:var(--muted);font-size:0.75rem">Keine Daten.</span>'; return; }
+
+  series.forEach(game => {
+    const item = document.createElement('div');
+    item.className = 'series-item';
+
+    const sym = game.type === 'win' ? '&#10003;' : '&#8211;';
+    const cls = game.type === 'win' ? 'series-win' : 'series-draw';
 
     item.innerHTML = `
-      <div class="match-date">${game.date}</div>
-      <img src="${game.logo}" alt="${game.opponent}" 
-          style="width:24px;height:24px;border-radius:50%;margin-top:2px;">
-      <div class="opponent-name">${game.opponent}</div>
-      <div class="series-circle ${circleClass}">${symbol}</div>
-      <div class="series-tooltip">${tooltipText}</div>
+      <div class="series-circle ${cls}">${sym}</div>
+      <img class="opp-logo" src="${game.logo}" alt="${game.opponent}" loading="lazy">
+      <div class="series-tooltip">
+        <strong>${game.opponent}</strong><br>
+        ${game.result} &middot; ${game.date}<br>
+        <span style="color:var(--muted)">${game.tournament}</span>
+      </div>
     `;
 
-    const tooltip = item.querySelector(".series-tooltip");
-
-    // Hilfsfunktion: Tooltip-Position für Desktop anpassen
-    function adjustTooltipPosition() {
-      tooltip.style.left = "50%";
-      tooltip.style.right = "auto";
-      tooltip.style.transform = "translateX(-50%)";
-
-      const rect = tooltip.getBoundingClientRect();
-
-      if (rect.left < 0) {
-        tooltip.style.left = "0px";
-        tooltip.style.transform = "none";
-      } else if (rect.right > window.innerWidth) {
-        tooltip.style.left = "auto";
-        tooltip.style.right = "0px";
-        tooltip.style.transform = "none";
-      }
-    }
-
-    // Desktop: Hover
-    item.addEventListener("mouseenter", () => {
-      if (window.innerWidth > 768) {
-        tooltip.style.display = "block";
-        adjustTooltipPosition();
-      }
-    });
-
-    item.addEventListener("mouseleave", () => {
-      tooltip.style.display = "none";
-      tooltip.style.left = "50%";
-      tooltip.style.right = "auto";
-      tooltip.style.transform = "translateX(-50%)";
-    });
-
-    // Mobile: Klick → Modal
-    item.addEventListener("click", () => {
-      if (window.innerWidth <= 768) {
-        const existingModal = document.getElementById("tooltip-modal");
-        if (existingModal) existingModal.remove();
-
-        const modal = document.createElement("div");
-        modal.id = "tooltip-modal";
-        modal.innerHTML = `
-          <div class="tooltip-modal-content">
-            <button class="close-tooltip">&times;</button>
-            <div class="tooltip-text">${tooltipText}</div>
-          </div>
-        `;
-        document.body.appendChild(modal);
-
-        modal.querySelector(".close-tooltip").addEventListener("click", () => {
-          modal.remove();
-        });
-      }
+    // Mobile click → modal
+    item.addEventListener('click', () => {
+      if (window.innerWidth > 768) return;
+      document.getElementById('tooltip-modal')?.remove();
+      const modal = document.createElement('div');
+      modal.id = 'tooltip-modal';
+      modal.innerHTML = `
+        <div class="tooltip-modal-content">
+          <button class="close-tooltip">&times;</button>
+          <strong>${game.opponent}</strong><br>
+          Ergebnis: ${game.result}<br>
+          Datum: ${game.date}<br>
+          Wettbewerb: ${game.tournament}
+        </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('.close-tooltip').addEventListener('click', () => modal.remove());
     });
 
     container.appendChild(item);
-  }
+  });
 }
-
-
-  renderSeries(currentContainer, currentSeries);
-  renderSeries(longestContainer, longestSeries);
-}
-
-
-
-
-

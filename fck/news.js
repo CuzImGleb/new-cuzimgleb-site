@@ -1,155 +1,125 @@
-const rssUrl = "https://news.google.com/rss/search?q=1.+FC+Kaiserslautern&hl=de&gl=DE&ceid=DE:de";
-const rssApiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-const gnewsApiUrl = "https://gnews.io/api/v4/search?q=%221.%20FC%20Kaiserslautern%22&lang=de&country=de&sortby=publishedAt&apikey=3f09132026fd587878b0a048d922c2ee";
+/* ===================================================
+   FCK Dashboard – news.js  |  2026 Rewrite
+   =================================================== */
 
-function extractSourceFromTitle(title) {
-  const parts = title.split(" - ");
-  if (parts.length > 1) {
-    return parts[parts.length - 1].trim();
-  }
-  return "Unbekannte Quelle";
+const RSS_API = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://news.google.com/rss/search?q=1.+FC+Kaiserslautern&hl=de&gl=DE&ceid=DE:de')}`;
+const GNEWS_API = `https://gnews.io/api/v4/search?q=%221.%20FC%20Kaiserslautern%22&lang=de&country=de&sortby=publishedAt&apikey=3f09132026fd587878b0a048d922c2ee`;
+
+function extractSource(title) {
+  const parts = title.split(' - ');
+  return parts.length > 1 ? parts[parts.length - 1].trim() : 'Unbekannte Quelle';
 }
 
-if (window.location.pathname.endsWith('news') || window.location.pathname.endsWith('news.html')) {
-  console.log(`[${new Date().toISOString()}] news.html geladen – beginne mit Abrufen der News.`);
+function newsItemHTML(item, large = false) {
+  const date = new Date(item.pubDate).toLocaleDateString('de-DE', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
 
-  // Nur auf news.html ausführen
-  fetch(rssApiUrl)
-    .then(res => {
-      console.log(`[${new Date().toISOString()}] RSS-API aufgerufen: ${rssApiUrl}`);
-      if (!res.ok) throw new Error(`RSS-API-Fehler: ${res.status} ${res.statusText}`);
-      return res.json();
-    })
-    .then(async (rssData) => {
-      let gnewsItems = [];
-      try {
-        const gnewsRes = await fetch(gnewsApiUrl);
-        console.log(`[${new Date().toISOString()}] GNews-API aufgerufen: ${gnewsApiUrl}`);
-        if (!gnewsRes.ok) throw new Error(`GNews-API-Fehler: ${gnewsRes.status} ${gnewsRes.statusText}`);
-        const gnewsData = await gnewsRes.json();
+  const imgEl = item.image
+    ? `<img class="news-thumb" src="${item.image}" alt="" loading="lazy">`
+    : `<div class="news-thumb-placeholder"><i class="fas fa-newspaper"></i></div>`;
 
-        gnewsItems = (gnewsData.articles || []).map(article => ({
-          title: article.title,
-          link: article.url,
-          pubDate: new Date(article.publishedAt),
-          source: article.source.name,
-          image: article.image
-        }));
-      } catch (gnewsErr) {
-        console.warn(`[${new Date().toISOString()}] GNews konnte nicht geladen werden: ${gnewsErr.message}`);
-        gnewsItems = []; // leere Liste, wenn GNews scheitert
-      }
+  const wrapClass = large ? 'news-page-item' : 'news-item';
 
-      const newsList = document.getElementById("news-list");
-      newsList.innerHTML = "";
-
-      const rssItems = (rssData.items || []).map(item => ({
-        title: item.title,
-        link: item.link,
-        pubDate: new Date(item.pubDate),
-        source: extractSourceFromTitle(item.title),
-        image: null
-      }));
-
-      const allItems = [...rssItems, ...gnewsItems].sort((a, b) => b.pubDate - a.pubDate);
-      console.log(`[${new Date().toISOString()}] Insgesamt ${allItems.length} Newsartikel geladen.`);
-
-      allItems.slice(0, 15).forEach((item, i) => {
-        const li = document.createElement("li");
-        li.style.setProperty("--i", i);
-
-        const formattedDate = item.pubDate.toLocaleDateString("de-DE", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
-
-        li.innerHTML = `
-          <a href="${item.link}" target="_blank" rel="noopener" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-            ${item.image ? `<img src="${item.image}" alt="Thumbnail" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; border-radius: 6px;">` : ""}
-            <div style="display: flex; flex-direction: column;">
-              <span style="font-weight: bold;">${item.title}</span>
-              <small style="color: #888;">Quelle: ${item.source} | ${formattedDate}</small>
-            </div>
-          </a>
-        `;
-        newsList.appendChild(li);
-      });
-    })
-    .catch(err => {
-      const errorMsg = `[${new Date().toISOString()}] Fehler beim Abrufen der News: ${err.message}`;
-      console.error(errorMsg, err);
-      const newsList = document.getElementById("news-list");
-      if (newsList) {
-        newsList.innerHTML = `<li>Fehler beim Laden der News</li>`;
-      }
-    });
+  return `
+    <div class="${wrapClass}">
+      <a href="${item.link}" target="_blank" rel="noopener">
+        ${imgEl}
+        <div class="news-content">
+          <div class="news-title">${item.title}</div>
+          <div class="news-meta">${item.source} &middot; ${date}</div>
+        </div>
+      </a>
+    </div>`;
 }
 
-
-
+// ── Dashboard preview (index.html) ───────────────────
 async function loadNews() {
-  const newsList = document.getElementById("news-list2");
-  newsList.innerHTML = "<li>Lade News...</li>";
-
-  const rssUrl = "https://news.google.com/rss/search?q=1.+FC+Kaiserslautern&hl=de&gl=DE&ceid=DE:de";
-  const rssApiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+  const container = document.getElementById('news-list2');
+  if (!container) return;
 
   try {
-    const res = await fetch(rssApiUrl);
+    const res  = await fetch(RSS_API);
     const data = await res.json();
 
-    if (data && data.items && data.items.length > 0) {
-      data.items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-      
-      newsList.innerHTML = "";
+    if (!data?.items?.length) { container.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Keine News gefunden.</div>'; return; }
 
-      data.items.slice(0, 6).forEach(item => {
-        // Datum formatieren
-        const date = new Date(item.pubDate);
-        const formattedDate = date.toLocaleDateString("de-DE", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
+    const items = data.items
+      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+      .slice(0, 6)
+      .map(item => ({
+        title:   item.title,
+        link:    item.link,
+        pubDate: item.pubDate,
+        source:  extractSource(item.title),
+        image:   item.enclosure?.link || null
+      }));
 
-        // Quelle extrahieren
-        const source = extractSourceFromTitle(item.title) || "Unbekannte Quelle";
-
-        const li = document.createElement("li");
-        li.style.listStyle = "none";
-        li.style.marginBottom = "10px";
-
-        li.innerHTML = `
-        <a href="${item.link}" target="_blank" rel="noopener" 
-           style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-            ${item.enclosure && item.enclosure.link 
-              ? `<img src="${item.enclosure.link}" alt="Thumbnail" 
-                     style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; border-radius: 6px;">` 
-              : ""}
-            <div style="display: flex; flex-direction: column;">
-                <span style="font-weight: bold;">${item.title}</span>
-                <small style="color: #888;">Quelle: ${source} | ${formattedDate}</small>
-            </div>
-        </a>
-        `;
-        newsList.appendChild(li);
-      });
-    } else {
-      newsList.innerHTML = "<li>Keine News gefunden</li>";
-    }
-  } catch (error) {
-    console.error(error);
-    newsList.innerHTML = "<li>Fehler beim Laden der News</li>";
+    container.innerHTML = items.map(i => newsItemHTML(i)).join('');
+  } catch (err) {
+    console.error('News dashboard:', err);
+    container.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Fehler beim Laden der News.</div>';
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadNews();
+// ── Full News Page (news.html) ────────────────────────
+async function loadFullNews() {
+  const container = document.getElementById('news-list');
+  if (!container) return;
+
+  try {
+    const [rssRes, gnewsRes] = await Promise.allSettled([
+      fetch(RSS_API).then(r => r.json()),
+      fetch(GNEWS_API).then(r => r.json())
+    ]);
+
+    const rssItems = rssRes.status === 'fulfilled'
+      ? (rssRes.value.items || []).map(item => ({
+          title:   item.title,
+          link:    item.link,
+          pubDate: item.pubDate,
+          source:  extractSource(item.title),
+          image:   null
+        }))
+      : [];
+
+    const gnewsItems = gnewsRes.status === 'fulfilled'
+      ? (gnewsRes.value.articles || []).map(a => ({
+          title:   a.title,
+          link:    a.url,
+          pubDate: a.publishedAt,
+          source:  a.source.name,
+          image:   a.image
+        }))
+      : [];
+
+    const all = [...rssItems, ...gnewsItems]
+      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+      .slice(0, 20);
+
+    if (!all.length) { container.innerHTML = '<div style="color:var(--muted);padding:16px">Keine News gefunden.</div>'; return; }
+
+    container.innerHTML = all.map((item, i) => {
+      const el = document.createElement('div');
+      el.innerHTML = newsItemHTML(item, true);
+      const child = el.firstElementChild;
+      child.style.animationDelay = `${i * 0.04}s`;
+      return child.outerHTML;
+    }).join('');
+
+  } catch (err) {
+    console.error('Full news:', err);
+    container.innerHTML = '<div style="color:var(--muted);padding:16px">Fehler beim Laden der News.</div>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
+  if (path.endsWith('news.html') || path.endsWith('news')) {
+    loadFullNews();
+    window.addEventListener('load', () => document.body.classList.add('loaded'));
+  } else {
+    loadNews();
+  }
 });
-
-

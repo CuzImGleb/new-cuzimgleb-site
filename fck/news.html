@@ -1,46 +1,54 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FCK News</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" type="image/png" href="/fck/web-icons/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/fck/web-icons/favicon.svg" />
-  <link rel="shortcut icon" href="/fck/web-icons/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/fck/web-icons/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="MyWebSite" />
-  <link rel="manifest" href="/fck/web-icons/site.webmanifest" />
-  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FCK News &#8212; Dashboard</title>
+  <link rel="icon" type="image/png" href="/fck/web-icons/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/svg+xml" href="/fck/web-icons/favicon.svg">
+  <link rel="shortcut icon" href="/fck/web-icons/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/fck/web-icons/apple-touch-icon.png">
+  <link rel="manifest" href="/fck/web-icons/site.webmanifest">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="layout-wrapper">
-    <aside class="sidebar">
-      <h2>⚽ FCK Dashboard</h2>
-      <nav>
-        <a href="index.html">🏠 Start</a>
-        <a href="index.html#tabelle-box">📈 Tabelle</a>
-        <a href="index.html#next-match-box">📅 Spiele</a>
-        <a href="index.html#undefeated-series">⚡ Serien</a>
-        <a href="news.html" class="active">📰 News</a>
-      </nav>
-    </aside>
 
-    <main>
-      <div class="card full-width-news">
-        <h3>📰 Aktuelle News zum FCK</h3>
-        <ul id="news-list">
-          <li>News werden geladen...</li>
-        </ul>
-      </div>
-    </main>
+  <nav class="topnav">
+    <div class="topnav-brand">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Logo_1_FC_Kaiserslautern.svg/200px-Logo_1_FC_Kaiserslautern.svg.png" alt="FCK">
+      FCK <span>Dashboard</span>
+    </div>
+    <div class="topnav-links" id="nav-links">
+      <a href="index.html"><i class="fas fa-table-list"></i> Tabelle</a>
+      <a href="index.html#next-match-box"><i class="fas fa-calendar"></i> Spiele</a>
+      <a href="index.html#last-matches"><i class="fas fa-clock-rotate-left"></i> Ergebnisse</a>
+      <a href="index.html#undefeated-series"><i class="fas fa-fire"></i> Serien</a>
+      <a href="news.html" class="active"><i class="fas fa-newspaper"></i> News</a>
+    </div>
+    <a href="https://cuzimgleb.de" class="topnav-back"><i class="fas fa-arrow-left"></i> cuzimgleb.de</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Men&#252;">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="page-hero">
+    <span class="page-label"><i class="fas fa-newspaper"></i> Aktuell</span>
+    <h1>FCK <span>News</span></h1>
   </div>
 
+  <div class="news-page-wrapper">
+    <div class="news-page-grid" id="news-list">
+      <div style="color:var(--muted);font-size:0.85rem;padding:16px">News werden geladen&#8230;</div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    &#169; 2024&#8211;2026 mit &#10084;&#65039; entwickelt von <a href="https://cuzimgleb.de" style="color:var(--red)">CuzImGleb</a>.<br>
+    Teamnamen und Logos sind Eigentum der jeweiligen Vereine. Diese Seite ist eine Fan-Seite ohne Zusammenhang mit offiziellen Markenrechten.
+  </footer>
+
   <script src="news.js"></script>
-  <script>
-    window.addEventListener("load", () => {
-      document.body.classList.add("loaded");
-    });
-  </script>
+  <script>window.addEventListener("load", () => document.body.classList.add("loaded"));</script>
 </body>
 </html>
