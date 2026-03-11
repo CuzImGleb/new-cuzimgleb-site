@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shopify Kalkulator</title>
+<script>
+  // ── Deine Scraper API URL hier eintragen ──
+  window.SCRAPER_API_URL = 'https://vercel-scrape-api.vercel.app';
+  // ──────────────────────────────────────────
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -2786,78 +2791,39 @@
       // Step 1: Market research via model knowledge
       setStep(1);
 
-      const reqPrompt = `Produkt: "${productName}"
-Markt: ${marketLabel}
-Meine Netto-Gesamtkosten: €${baseCosts.toFixed(2)} | Shopify-Fee: ${aiFeePercent}%+€${aiFeeFixed.toFixed(2)} | MwSt: ${aiVatRate}% | Zielmarge: ${(targetMargin*100).toFixed(0)}%
+      document.getElementById('aiLoadingStatus').textContent = 'Suche Marktpreise...';
 
-Recherchiere den aktuellen deutschen Marktpreis für GENAU dieses Produkt/Modell.
-Falls es eine Modellnummer ist: Erkenne das vollständige Produkt und nutze bekannte Preise.
-Gib realistische Preise an – keine Phantasiezahlen.
+      const SCRAPER_API = (window.SCRAPER_API_URL || '').replace(/\/$/, '');
+      if (!SCRAPER_API) throw new Error('SCRAPER_API_URL nicht gesetzt.');
 
-Antworte NUR mit diesem JSON (alle Preise als Zahlen, kein String, kein Text drumherum):
-{
-  "product_found": true,
-  "product_name": "VOLLSTÄNDIGER OFFIZIELLER PRODUKTNAME",
-  "competitors": [
-    {"source": "Amazon.de", "price": 0.00, "note": "Prime / Verkäufer"},
-    {"source": "Idealo günstigster", "price": 0.00, "note": "Bestpreis"},
-    {"source": "MediaMarkt", "price": 0.00, "note": ""},
-    {"source": "Saturn", "price": 0.00, "note": ""},
-    {"source": "Otto", "price": 0.00, "note": ""}
-  ],
-  "market_min": 0.00,
-  "market_max": 0.00,
-  "market_avg": 0.00,
-  "recommended_evp": 0.00,
-  "evp_strategy": "competitive",
-  "analysis": "2-3 Sätze: Marktlage, typischer Preis, Wettbewerb",
-  "risks": "1-2 Sätze: Hauptrisiken beim Verkauf",
-  "trend": "stabil"
-}
-
-Wenn Produkt wirklich unbekannt: product_found=false, aber trotzdem sinnvolle Kategorie-Schätzpreise.`;
-
-      document.getElementById('aiLoadingStatus').textContent = 'Verbinde mit Server...';
-
-      const reqBody = JSON.stringify({
-        productName,
-        marketLabel,
-        baseCosts,
-        aiFeePercent,
-        aiFeeFixed,
-        aiVatRate,
-        targetMargin,
-      });
-
-      let data = null;
+      let scraperData;
       try {
-        const r = await fetch('/api/claude', {
+        const r = await fetch(`${SCRAPER_API}/api/prices`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: reqBody,
+          body: JSON.stringify({ query: productName }),
         });
-        data = await r.json();
-        if (!r.ok) throw new Error(data?.error?.message || `HTTP ${r.status}`);
+        scraperData = await r.json();
+        if (!r.ok) throw new Error(scraperData?.error || `HTTP ${r.status}`);
       } catch (e) {
-        throw new Error(`Verbindung fehlgeschlagen: ${e.message}`);
+        throw new Error(`Scraper API Fehler: ${e.message}`);
       }
-      if (!data.content) throw new Error(`Unerwartete API-Antwort: ${JSON.stringify(data).slice(0,150)}`);
 
-      // Check if response was truncated by token limit
-      const stopReason = data.stop_reason;
-      if (stopReason === 'max_tokens') {
-        // Try to salvage truncated JSON by extracting whatever we got
-        rawJson = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-        const s = rawJson.indexOf('{');
-        const e2 = rawJson.lastIndexOf('}');
-        if (s === -1 || e2 <= s) {
-          throw new Error('Antwort wurde durch Token-Limit abgeschnitten. Bitte nochmal versuchen.');
-        }
-        // Try to parse the partial JSON - it may still work if truncation was after last }
-        rawJson = rawJson.slice(s, e2 + 1);
-      } else {
-        rawJson = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-      }
+      rawJson = JSON.stringify({
+        product_found: scraperData.product_found !== false,
+        product_name: scraperData.product_name || productName,
+        competitors: (scraperData.competitors || []).map(c => ({
+          source: c.source, price: c.price || 0, note: c.note || '', url: c.url || '',
+        })),
+        market_min: scraperData.market_min || 0,
+        market_max: scraperData.market_max || 0,
+        market_avg: scraperData.market_avg || 0,
+        recommended_evp: scraperData.market_avg || 0,
+        evp_strategy: 'competitive',
+        analysis: `Echte Marktdaten von ${(scraperData.competitors||[]).filter(c=>c.price>0).length} Shops. Günstigster: €${(scraperData.market_min||0).toFixed(2)}, Durchschnitt: €${(scraperData.market_avg||0).toFixed(2)}.`,
+        risks: 'Preise ändern sich täglich – regelmäßige Überprüfung empfohlen.',
+        trend: 'stabil',
+      });
 
       setStep(3);
 
