@@ -3146,7 +3146,7 @@
     if (result.trend === 'steigend') {
       tips.push({ icon: '📈', text: '<strong>Steigender Markt:</strong> Guter Zeitpunkt einzusteigen – Preispotenzial nach oben vorhanden.', accent: true });
     }
-    tips.push({ icon: '🔄', text: '<strong>Repricing:</strong> Prüfe Marktpreise wöchentlich. Kleine Anpassungen von 2–5% können Conversion stark beeinflussen.' });
+    tips.push({ icon: '🔄', text: '<strong>Repricing:</strong> Prüfe Marktpreise alle 1–2 Wochen neu (einfach EAN hier eintippen). Schon ±2–3% Preisanpassung kann Conversion messbar verschieben – reagiere besonders bei Trendprodukten schnell auf fallende MIN-Preise.' });
 
     let analysisHtml = '';
 
@@ -3155,13 +3155,40 @@
     }
 
     // Market position summary
+    const trendColor = result.trend === 'steigend' ? 'var(--green)' : result.trend === 'fallend' ? 'var(--red)' : 'var(--warn)';
     analysisHtml += `
-      <div style="padding:12px;background:rgba(0,0,0,0.3);border-radius:10px;margin-bottom:12px;border-left:3px solid ${positionColor}">
+      <div style="padding:12px;background:rgba(0,0,0,0.3);border-radius:10px;margin-bottom:10px;border-left:3px solid ${positionColor}">
         <div style="font-size:12px;line-height:1.6;color:${positionColor}">${positionVerdict}</div>
-        ${marketMin > 0 ? `<div style="margin-top:6px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">
-          ${trendIcon} Trend: ${result.trend} &nbsp;·&nbsp; Markt: €${marketMin.toFixed(2)}–€${(result.market_max||0).toFixed(2)} &nbsp;·&nbsp; Ø €${marketAvg.toFixed(2)}
-        </div>` : ''}
       </div>`;
+    if (marketMin > 0) {
+      analysisHtml += `
+      <div style="background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;">📊 Marktdaten</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:3px;">MIN</div>
+            <div style="font-size:15px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">€${marketMin.toFixed(2)}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:3px;">Ø SCHNITT</div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;">€${marketAvg.toFixed(2)}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:3px;">MAX</div>
+            <div style="font-size:15px;font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">€${(result.market_max||0).toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:8px;">
+          <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Preistrend</span>
+          <span style="font-size:12px;font-weight:700;color:${trendColor};font-family:'DM Mono',monospace;">${trendIcon} ${result.trend.charAt(0).toUpperCase() + result.trend.slice(1)}</span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;"><span style="color:var(--green);font-size:8px;">●</span> MIN = günstigster Anbieter</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;"><span style="color:var(--text);font-size:8px;">●</span> Ø = Marktdurchschnitt</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;"><span style="color:var(--red);font-size:8px;">●</span> MAX = teuerster Anbieter</div>
+        </div>
+      </div>`;
+    }
 
     // Pricing tips
     analysisHtml += `<div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:8px;">💰 Pricing Guide</div>`;
@@ -3178,26 +3205,45 @@
 
     analysisBox.innerHTML = analysisHtml;
 
-    // Cost breakdown
-    const vatAmt = (evp + shipCharged) - (evp + shipCharged) / (1 + aiVatRate / 100);
-    const payFee = (evp + shipCharged) * (aiFeePercent / 100) + aiFeeFixed;
-    const rows = [
-      { label: 'Brutto Verkaufspreis', value: `€${evp.toFixed(2)}`, color: '' },
-      { label: `MwSt ${aiVatRate}%`, value: `−€${vatAmt.toFixed(2)}`, color: 'var(--red)' },
-      { label: `Shopify Fee (${aiFeePercent}% + €${aiFeeFixed.toFixed(2)})`, value: `−€${payFee.toFixed(2)}`, color: 'var(--red)' },
-      { label: 'EK (netto)', value: `−€${ekNetto.toFixed(2)}`, color: 'var(--red)' },
-      { label: 'Versandkosten', value: `−€${shipCost.toFixed(2)}`, color: 'var(--red)' },
-    ];
-    if (adCost > 0)   rows.push({ label: 'Werbekosten',    value: `−€${adCost.toFixed(2)}`,    color: 'var(--red)' });
-    if (otherCost > 0) rows.push({ label: 'Sonstige Kosten', value: `−€${otherCost.toFixed(2)}`, color: 'var(--red)' });
-    rows.push({ label: 'Reingewinn', value: `€${evpProfit.toFixed(2)}`, color: evpProfit >= 0 ? 'var(--green)' : 'var(--red)', bold: true });
+    // Cost breakdown (vollständig wie Kalkulator-Tab)
+    const aiEkVatRate = parseFloat(document.getElementById('aiEkVat')?.value) || 0;
+    const evpNetto = evp / (1 + aiVatRate / 100);
+    const vatAmt   = evp - evpNetto;
+    const payFee   = evp * (aiFeePercent / 100) + aiFeeFixed;
+    const ekVorsteuer = ekNetto * (aiEkVatRate / 100);
+    const shipDiff    = shipCharged - shipCost;
+    const totalShopifyFees = payFee;
+    const totalCosts = vatAmt + payFee + ekNetto + shipCost + adCost + otherCost;
+
+    function bRow(label, sub, value, color, bold, divBefore) {
+      return `
+        ${divBefore ? `<div style="height:1px;background:var(--border);margin:3px 0 1px;"></div>` : ''}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-family:'DM Mono',monospace;font-size:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="color:${bold?'var(--text)':'var(--muted)'}">${label}</div>
+            ${sub ? `<div style="font-size:10px;color:var(--muted);opacity:0.55;margin-top:1px;">${sub}</div>` : ''}
+          </div>
+          <span style="color:${color||'var(--text)'};font-weight:${bold?'700':'400'};min-width:72px;text-align:right;flex-shrink:0;">${value}</span>
+        </div>`;
+    }
 
     const breakdownEl = document.getElementById('aiBreakdownRows');
-    breakdownEl.innerHTML = rows.map(r => `
-      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px;">
-        <span style="color:var(--muted)">${r.label}</span>
-        <span style="color:${r.color||'var(--text)'};font-weight:${r.bold?'700':'400'}">${r.value}</span>
-      </div>`).join('');
+    breakdownEl.innerHTML = [
+      bRow('Brutto-Verkaufspreis',   'Kunde zahlt',             `€${evp.toFixed(2)}`,                 'var(--text)',  false),
+      bRow('Netto-Verkaufspreis',    'ohne MwSt',               `€${evpNetto.toFixed(2)}`,             'var(--muted)', false),
+      bRow(`MwSt (${aiVatRate}%)`,   'abzuführen ans Finanzamt',`−€${vatAmt.toFixed(2)}`,              'var(--red)',   false),
+      bRow('Shopify Payment Fee',    `${aiFeePercent}% + €${aiFeeFixed.toFixed(2)}`, `−€${payFee.toFixed(2)}`, 'var(--red)', false, true),
+      bRow('Transaktionsgebühr',     'nur bei Drittanbieter',   'entfällt',                            'var(--muted)', false),
+      bRow('Einkaufspreis (netto)',   'nach Vorsteuerabzug',     `−€${ekNetto.toFixed(2)}`,             'var(--red)',   false, true),
+      ...(aiEkVatRate > 0 ? [bRow('Vorsteuer (EK MwSt)', 'erstattungsfähig', `+€${ekVorsteuer.toFixed(2)}`, 'var(--green)', false)] : []),
+      bRow('Versandkosten (tatsächlich)', '',                    `−€${shipCost.toFixed(2)}`,            'var(--red)',   false),
+      bRow('Versand-Differenz',      'Kunde − tatsächlich',     `${shipDiff >= 0 ? '+' : '−'}€${Math.abs(shipDiff).toFixed(2)}`, shipDiff >= 0 ? 'var(--green)' : 'var(--red)', false),
+      ...(adCost > 0   ? [bRow('Werbekosten',    '', `−€${adCost.toFixed(2)}`,   'var(--red)', false)] : []),
+      ...(otherCost > 0? [bRow('Sonstige Kosten','', `−€${otherCost.toFixed(2)}`, 'var(--red)', false)] : []),
+      bRow('Gesamtgebühren (Shopify)','',                        `−€${totalShopifyFees.toFixed(2)}`,    'var(--warn)',  false, true),
+      bRow('Gesamtkosten',           'alle Abzüge summiert',     `−€${totalCosts.toFixed(2)}`,          'var(--red)',   false),
+      bRow('Gewinn (netto, nach Steuern)', '',                   `€${evpProfit.toFixed(2)}`,            evpProfit >= 0 ? 'var(--green)' : 'var(--red)', true),
+    ].join('');
 
     // Show results
     document.getElementById('aiAppliedBanner').style.display = 'none';
