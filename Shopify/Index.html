@@ -2872,7 +2872,7 @@
       let scraperData;
       try {
         const ctrl = new AbortController();
-        const fetchTimer = setTimeout(() => ctrl.abort(), 55000);
+        const fetchTimer = setTimeout(() => ctrl.abort(), 240000);
         const r = await fetch(FETCH_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
