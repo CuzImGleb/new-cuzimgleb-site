@@ -36,19 +36,12 @@ document.querySelectorAll('.topnav-links a[data-targets]').forEach(link => {
   });
 });
 
-// ── API URLs ─────────────────────────────────────────
-const PROXY1 = 'https://corsproxy.io/?url=';
-const PROXY2 = 'https://api.allorigins.win/raw?url=';
-
+// ── API Fetch ─────────────────────────────────────────
+// openligadb.de unterstützt CORS nativ – kein Proxy nötig
 async function fetchWithFallback(path) {
-  for (const proxy of [PROXY1, PROXY2]) {
-    try {
-      const res = await fetch(proxy + encodeURIComponent(path));
-      if (!res.ok) continue;
-      return await res.json();
-    } catch { /* try next */ }
-  }
-  throw new Error('All proxies failed for: ' + path);
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for: ${path}`);
+  return await res.json();
 }
 
 // ── Tabelle ───────────────────────────────────────────
