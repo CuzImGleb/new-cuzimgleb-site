@@ -2860,7 +2860,6 @@
       const geizhalsChip = document.getElementById('shop-geizhals');
       aiShopList.style.display = 'flex';
 
-      // Mark both chips as active
       idealoChip.className = 'ai-shop-item active';
       idealoChip.querySelector('.shop-icon').textContent = '⟳';
       geizhalsChip.className = 'ai-shop-item active';
@@ -2873,7 +2872,7 @@
       let scraperData;
       try {
         const ctrl = new AbortController();
-        const fetchTimer = setTimeout(() => ctrl.abort(), 25000);
+        const fetchTimer = setTimeout(() => ctrl.abort(), 55000);
         const r = await fetch(FETCH_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2898,11 +2897,9 @@
       const competitors = scraperData.competitors || [];
       const validPrices = competitors.filter(c => c.price > 0).map(c => c.price);
 
-      // Zähle Ergebnisse pro Quelle
       const idealoCount = competitors.filter(c => c.price > 0 && c.via === 'Idealo').length;
       const geizhalsCount = competitors.filter(c => c.price > 0 && c.via === 'Geizhals').length;
 
-      // Update Idealo chip
       idealoChip.className = idealoCount > 0 ? 'ai-shop-item done-found' : 'ai-shop-item done-empty';
       idealoChip.querySelector('.shop-icon').textContent = idealoCount > 0 ? '✓' : '○';
       idealoChip.querySelector('.shop-result').textContent = idealoCount > 0 ? `${idealoCount} Shops` : 'keine';
@@ -2912,12 +2909,11 @@
         idealoChip.onclick = () => window.open(scraperData.idealo_product_url, '_blank');
       }
 
-      // Update Geizhals chip
       geizhalsChip.className = geizhalsCount > 0 ? 'ai-shop-item done-found' : 'ai-shop-item done-empty';
       geizhalsChip.querySelector('.shop-icon').textContent = geizhalsCount > 0 ? '✓' : '○';
       geizhalsChip.querySelector('.shop-result').textContent = geizhalsCount > 0 ? `${geizhalsCount} Shops` : 'keine';
 
-      // Render found shops as chips
+      // Render individual shop chips
       competitors.filter(c => c.price > 0).forEach(c => {
         const chip = document.createElement('div');
         chip.className = 'ai-shop-item done-found';
