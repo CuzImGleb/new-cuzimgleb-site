@@ -2075,16 +2075,16 @@
           <div class="ai-strat-grid" id="aiStratGrid"></div>
         </div>
 
-        <!-- Full breakdown -->
-        <div class="ai-breakdown" id="aiBreakdownCard">
-          <div class="ai-breakdown-title">Kostenaufschlüsselung (EVP)</div>
-          <div id="aiBreakdownRows"></div>
-        </div>
-
         <!-- AI Analysis text -->
         <div class="ai-card">
           <div class="ai-card-title">KI Marktanalyse</div>
           <div class="ai-analysis-box" id="aiAnalysisText">—</div>
+        </div>
+
+        <!-- Full breakdown -->
+        <div class="ai-breakdown" id="aiBreakdownCard">
+          <div class="ai-breakdown-title">Kostenaufschlüsselung (EVP)</div>
+          <div id="aiBreakdownRows"></div>
         </div>
 
       </div><!-- /aiResults -->
@@ -3085,6 +3085,7 @@
     // Cost breakdown
     const vatAmt = (evp + shipCharged) - (evp + shipCharged) / (1 + aiVatRate / 100);
     const payFee = (evp + shipCharged) * (aiFeePercent / 100) + aiFeeFixed;
+    const allCosts = vatAmt + payFee + baseCosts;
     const rows = [
       { label: 'Brutto Verkaufspreis', value: `€${evp.toFixed(2)}`, color: '' },
       { label: `MwSt ${aiVatRate}%`, value: `−€${vatAmt.toFixed(2)}`, color: 'var(--red)' },
@@ -3092,7 +3093,7 @@
       { label: 'EK (netto)', value: `−€${ekNetto.toFixed(2)}`, color: 'var(--red)' },
       { label: 'Versandkosten', value: `−€${shipCost.toFixed(2)}`, color: 'var(--red)' },
     ];
-    if (adCost > 0)   rows.push({ label: 'Werbekosten',    value: `−€${adCost.toFixed(2)}`,    color: 'var(--red)' });
+    if (adCost > 0) rows.push({ label: 'Werbekosten', value: `−€${adCost.toFixed(2)}`, color: 'var(--red)' });
     if (otherCost > 0) rows.push({ label: 'Sonstige Kosten', value: `−€${otherCost.toFixed(2)}`, color: 'var(--red)' });
     rows.push({ label: 'Reingewinn', value: `€${evpProfit.toFixed(2)}`, color: evpProfit >= 0 ? 'var(--green)' : 'var(--red)', bold: true });
 
